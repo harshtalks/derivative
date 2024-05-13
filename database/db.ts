@@ -1,8 +1,9 @@
 import { env } from "@/env";
 import { createClient } from "@libsql/client";
 import { DrizzleSQLiteAdapter } from "@lucia-auth/adapter-drizzle";
-import { drizzle } from "drizzle-orm/better-sqlite3";
+import { drizzle } from "drizzle-orm/libsql";
 import { sessions, users } from "./schema";
+export * from "drizzle-orm";
 
 const { DATABASE_URL, DATABASE_AUTH_TOKEN } = env;
 

@@ -1,0 +1,27 @@
+{
+  "version": "6",
+  "dialect": "sqlite",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "6",
+      "when": 1715618896277,
+      "tag": "0000_faithful_bloodstorm",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1715619063310,
+      "tag": "0001_light_invaders",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1715619112312,
+      "tag": "0002_true_freak",
+      "breakpoints": true
+    }
+  ]
+}

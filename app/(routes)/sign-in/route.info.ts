@@ -1,13 +1,11 @@
 import { EmptyRouteConfig } from "@/app/route.info";
-import { createRoute } from "tempeh";
+import createRoute from "@/route.config";
+import { array, object, string, enum as enum_ } from "zod";
 
 const SignInPage = createRoute({
   name: "sign-in",
   fn: () => "/sign-in",
   paramsSchema: EmptyRouteConfig,
-  options: {
-    internal: true,
-  },
 });
 
 export default SignInPage;

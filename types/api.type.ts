@@ -3,9 +3,18 @@ import * as z from "zod";
 
 import { NextMiddleware } from "next/server";
 
+import { NextRequest, NextResponse } from "next/server";
+
 // middleware chaining
 export type MiddlewareFactory = (middleware: NextMiddleware) => NextMiddleware;
 
+// next handler signature
+export type NextHandler<TBody = unknown> = (
+  req: NextRequest,
+  { params }: { params: Record<string, string | undefined> }
+) => Promise<NextResponse<TBody>>;
+
+// api.type.ts - UTILS
 export type RequestSuccess<TData> = {
   status: "success";
   result: TData;

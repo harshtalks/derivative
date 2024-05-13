@@ -1,3 +1,4 @@
+"use client";
 import { Button } from "@/components/ui/button";
 import React from "react";
 import SignInPage from "../(routes)/sign-in/route.info";
@@ -5,9 +6,10 @@ import { cn } from "@/lib/utils";
 import Container from "./container";
 import Frame from "./frame";
 import { ArrowLeftIcon, ArrowRightIcon } from "@radix-ui/react-icons";
-import { createEndPoint } from "safe-fetchttp";
+import HomePageRoute from "../route.info";
 
 const Hero = () => {
+  const params = HomePageRoute.useSearchParams();
   return (
     <div className="relative overflow-hidden" id="home">
       <div
@@ -33,7 +35,7 @@ const Hero = () => {
                   </Button>
                 </SignInPage.Link>
               </Frame>
-            </div>
+            </div>{" "}
             <div className="py-8 mt-16 gap-4 border-y dark:border-gray-800 flex-wrap flex justify-between">
               <div className="text-left">
                 <svg
