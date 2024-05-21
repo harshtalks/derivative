@@ -1,15 +1,15 @@
-"use client";
 import { Button } from "@/components/ui/button";
 import React from "react";
 import SignInPage from "../(routes)/sign-in/route.info";
-import { cn } from "@/lib/utils";
 import Container from "./container";
 import Frame from "./frame";
-import { ArrowLeftIcon, ArrowRightIcon } from "@radix-ui/react-icons";
-import HomePageRoute from "../route.info";
+import { validateRequestCached } from "@/auth/validate-request";
+import WebAuthRoute from "../(routes)/webauth/route.info";
+import Meteors from "./meteor";
+import AnimatedGradientText from "./animated-badge";
 
-const Hero = () => {
-  const params = HomePageRoute.useSearchParams();
+const Hero = async () => {
+  const { session } = await validateRequestCached();
   return (
     <div className="relative overflow-hidden" id="home">
       <div
@@ -18,7 +18,11 @@ const Hero = () => {
       />
       <Container>
         <div className="relative pt-32 sm:pt-44 ml-auto">
+          <Meteors />
           <div className="lg:w-2/3 text-center mx-auto">
+            <AnimatedGradientText className="mb-4">
+              Announcing Invoicing APIs {"->"}
+            </AnimatedGradientText>
             <h1 className="text-gray-900 dark:text-white font-bold text-4xl sm:text-5xl md:text-6xl">
               Fastest Invoice Experience Ever Made
             </h1>
@@ -29,11 +33,19 @@ const Hero = () => {
             </p>
             <div className="mt-8 flex flex-wrap justify-center gap-y-4 gap-x-6">
               <Frame>
-                <SignInPage.Link params={{}}>
-                  <Button size="sm" variant="gooeyRight">
-                    Start Building Invoices
-                  </Button>
-                </SignInPage.Link>
+                {session ? (
+                  <WebAuthRoute.Link params={{}}>
+                    <Button size="sm" variant="gooeyRight">
+                      Get Started Now
+                    </Button>
+                  </WebAuthRoute.Link>
+                ) : (
+                  <SignInPage.Link params={{}}>
+                    <Button size="sm" variant="gooeyRight">
+                      Join Derivative Now
+                    </Button>
+                  </SignInPage.Link>
+                )}
               </Frame>
             </div>{" "}
             <div className="py-8 mt-16 gap-4 border-y dark:border-gray-800 flex-wrap flex justify-between">

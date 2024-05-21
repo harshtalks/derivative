@@ -34,7 +34,9 @@ export const validateRequest = async (): Promise<
         sessionCookie.attributes
       );
     }
-  } catch {}
+  } catch {
+    // do nothing
+  }
   return result;
 };
 

@@ -1,12 +1,6 @@
-// middleware/types.ts
 import * as z from "zod";
 
-import { NextMiddleware } from "next/server";
-
 import { NextRequest, NextResponse } from "next/server";
-
-// middleware chaining
-export type MiddlewareFactory = (middleware: NextMiddleware) => NextMiddleware;
 
 // next handler signature
 export type NextHandler<TBody = unknown> = (
@@ -42,3 +36,5 @@ export const RequestErrorSchema = z.object({
 
 export const RequestResponseSchema = <T extends z.ZodType>(schema: T) =>
   z.union([RequestSuccessSchema(schema), RequestErrorSchema]);
+
+export type NullResponseType = null | { success: boolean; message: string };

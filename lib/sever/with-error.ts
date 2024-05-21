@@ -9,12 +9,14 @@ const withError = <TBody = unknown>(
   config?: {
     error?: (error: unknown) => NextResponse<null> | void;
     finally?: () => void;
+    logError?: boolean;
   }
 ): NextHandler => {
   return async (req, params) => {
     try {
       return await handler(req, params);
     } catch (error) {
+      config?.logError && console.error(error);
       // custom error here
       config?.error?.(error);
 
@@ -26,11 +28,17 @@ const withError = <TBody = unknown>(
         });
       }
 
-      // fallback error here
-      return new NextResponse(null, {
-        status: StatusCodes["INTERNAL_SERVER_ERROR"],
-        statusText: "Internal Server Error",
-      });
+      return error instanceof Error
+        ? // thrown error here
+          new NextResponse(null, {
+            status: StatusCodes["INTERNAL_SERVER_ERROR"],
+            statusText: error.message,
+          })
+        : // fallback error here
+          new NextResponse(null, {
+            status: StatusCodes["INTERNAL_SERVER_ERROR"],
+            statusText: "Internal Server Error",
+          });
     } finally {
       config?.finally?.();
     }

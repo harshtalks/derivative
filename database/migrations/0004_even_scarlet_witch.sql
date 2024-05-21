@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX `authenticators_webauthn_user_id_unique` ON `authenticators` (`webauthn_user_id`);

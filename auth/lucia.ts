@@ -1,12 +1,13 @@
 import { adapter } from "@/database/db";
 import { users } from "@/database/schema";
-import { Lucia } from "lucia";
+import { Lucia, TimeSpan } from "lucia";
 import { GitHub } from "arctic";
 import { env } from "@/env";
 
 export const lucia = new Lucia(adapter, {
   sessionCookie: {
-    expires: false,
+    expires: true,
+
     attributes: {
       secure: process.env.NODE_ENV === "production",
     },
@@ -16,8 +17,12 @@ export const lucia = new Lucia(adapter, {
       // attributes has the type of DatabaseUserAttributes
       githubId: attributes.githubId,
       username: attributes.username,
+      avatar: attributes.avatar,
+      email: attributes.email,
+      twoFactorEnabled: attributes.twoFactorEnabled,
     };
   },
+  sessionExpiresIn: new TimeSpan(24, "h"), // 2 weeks
 });
 
 declare module "lucia" {

@@ -81,6 +81,7 @@ export const GET = withError(
         username: githubUserResponse.name,
         avatar: githubUserResponse.avatar_url,
         name: githubUserResponse.name,
+        email: githubUserEmailsResponse[0].email,
       })
       .returning();
 
