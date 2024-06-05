@@ -1,11 +1,28 @@
 import { relations, sql } from "drizzle-orm";
-import { sqliteTable, text, integer, blob } from "drizzle-orm/sqlite-core";
+import {
+  sqliteTable,
+  text,
+  integer,
+  blob,
+  unique,
+} from "drizzle-orm/sqlite-core";
 
 // tables
 
-/**
- * @description Users table
- */
+export const memberRoles = [
+  "admin",
+  "support",
+  "dev",
+  "managerial",
+  "qa",
+  "hr",
+  "finance",
+  "marketing",
+] as const;
+
+export type Permission = "read" | "write" | "delete" | "admin";
+
+export const workspaceStatus = ["active", "inactive", "archived"] as const;
 
 export const createdAtSchema = integer("created_at").default(
   sql`(cast(unixepoch() as int))`
@@ -14,6 +31,8 @@ export const createdAtSchema = integer("created_at").default(
 const updatedAtSchema = integer("updated_at").default(
   sql`(cast(unixepoch() as int))`
 );
+
+// TABLES
 
 export const users = sqliteTable("users", {
   id: text("id")
@@ -41,6 +60,12 @@ export const sessions = sqliteTable("sessions", {
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
   expiresAt: integer("expires_at").notNull(),
+  details: text("details", { mode: "json" }).$type<{
+    model?: string | undefined;
+    type?: string | undefined;
+    vendor?: string | undefined;
+  }>(),
+  ua: text("ua"),
 });
 
 /**
@@ -62,10 +87,62 @@ export const authenticators = sqliteTable("authenticators", {
   // basic ones
   createdAt: createdAtSchema,
   updatedAt: updatedAtSchema,
-  lastUsed: integer("updated_at").notNull(),
 });
 
-// relations
+// Business Logic Schema
+export const members = sqliteTable(
+  "members",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => `member_${crypto.randomUUID()}`),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    workspaceId: text("workspace_id")
+      .notNull()
+      .references(() => workspaces.id, { onDelete: "cascade" }),
+    createdAt: createdAtSchema,
+    updatedAt: updatedAtSchema,
+    role: text("member_role", { enum: memberRoles }).notNull(),
+    permissions: text("permissions", { mode: "json" }).$type<Permission[]>(),
+  },
+  (table) => {
+    return {
+      uniqueMember: unique("unique_member").on(table.userId, table.workspaceId),
+    };
+  }
+);
+
+// workspaces -> what do you ideally need in the workspaces?
+export const workspaces = sqliteTable("workspaces", {
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => `workspace_${crypto.randomUUID()}`),
+  name: text("name").notNull(),
+  description: text("description"),
+  createdAt: createdAtSchema,
+  updatedAt: updatedAtSchema,
+  createdBy: text("created_by").references(() => users.id, {
+    onDelete: "set null",
+  }),
+  status: text("status", {
+    enum: workspaceStatus,
+  }).notNull(),
+  note: text("note"),
+  tags: text("tags", { mode: "json" }).$type<string[]>(),
+});
+
+// RELATIONS
+
+// user relations
 export const userRelations = relations(users, ({ many }) => ({
   authenticators: many(authenticators),
+  sessions: many(sessions),
+  members: many(members),
+}));
+
+// workspace relations
+export const workspaceRelations = relations(workspaces, ({ many }) => ({
+  members: many(members),
 }));

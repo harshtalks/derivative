@@ -1,22 +1,12 @@
+import { EmptyRouteConfig } from "@/app/route.info";
+import { env } from "@/env";
 import createRoute from "@/route.config";
-import { User, Session } from "lucia";
-import { createEndPoint } from "tempeh";
-import * as z from "zod";
 
-const validateGithubAuth = createEndPoint({
-  httpMethod: "GET",
-  path: createRoute({
-    name: "github-auth-verify",
-    paramsSchema: z.object({}),
-    fn: () => "/api/auth/github/verify",
-    baseUrl: "APP_BASE_URL",
-  }),
-  SafeResponse: false,
+const ValidateGithubAuth = createRoute({
+  fn: () => "/api/auth/github/verify",
+  name: "validate-github-auth",
+  paramsSchema: EmptyRouteConfig,
+  baseUrl: env.BASE_URL,
 });
 
-export type ValidateGithubAuth = {
-  user: User;
-  session: Session;
-};
-
-export default validateGithubAuth;
+export default ValidateGithubAuth;

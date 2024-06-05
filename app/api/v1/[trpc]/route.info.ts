@@ -1,10 +1,10 @@
 import { EmptyRouteConfig } from "@/app/route.info";
 import createRoute from "@/route.config";
 
-const DashboardRoute = createRoute({
-  name: "dashboard",
-  fn: () => "/dashboard",
+const V1Route = createRoute({
+  name: "v1-route",
+  fn: () => "/api/v1",
   paramsSchema: EmptyRouteConfig,
 });
 
-export default DashboardRoute;
+export default V1Route;

@@ -9,6 +9,7 @@ import React, { useState } from "react";
 import { toast } from "sonner";
 import WebAuthRoute from "../../route.info";
 import { useRouter } from "next/navigation";
+import WorkspaceRouteInfo from "@/app/(routes)/workspaces/route.info";
 
 const TfLogin = () => {
   const [state, setState] = useState<FetchingState>("idle");
@@ -72,7 +73,7 @@ const TfLogin = () => {
         throw new Error(signedJWT.message);
       }
 
-      push(redirectUrl || "/");
+      push(redirectUrl || WorkspaceRouteInfo({}));
 
       return { success: true };
     } catch (e) {

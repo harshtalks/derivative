@@ -1,6 +1,8 @@
 import GithubAuth from "@/app/api/auth/github/route.info";
+import HomePageRoute from "@/app/route.info";
 import { Button } from "@/components/ui/button";
 import { GitHubLogoIcon } from "@radix-ui/react-icons";
+import { HomeIcon } from "lucide-react";
 import React from "react";
 
 const Page = () => {
@@ -18,7 +20,7 @@ const Page = () => {
               settings.
             </p>
           </div>
-          <div className="mt-8">
+          <div className="mt-8 gap-4 w-full flex flex-col items-center justify-center">
             <GithubAuth.Link params={{}}>
               <Button
                 className="inline-flex items-center justify-center w-full h-12 gap-3 px-5 py-3 font-medium duration-200 rounded-xl focus:ring-2 focus:ring-offset-2 focus:ring-zinc-500"
@@ -28,6 +30,11 @@ const Page = () => {
                 <span>Sign in with Google</span>
               </Button>
             </GithubAuth.Link>
+            <HomePageRoute.Link params={{}}>
+              <Button variant="ghost">
+                <HomeIcon />
+              </Button>
+            </HomePageRoute.Link>
           </div>
         </div>
       </div>

@@ -1,8 +1,10 @@
 import { MiddlewareWrapper } from "@/types/middleware.type";
-import { protectedRoutes } from "./utils.middleware";
+import { publicRoutes, webAuthPublicRoutes } from "./utils.middleware";
 import { NextResponse } from "next/server";
-import validateGithubAuth from "@/app/api/auth/github/verify/route.info";
 import SignInPage from "@/app/(routes)/sign-in/route.info";
+import ValidateGithubAuth from "@/app/api/auth/github/verify/route.info";
+import { User } from "lucia";
+import WebAuthRoute from "@/app/(routes)/webauth/route.info";
 
 const withAuth: MiddlewareWrapper = (nextMW) => {
   return async (request, event) => {
@@ -13,7 +15,7 @@ const withAuth: MiddlewareWrapper = (nextMW) => {
     const pathname = request.nextUrl.pathname;
 
     // check if the user pathname is part of the protected routes
-    if (protectedRoutes.includes(pathname)) {
+    if (!publicRoutes.includes(pathname)) {
       /**
        * -> Round trip to server to validate the request.
        * -> We do it because next.js runs this on EDGE and we are not edging enough with the database to validate the request.
@@ -26,16 +28,24 @@ const withAuth: MiddlewareWrapper = (nextMW) => {
 
       try {
         // this has all the logic to validate the user session
-        await validateGithubAuth({
-          params: {},
-          requestOptions: {
-            requestConfig: {
-              headers: {
-                Cookie: cookiesFromReq,
-              },
-            },
+        const response = await fetch(ValidateGithubAuth({}), {
+          headers: {
+            cookie: cookiesFromReq,
           },
         });
+        if (!response.ok) {
+          throw new Error("User not found");
+        }
+
+        const { user } = (await response.json()) as { user: User | null };
+
+        if (!user) {
+          throw new Error("User not found");
+        } else {
+          // if the user is found, return the next middleware
+
+          return nextMW(request, event, NextResponse.next());
+        }
       } catch (e) {
         // if the user is not found, redirect to the login page
         return NextResponse.redirect(new URL(SignInPage({}), request.url));

@@ -6,11 +6,15 @@ import db, { eq } from "@/database/db";
 import { users } from "@/database/schema";
 import { OAuth2RequestError } from "arctic";
 import withError from "@/lib/sever/with-error";
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse, userAgent } from "next/server";
+import WebAuthRoute from "@/app/(routes)/webauth/route.info";
+import WorkspaceRouteInfo from "@/app/(routes)/workspaces/route.info";
 
 export const GET = withError(
   async (request: NextRequest) => {
     const url = new URL(request.url);
+
+    const { device, ua } = userAgent(request);
 
     const code = url.searchParams.get("code");
 
@@ -22,6 +26,9 @@ export const GET = withError(
       return new NextResponse(null, {
         status: StatusCodes["TEMPORARY_REDIRECT"],
         statusText: "Temporary Redirect due to missing code or state",
+        headers: {
+          Location: "/sign-in",
+        },
       });
     }
 
@@ -57,7 +64,11 @@ export const GET = withError(
       .where(eq(users.githubId, githubUserResponse.login));
 
     if (checkIfUserExists.length > 0) {
-      const session = await lucia.createSession(checkIfUserExists[0].id, {});
+      const session = await lucia.createSession(checkIfUserExists[0].id, {
+        details: device,
+        ua,
+      });
+
       const sessionCookie = lucia.createSessionCookie(session.id);
 
       cookies().set(
@@ -69,7 +80,9 @@ export const GET = withError(
       return new NextResponse(null, {
         status: StatusCodes["MOVED_TEMPORARILY"],
         headers: {
-          Location: "/",
+          Location: checkIfUserExists[0].twoFactorEnabled
+            ? WebAuthRoute({})
+            : WorkspaceRouteInfo({}),
         },
       });
     }
@@ -82,10 +95,14 @@ export const GET = withError(
         avatar: githubUserResponse.avatar_url,
         name: githubUserResponse.name,
         email: githubUserEmailsResponse[0].email,
+        twoFactorEnabled: true,
       })
       .returning();
 
-    const session = await lucia.createSession(user[0].id, {});
+    const session = await lucia.createSession(user[0].id, {
+      details: device,
+      ua,
+    });
     const sessionCookie = lucia.createSessionCookie(session.id);
     cookies().set(
       sessionCookie.name,
@@ -96,7 +113,7 @@ export const GET = withError(
     return new NextResponse(null, {
       status: StatusCodes["MOVED_TEMPORARILY"],
       headers: {
-        Location: "/",
+        Location: WebAuthRoute({}),
       },
     });
   },
@@ -111,6 +128,9 @@ export const GET = withError(
         return new NextResponse(null, {
           status: StatusCodes["BAD_REQUEST"],
           statusText: e.message,
+          headers: {
+            Location: "/404",
+          },
         });
       }
     },

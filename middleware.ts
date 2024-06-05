@@ -17,4 +17,4 @@ export const config = {
 
 // whatever middleware you want to run at the end, keep if at the first
 // order of the middleware matters -> the first will be the last to run
-export default pipe(withWebAuthn, withAuth);
+export default pipe(withAuth, withWebAuthn);

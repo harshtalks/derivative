@@ -5,43 +5,8 @@
     {
       "idx": 0,
       "version": "6",
-      "when": 1716022467648,
-      "tag": "0000_new_zuras",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "6",
-      "when": 1716023059532,
-      "tag": "0001_jazzy_devos",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "6",
-      "when": 1716112472123,
-      "tag": "0002_typical_santa_claus",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "6",
-      "when": 1716113902285,
-      "tag": "0003_little_prism",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "6",
-      "when": 1716114802296,
-      "tag": "0004_even_scarlet_witch",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "6",
-      "when": 1716224943556,
-      "tag": "0005_military_silver_sable",
+      "when": 1717605291999,
+      "tag": "0000_vengeful_baron_strucker",
       "breakpoints": true
     }
   ]

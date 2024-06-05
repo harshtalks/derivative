@@ -1,8 +1,9 @@
 import { adapter } from "@/database/db";
-import { users } from "@/database/schema";
+import { sessions, users } from "@/database/schema";
 import { Lucia, TimeSpan } from "lucia";
 import { GitHub } from "arctic";
 import { env } from "@/env";
+import exp from "constants";
 
 export const lucia = new Lucia(adapter, {
   sessionCookie: {
@@ -29,7 +30,11 @@ declare module "lucia" {
   interface Register {
     Lucia: typeof lucia;
     DatabaseUserAttributes: typeof users.$inferSelect;
+    DatabaseSessionAttributes: DatabaseSessionAttributes;
   }
+
+  interface DatabaseSessionAttributes
+    extends Omit<typeof sessions.$inferSelect, "id" | "userId" | "expiresAt"> {}
 }
 
 export const github = new GitHub(
