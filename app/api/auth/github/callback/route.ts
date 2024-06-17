@@ -36,27 +36,21 @@ export const GET = withError(
 
     const githubUserResponse = await githubHandlers.getGithubUser({
       params: {},
-      requestOptions: {
-        requestConfig: {
-          headers: {
-            Authorization: `Bearer ${token.accessToken}`,
-          },
+      requestConfig: {
+        headers: {
+          Authorization: `Bearer ${token.accessToken}`,
         },
       },
     });
 
     const githubUserEmailsResponse = await githubHandlers.getGithubUserEmails({
       params: {},
-      requestOptions: {
-        requestConfig: {
-          headers: {
-            Authorization: `Bearer ${token.accessToken}`,
-          },
+      requestConfig: {
+        headers: {
+          Authorization: `Bearer ${token.accessToken}`,
         },
       },
     });
-
-    console.log("api call for user", githubUserResponse);
 
     const checkIfUserExists = await db
       .select()
@@ -103,6 +97,7 @@ export const GET = withError(
       details: device,
       ua,
     });
+
     const sessionCookie = lucia.createSessionCookie(session.id);
     cookies().set(
       sessionCookie.name,

@@ -8,8 +8,8 @@ import {
 
 import React from "react";
 import { InfoCircledIcon } from "@radix-ui/react-icons";
-import Auth from "./two-factor/auth";
 import { TFDialog } from "./two-factor/tf-dialog";
+import { DisableTF } from "./two-factor/DisableTF";
 
 const Hero = () => {
   return (
@@ -32,8 +32,8 @@ const Hero = () => {
             </div>
             <div className="py-12 flex items-center gap-2">
               <TFDialog />
+              <DisableTF />
               <div className="flex items-center justify-center">
-                <Button variant="link">Skip for Now</Button>
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger>

@@ -2,13 +2,10 @@ import validateGithubAuth from "@/app/api/auth/github/verify/route.info";
 import { MiddlewareWrapper } from "@/types/middleware.type";
 import { User } from "lucia";
 import { NextResponse } from "next/server";
-import { publicRoutes, webAuthPublicRoutes } from "./utils.middleware";
+import { webAuthPublicRoutes } from "./utils.middleware";
 import { COOKIE_NAME, verifyJWT } from "@/auth/tf";
-import { cookies } from "next/headers";
 import WebAuthRoute from "@/app/(routes)/webauth/route.info";
-import DashboardRoute from "@/app/(routes)/workspaces/[workspaceId]/dashboard/route.info";
 import WorkspaceRouteInfo from "@/app/(routes)/workspaces/route.info";
-import { env } from "@/env";
 import ValidateGithubAuth from "@/app/api/auth/github/verify/route.info";
 import SignInPage from "@/app/(routes)/sign-in/route.info";
 
@@ -35,6 +32,8 @@ const withWebAuthn: MiddlewareWrapper = (nextMW) => {
     // get the request pathname
     const pathname = request.nextUrl.pathname;
 
+    console.log("here", pathname);
+
     /**
      * if user is not authenticated, they will be redirected to this url. if user is from the webauth page, no need to redirect.
      */
@@ -48,7 +47,6 @@ const withWebAuthn: MiddlewareWrapper = (nextMW) => {
 
     // this also includes the web auth routes as well
     if (!webAuthPublicRoutes.includes(pathname)) {
-      console.log(pathname, "pathname");
       try {
         // get the data from the request validator
 

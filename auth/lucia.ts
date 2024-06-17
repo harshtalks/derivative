@@ -23,7 +23,14 @@ export const lucia = new Lucia(adapter, {
       twoFactorEnabled: attributes.twoFactorEnabled,
     };
   },
-  sessionExpiresIn: new TimeSpan(24, "h"), // 2 weeks
+  sessionExpiresIn: new TimeSpan(2, "w"), // 2 weeks
+  getSessionAttributes: (attributes) => {
+    return {
+      // attributes has the type of DatabaseSessionAttributes
+      userAgent: attributes.ua,
+      details: attributes.details,
+    };
+  },
 });
 
 declare module "lucia" {

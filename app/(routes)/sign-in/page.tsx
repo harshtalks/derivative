@@ -1,11 +1,21 @@
 import GithubAuth from "@/app/api/auth/github/route.info";
 import HomePageRoute from "@/app/route.info";
 import { Button } from "@/components/ui/button";
+import api from "@/trpc/server";
 import { GitHubLogoIcon } from "@radix-ui/react-icons";
 import { HomeIcon } from "lucide-react";
 import React from "react";
+import WorkspaceRouteInfo from "../workspaces/route.info";
+import { redirect } from "next/navigation";
+import { validateRequestCached } from "@/auth/validate-request";
 
-const Page = () => {
+const Page = async () => {
+  const { session } = await validateRequestCached();
+
+  if (session) {
+    redirect(WorkspaceRouteInfo({}));
+  }
+
   return (
     <section>
       <div className="px-8 py-48  mx-auto md:px-12 lg:px-32 max-w-7xl">

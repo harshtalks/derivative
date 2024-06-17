@@ -1,30 +1,16 @@
 import Link from "next/link";
-import { CircleUser, Menu, Package2, Search } from "lucide-react";
+import { Menu, Package2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Input } from "@/components/ui/input";
+
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import WorkspaceRouteInfo from "../workspaces/route.info";
 import HomePageRoute from "@/app/route.info";
 import { HomeIcon } from "@radix-ui/react-icons";
 import { UserNav } from "@/app/_components/user";
 import { ThemeToggle } from "@/app/_components/theme-toggle";
+import TwoFactorStatus from "./components/two-factor-status";
+import Session from "./components/sessions";
 
 export default function Dashboard() {
   return (
@@ -138,42 +124,8 @@ export default function Dashboard() {
             <Link href="#">Advanced</Link>
           </nav>
           <div className="grid gap-6">
-            <Card x-chunk="dashboard-04-chunk-1">
-              <CardHeader>
-                <CardTitle>Store Name</CardTitle>
-                <CardDescription>
-                  Used to identify your store in the marketplace.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <form>
-                  <Input placeholder="Store Name" />
-                </form>
-              </CardContent>
-              <CardFooter className="border-t px-6 py-4">
-                <Button>Save</Button>
-              </CardFooter>
-            </Card>
-            <Card x-chunk="dashboard-04-chunk-2">
-              <CardHeader>
-                <CardTitle>Plugins Directory</CardTitle>
-                <CardDescription>
-                  The directory within your project, in which your plugins are
-                  located.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <form className="flex flex-col gap-4">
-                  <Input
-                    placeholder="Project Name"
-                    defaultValue="/content/plugins"
-                  />
-                </form>
-              </CardContent>
-              <CardFooter className="border-t px-6 py-4">
-                <Button>Save</Button>
-              </CardFooter>
-            </Card>
+            <TwoFactorStatus />
+            <Session />
           </div>
         </div>
       </main>

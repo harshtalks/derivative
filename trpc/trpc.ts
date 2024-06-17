@@ -151,5 +151,3 @@ export type ProtectedTRPCContext = TRPCContext & {
   user: NonNullable<TRPCContext["user"]>;
   session: NonNullable<TRPCContext["session"]>;
 };
-
-// important stuff

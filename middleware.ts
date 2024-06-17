@@ -1,3 +1,4 @@
+import V1Route from "./app/api/v1/[trpc]/route.info";
 import pipe from "./middlewares/pipe";
 import withAuth from "./middlewares/with-auth";
 import withWebAuthn from "./middlewares/with-web-auth";
@@ -11,7 +12,7 @@ export const config = {
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
      */
-    "/((?!_next/static|_next/image|favicon.ico).*)",
+    "/((?!api/v1/*|_next/static|_next/image|favicon.ico).*)",
   ],
 };
 
