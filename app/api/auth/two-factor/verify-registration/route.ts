@@ -62,7 +62,6 @@ export const POST = withError<null | { verified: boolean }>(
             body.registrationResponse.response.transports?.join(",") || "",
           backupStatus: credentialBackedUp,
           backupEligible: credentialBackedUp,
-          lastUsed: Date.now(),
         });
       }
     }

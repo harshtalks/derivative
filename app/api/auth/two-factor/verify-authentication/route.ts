@@ -82,7 +82,7 @@ export const POST = withError<null | { success: boolean; message: string }>(
 
     await db
       .update(authenticators)
-      .set({ counter: newCounter, lastUsed: Date.now() })
+      .set({ counter: newCounter })
       .where(eq(authenticators.id, passkey.id));
 
     return NextResponse.json(
