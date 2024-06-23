@@ -1,4 +1,4 @@
-import V1Route from "./app/api/v1/[trpc]/route.info";
+import V1Route from "./app/api/v1/[...trpc]/route.info";
 import pipe from "./middlewares/pipe";
 import withAuth from "./middlewares/with-auth";
 import withWebAuthn from "./middlewares/with-web-auth";

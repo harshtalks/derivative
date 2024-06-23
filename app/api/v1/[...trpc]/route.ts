@@ -3,7 +3,6 @@ import { appRouter } from "@/trpc";
 import { createTRPCContext } from "@/trpc/trpc";
 import { fetchRequestHandler } from "@trpc/server/adapters/fetch";
 import { cookies } from "next/headers";
-import { NextRequest } from "next/server";
 import V1Route from "./route.info";
 
 const createContext = (req: Request) => {
