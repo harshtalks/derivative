@@ -1,4 +1,5 @@
 "use client";
+import { reloadPage } from "@/actions/revalidate";
 import { validateRequestCached } from "@/auth/validate-request";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -15,14 +16,18 @@ import {
 import client from "@/trpc/client";
 import { User2, UserIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
+import SignInPage from "../(routes)/sign-in/route.info";
 
 export function UserNav() {
   const { data: user } = client.user.get.useQuery();
-  const { refresh, push } = useRouter();
+  const { push } = useRouter();
+  const signInPageRouter = SignInPage.useRouter(useRouter);
 
   const { mutate } = client.user.logout.useMutation({
-    onSuccess: () => {
-      refresh();
+    onSettled: () => {
+      signInPageRouter.push({
+        params: {},
+      });
     },
   });
 

@@ -6,16 +6,25 @@ import { Button } from "@/components/ui/button";
 import client from "@/trpc/client";
 import { useRouter } from "next/navigation";
 import WorkspaceRouteInfo from "@/app/(routes)/workspaces/route.info";
+import WebAuthRoute from "../../route.info";
+import { useTempehRouter } from "@/route.config";
 
 export const DisableTF = () => {
-  const { push } = useRouter();
+  const { push } = WorkspaceRouteInfo.useRouter(useRouter);
+  const { push: tempehPush } = useTempehRouter(useRouter);
+  const { redirectUrl } = WebAuthRoute.useSearchParams();
 
   const { mutate, isPending } = client.user.twoFactor.useMutation({
     onSuccess: (data) => {
       toast.success(
         "Two factor authentication is disabled. You can enable it again in your settings."
       );
-      push(WorkspaceRouteInfo({}));
+
+      redirectUrl
+        ? tempehPush({ path: redirectUrl })
+        : push({
+            params: {},
+          });
     },
     onError: (error) => {
       toast.error(error.message);

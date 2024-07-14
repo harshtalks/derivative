@@ -54,8 +54,6 @@ export const POST = withError<null | { success: boolean; message: string }>(
       });
     }
 
-    console.log(isoBase64URL.fromUTF8String(env.WEB_AUTH_CHALLENGE));
-
     // get the passkey
     const passkey = passkeys[0];
 

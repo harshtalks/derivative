@@ -2,19 +2,18 @@
 import { Button } from "@/components/ui/button";
 import client from "@/trpc/client";
 import { Loader } from "lucide-react";
-import { useRouter } from "next/navigation";
 import React from "react";
 import { toast } from "sonner";
 
 const TfStatusChange = ({ tf }: { tf: boolean }) => {
-  const { refresh } = useRouter();
   const { mutate, isPending } = client.user.twoFactor.useMutation({
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       toast.success(
         `Two factor authentication is ${tf ? "disabled" : "enabled"}.`
       );
 
-      refresh();
+      // refresh the page using windows
+      window.location.href = window.location.href;
     },
     onError: (error) => {
       toast.error(error.message);

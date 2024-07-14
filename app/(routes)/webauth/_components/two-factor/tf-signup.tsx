@@ -11,12 +11,16 @@ import {
 import { toast } from "sonner";
 import enableTF from "@/app/api/auth/two-factor/enable/route.info";
 import { useRouter } from "next/navigation";
+import WorkspaceRouteInfo from "@/app/(routes)/workspaces/route.info";
+import { useTempehRouter } from "@/route.config";
+import WebAuthRoute from "../../route.info";
 
-const Auth = () => {
+const TFSignup = () => {
   const [state, setState] = useState<FetchingState>("idle");
   const [isSupported, setIsSupported] = useState(true);
-
-  const { push } = useRouter();
+  const { push } = WorkspaceRouteInfo.useRouter(useRouter);
+  const { push: tempehPush } = useTempehRouter(useRouter);
+  const { redirectUrl } = WebAuthRoute.useSearchParams();
 
   const handler = async () => {
     setState("loading");
@@ -53,9 +57,16 @@ const Auth = () => {
 
       const { verified } = (await verification.json()) as { verified: boolean };
 
-      push("/dashboard");
+      redirectUrl
+        ? tempehPush({ path: redirectUrl })
+        : push({
+            // as it accepts empty object
+            params: {},
+          });
 
-      return { verified };
+      return {
+        verified,
+      };
     } catch (e) {
       console.log(e);
       if (e instanceof Error) {
@@ -107,4 +118,4 @@ const Auth = () => {
   );
 };
 
-export default Auth;
+export default TFSignup;

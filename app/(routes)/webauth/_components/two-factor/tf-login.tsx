@@ -10,11 +10,14 @@ import { toast } from "sonner";
 import WebAuthRoute from "../../route.info";
 import { useRouter } from "next/navigation";
 import WorkspaceRouteInfo from "@/app/(routes)/workspaces/route.info";
+import { useTempehRouter } from "@/route.config";
 
 const TfLogin = () => {
   const [state, setState] = useState<FetchingState>("idle");
   const { redirectUrl } = WebAuthRoute.useSearchParams();
-  const { push } = useRouter();
+
+  const { push: tempehPush } = useTempehRouter(useRouter);
+  const { push: workspacePush } = WorkspaceRouteInfo.useRouter(useRouter);
 
   const handler = async () => {
     try {
@@ -73,7 +76,13 @@ const TfLogin = () => {
         throw new Error(signedJWT.message);
       }
 
-      push(redirectUrl || WorkspaceRouteInfo({}));
+      redirectUrl
+        ? tempehPush({
+            path: redirectUrl,
+          })
+        : workspacePush({
+            params: {},
+          });
 
       return { success: true };
     } catch (e) {

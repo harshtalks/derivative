@@ -26,7 +26,10 @@ const userRouter = createTRPCRouter({
     )
     .mutation(async (opts) => {
       const { ctx, input } = opts;
-      const { user, db } = ctx;
+      const { user, db, cookieStore } = ctx;
+
+      // deleting the cookie as a preventive measure
+      cookieStore.delete(COOKIE_NAME);
 
       const output = await db
         .update(users)

@@ -10,9 +10,8 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import Auth from "./auth";
 import TfLogin from "./tf-login";
-import WebAuthRoute from "../../route.info";
+import TFSignup from "./tf-signup";
 
 export function TFDialog() {
   return (
@@ -33,7 +32,7 @@ export function TFDialog() {
               <strong> authenticate</strong> to move forward.
             </p>
             <div className="flex items-center pt-4 justify-center gap-4">
-              <Auth />
+              <TFSignup />
               <TfLogin />
             </div>
           </AlertDialogDescription>

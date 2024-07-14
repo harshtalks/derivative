@@ -7,7 +7,9 @@ import { fromError } from "zod-validation-error";
 const withError = <TBody = unknown>(
   handler: NextHandler<TBody>,
   config?: {
-    error?: (error: unknown) => NextResponse<null> | void;
+    error?: (error: unknown) => NextResponse<null | {
+      error: string;
+    }> | void;
     finally?: () => void;
     logError?: boolean;
   }
@@ -30,15 +32,25 @@ const withError = <TBody = unknown>(
 
       return error instanceof Error
         ? // thrown error here
-          new NextResponse(null, {
-            status: StatusCodes["INTERNAL_SERVER_ERROR"],
-            statusText: error.message,
-          })
+          NextResponse.json(
+            {
+              error: error.message,
+            },
+            {
+              status: StatusCodes["INTERNAL_SERVER_ERROR"],
+              statusText: error.message,
+            }
+          )
         : // fallback error here
-          new NextResponse(null, {
-            status: StatusCodes["INTERNAL_SERVER_ERROR"],
-            statusText: "Internal Server Error",
-          });
+          NextResponse.json(
+            {
+              error: "Internal Server Error",
+            },
+            {
+              status: StatusCodes["INTERNAL_SERVER_ERROR"],
+              statusText: "Internal Server Error",
+            }
+          );
     } finally {
       config?.finally?.();
     }

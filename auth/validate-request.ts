@@ -3,6 +3,7 @@ import { cache } from "react";
 
 import { type Session, type User } from "lucia";
 import { lucia } from "./lucia";
+import { revalidatePath } from "next/cache";
 
 export const validateRequest = async (): Promise<
   { user: User; session: Session } | { user: null; session: null }
@@ -55,6 +56,9 @@ export const invalidateAuth = async () => {
   }
 
   await lucia.invalidateSession(sessionId);
+
+  console.log("reloading page thru action");
+  revalidatePath("/");
 
   return {
     success: true,

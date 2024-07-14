@@ -39,8 +39,6 @@ export const GET = withError<null | PublicKeyCredentialCreationOptionsJSON>(
       .from(authenticators)
       .where(eq(authenticators.userId, user.id));
 
-    console.log(userPassKeys);
-
     // 4. Get options
     const options = await generateRegistrationOptions({
       rpName: env.RP_NAME,
