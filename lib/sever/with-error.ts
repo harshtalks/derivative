@@ -12,6 +12,8 @@ const withError = <TBody = unknown>(
     }> | void;
     finally?: () => void;
     logError?: boolean;
+    withAuth?: boolean;
+    withWebAuth?: boolean;
   }
 ): NextHandler => {
   return async (req, params) => {

@@ -17,10 +17,11 @@ import client from "@/trpc/client";
 import { User2, UserIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import SignInPage from "../(routes)/sign-in/route.info";
+import SettingsRouteInfo from "../(routes)/settings/route.info";
 
 export function UserNav() {
   const { data: user } = client.user.get.useQuery();
-  const { push } = useRouter();
+  const settingsPageRouter = SettingsRouteInfo.useRouter(useRouter);
   const signInPageRouter = SignInPage.useRouter(useRouter);
 
   const { mutate } = client.user.logout.useMutation({
@@ -71,7 +72,13 @@ export function UserNav() {
               Billing
               <DropdownMenuShortcut>⌘B</DropdownMenuShortcut>
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => push("/settings")}>
+            <DropdownMenuItem
+              onClick={() =>
+                settingsPageRouter.push({
+                  params: {},
+                })
+              }
+            >
               Settings
               <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
             </DropdownMenuItem>

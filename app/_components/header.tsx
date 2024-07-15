@@ -26,7 +26,7 @@ const links = [
   },
 ];
 
-const Header = () => {
+const Header = ({ withoutCenterStuff }: { withoutCenterStuff?: boolean }) => {
   return (
     <header>
       <nav className="absolute z-50 w-full lg:bg-transparent dark:lg:bg-transparent">
@@ -54,33 +54,39 @@ const Header = () => {
                 </button>
               </div>
             </div>
-            <div
-              id="navLayer"
-              aria-hidden="true"
-              className="fixed inset-0 z-10 h-screen w-screen origin-bottom scale-y-0 bg-white/70 backdrop-blur-2xl transition duration-500 dark:bg-gray-900/70 lg:hidden"
-            ></div>
+            {withoutCenterStuff ? null : (
+              <div
+                id="navLayer"
+                aria-hidden="true"
+                className="fixed inset-0 z-10 h-screen w-screen origin-bottom scale-y-0 bg-white/70 backdrop-blur-2xl transition duration-500 dark:bg-gray-900/70 lg:hidden"
+              ></div>
+            )}
+
             <div
               id="navlinks"
               className="hidden flex-wrap lg:flex gap-6 items-center w-full lg:w-fit"
             >
-              <div className="lg:fixed lg:inset-x-0 lg:size-fit lg:m-auto">
-                <Frame>
-                  <div className="relative w-full text-gray-600 dark:text-gray-300">
-                    <ul className="flex flex-col gap-6 tracking-wide lg:flex-row lg:gap-0 lg:text-sm">
-                      {links.map((link) => (
-                        <li key={link.label}>
-                          <a
-                            href={link.to}
-                            className="px-2 py-1 hover:bg-gray-950/5 hover:text-gray-950 rounded-[--btn-border-radius] block transition dark:hover:text-white md:px-4 dark:hover:bg-white/5"
-                          >
-                            <span>{link.label}</span>
-                          </a>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </Frame>
-              </div>
+              {withoutCenterStuff ? null : (
+                <div className="lg:fixed lg:inset-x-0 lg:size-fit lg:m-auto">
+                  <Frame>
+                    <div className="relative w-full text-gray-600 dark:text-gray-300">
+                      <ul className="flex flex-col gap-6 tracking-wide lg:flex-row lg:gap-0 lg:text-sm">
+                        {links.map((link) => (
+                          <li key={link.label}>
+                            <a
+                              href={link.to}
+                              className="px-2 py-1 hover:bg-gray-950/5 hover:text-gray-950 rounded-[--btn-border-radius] block transition dark:hover:text-white md:px-4 dark:hover:bg-white/5"
+                            >
+                              <span>{link.label}</span>
+                            </a>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </Frame>
+                </div>
+              )}
+
               <div className="w-full my-6 border-t dark:border-[--ui-dark-border-color] pt-6 lg:mt-0 flex gap-2 lg:my-0 lg:border-none lg:pt-0">
                 {/* <Button className="rounded-full">Get Started</Button> */}
                 <ThemeToggle />

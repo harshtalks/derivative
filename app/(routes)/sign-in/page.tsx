@@ -6,15 +6,13 @@ import { GitHubLogoIcon } from "@radix-ui/react-icons";
 import { HomeIcon } from "lucide-react";
 import React from "react";
 import WorkspaceRouteInfo from "../workspaces/route.info";
-import { redirect } from "next/navigation";
-import { validateRequestCached } from "@/auth/validate-request";
+import AuthInterceptor from "@/auth/authIntercepter";
+import SignInPage from "./route.info";
 
 const Page = async () => {
-  const { session } = await validateRequestCached();
-
-  if (session) {
-    redirect(WorkspaceRouteInfo({}));
-  }
+  await new AuthInterceptor(SignInPage({}))
+    .setRedirect(WorkspaceRouteInfo({}))
+    .execute();
 
   return (
     <section>

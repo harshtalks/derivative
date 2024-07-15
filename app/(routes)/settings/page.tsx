@@ -11,8 +11,12 @@ import { UserNav } from "@/app/_components/user";
 import { ThemeToggle } from "@/app/_components/theme-toggle";
 import TwoFactorStatus from "./components/two-factor-status";
 import Session from "./components/sessions";
+import AuthInterceptor from "@/auth/authIntercepter";
+import SettingsRouteInfo from "./route.info";
 
-export default function Dashboard() {
+export default async function Dashboard() {
+  await new AuthInterceptor(SettingsRouteInfo({})).withTwoFactor().execute();
+
   return (
     <div className="flex min-h-screen w-full flex-col">
       <header className="sticky top-0 flex h-16 items-center gap-4 border-b bg-background px-4 md:px-6">

@@ -3,22 +3,29 @@ import React from "react";
 import { Mail } from "./_components/wrapper";
 import { cookies } from "next/headers";
 import { accounts, mails } from "./_components/data";
+import withAuth from "@/auth/wrappers/withAuth";
 
-const page = async () => {
-  const { user } = await validateRequestCached();
+const page = withAuth(
+  async () => {
+    const { user } = await validateRequestCached();
 
-  const layout = cookies().get("react-resizable-panels:layout");
-  const collapsed = cookies().get("react-resizable-panels:collapsed");
+    const layout = cookies().get("react-resizable-panels:layout");
+    const collapsed = cookies().get("react-resizable-panels:collapsed");
 
-  return (
-    <Mail
-      accounts={accounts}
-      mails={mails}
-      defaultLayout={undefined}
-      defaultCollapsed={undefined}
-      navCollapsedSize={4}
-    />
-  );
-};
-
+    return (
+      <Mail
+        accounts={accounts}
+        mails={mails}
+        defaultLayout={undefined}
+        defaultCollapsed={undefined}
+        navCollapsedSize={4}
+      />
+    );
+  },
+  {
+    withWebAuthn: {
+      enabled: true,
+    },
+  }
+);
 export default page;

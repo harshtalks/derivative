@@ -4,6 +4,7 @@ import { cache } from "react";
 import { type Session, type User } from "lucia";
 import { lucia } from "./lucia";
 import { revalidatePath } from "next/cache";
+import { COOKIE_NAME, TfTokenPayload, verifyJWT } from "./tf";
 
 export const validateRequest = async (): Promise<
   { user: User; session: Session } | { user: null; session: null }
@@ -64,3 +65,30 @@ export const invalidateAuth = async () => {
     success: true,
   };
 };
+
+export const validateTFAuth = async () => {
+  try {
+    const jwtToken = cookies().get(COOKIE_NAME);
+
+    if (!jwtToken) {
+      return {
+        success: false as const,
+      };
+    }
+
+    const tokenResponse = await verifyJWT(jwtToken.value);
+
+    const payload = tokenResponse.payload as TfTokenPayload;
+
+    return {
+      success: true as const,
+      payload,
+    };
+  } catch {
+    return {
+      success: false as const,
+    };
+  }
+};
+
+export const validateTFAuthCached = cache(validateTFAuth);

@@ -5,8 +5,13 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import api from "@/trpc/server";
 import { ExclamationTriangleIcon } from "@radix-ui/react-icons";
+import AddNewWorkspaceRoute from "./add-new-workspace/route.info";
+import withAuth from "@/auth/wrappers/withAuth";
+import WorkspaceRouteInfo from "./route.info";
+import AuthInterceptor from "@/auth/authIntercepter";
 
 export default async function Page() {
+  await new AuthInterceptor(WorkspaceRouteInfo({})).withTwoFactor().execute();
   const user = await api.user.get();
   return (
     <>
@@ -67,9 +72,11 @@ export default async function Page() {
           </div>
           {/* Buttons */}
           <div className="mt-8 gap-3 flex justify-center">
-            <Button variant="ringHover" size={"lg"}>
-              Create a Workspace
-            </Button>
+            <AddNewWorkspaceRoute.Link params={{}}>
+              <Button variant="ringHover" size={"lg"}>
+                Create a Workspace
+              </Button>
+            </AddNewWorkspaceRoute.Link>
           </div>
           {/* End Buttons */}
         </div>
