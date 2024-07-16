@@ -5,15 +5,7 @@ import { cva } from "class-variance-authority";
 
 import type { PlateContentProps } from "@udecode/plate-common";
 import type { VariantProps } from "class-variance-authority";
-import { getPaperSizeInInches } from "@cityssm/paper-sizes";
 import { fontSerif } from "@/lib/fonts";
-
-function inchesToCm(inches: number) {
-  const CM_PER_INCH = 2.54;
-  // normalise based on screen DPI
-
-  return inches * CM_PER_INCH + "cm";
-}
 
 const editorVariants = cva(
   cn(
@@ -77,9 +69,9 @@ const Editor = React.forwardRef<HTMLDivElement, EditorProps>(
           fontSerif.className
         )}
         style={{
-          maxWidth: inchesToCm(getPaperSizeInInches("legal").width),
-          minHeight: inchesToCm(getPaperSizeInInches("legal").height),
-          maxHeight: inchesToCm(getPaperSizeInInches("legal").height),
+          maxWidth: "21cm",
+          minHeight: "29.7cm",
+          maxHeight: "29.7cm",
         }}
       >
         <PlateContent
