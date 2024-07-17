@@ -28,7 +28,6 @@ import {
   Indent,
   Italic,
   Keyboard,
-  LineChart,
   Link2,
   Link2Off,
   List,
@@ -223,7 +222,6 @@ export const Icons = {
   underline: Underline,
   unlink: Link2Off,
   viewing: Eye,
-  hr: LineChart,
 
   // www
   gitHub: (props: LucideProps) => (

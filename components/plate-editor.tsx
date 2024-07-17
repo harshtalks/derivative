@@ -19,7 +19,6 @@ import { FixedToolbarButtons } from "@/components/plate-ui/fixed-toolbar-buttons
 import { FloatingToolbar } from "@/components/plate-ui/floating-toolbar";
 import { FloatingToolbarButtons } from "@/components/plate-ui/floating-toolbar-buttons";
 import { MentionCombobox } from "@/components/plate-ui/mention-combobox";
-import { TooltipProvider } from "./plate-ui/tooltip";
 
 export default function PlateEditor() {
   const containerRef = useRef(null);
@@ -33,42 +32,40 @@ export default function PlateEditor() {
   ];
 
   return (
-    <TooltipProvider>
-      <DndProvider backend={HTML5Backend}>
-        <CommentsProvider users={commentsUsers} myUserId={myUserId}>
-          <Plate plugins={plugins} initialValue={initialValue}>
-            <div
-              ref={containerRef}
-              className={cn(
-                "relative",
-                // Block selection
-                "[&_.slate-start-area-left]:!w-[32px] [&_.slate-start-area-right]:!w-[64px] [&_.slate-start-area-top]:!h-4"
-              )}
-            >
-              <FixedToolbar>
-                <FixedToolbarButtons />
-              </FixedToolbar>
+    <DndProvider backend={HTML5Backend}>
+      <CommentsProvider users={commentsUsers} myUserId={myUserId}>
+        <Plate plugins={plugins} initialValue={initialValue}>
+          <div
+            ref={containerRef}
+            className={cn(
+              "relative",
+              // Block selection
+              "[&_.slate-start-area-left]:!w-[64px] [&_.slate-start-area-right]:!w-[64px] [&_.slate-start-area-top]:!h-4"
+            )}
+          >
+            <FixedToolbar>
+              <FixedToolbarButtons />
+            </FixedToolbar>
 
-              <Editor
-                className="px-10 py-12"
-                autoFocus
-                focusRing={false}
-                variant="ghost"
-              />
+            <Editor
+              className="px-20 py-16"
+              autoFocus
+              focusRing={false}
+              variant="ghost"
+            />
 
-              <FloatingToolbar>
-                <FloatingToolbarButtons />
-              </FloatingToolbar>
+            <FloatingToolbar>
+              <FloatingToolbarButtons />
+            </FloatingToolbar>
 
-              <MentionCombobox items={MENTIONABLES} />
+            <MentionCombobox items={MENTIONABLES} />
 
-              <CommentsPopover />
+            <CommentsPopover />
 
-              <CursorOverlay containerRef={containerRef} />
-            </div>
-          </Plate>
-        </CommentsProvider>
-      </DndProvider>
-    </TooltipProvider>
+            <CursorOverlay containerRef={containerRef} />
+          </div>
+        </Plate>
+      </CommentsProvider>
+    </DndProvider>
   );
 }

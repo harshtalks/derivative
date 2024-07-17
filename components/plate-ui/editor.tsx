@@ -5,7 +5,6 @@ import { cva } from "class-variance-authority";
 
 import type { PlateContentProps } from "@udecode/plate-common";
 import type { VariantProps } from "class-variance-authority";
-import { fontSerif } from "@/lib/fonts";
 
 const editorVariants = cva(
   cn(
@@ -64,10 +63,7 @@ const Editor = React.forwardRef<HTMLDivElement, EditorProps>(
     return (
       <div
         ref={ref}
-        className={cn(
-          "relative border mx-auto my-6 shadow-2xl rounded-md",
-          fontSerif.className
-        )}
+        className={cn("relative border mx-auto my-6 shadow-2xl rounded-md")}
         style={{
           maxWidth: "21cm",
           minHeight: "29.7cm",

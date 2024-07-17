@@ -1,51 +1,38 @@
 import Link from "next/link";
 
 import PlateEditor from "@/components/plate-editor";
-import Header from "@/app/_components/header";
 import Container from "@/app/_components/container";
-import { buttonVariants } from "@/components/ui/button";
+import Header from "@/app/_components/header";
+import { TooltipProvider } from "@/components/plate-ui/tooltip";
 
 export default function IndexPage() {
   return (
-    <main>
+    <TooltipProvider
+      disableHoverableContent
+      delayDuration={500}
+      skipDelayDuration={0}
+    >
       <Header withoutCenterStuff />
+
       <Container>
-        <section className="container grid items-center gap-6 pb-8 pt-6 md:py-[150px]">
-          <div className="flex flex-col items-start gap-2">
+        <section className="!pt-[100px] grid items-center gap-6 pb-8 md:py-10">
+          <div className="flex max-w-[980px] flex-col items-start gap-2">
             <h1 className="text-3xl font-extrabold leading-tight tracking-tighter md:text-4xl">
-              PDF Generation
+              Plate Playground.
             </h1>
             <p className="max-w-[700px] text-lg text-muted-foreground">
-              Here we generate a PDF from the content you write in the editor.
-              This is a Next.js app with a custom Slate plugin and a custom
-              Next.js API route. The PDF is generated on the server using
-              Puppeteer.
+              Plugin system & primitive component library.{" "}
+              <br className="hidden sm:inline" />
+              CLI for styled components. Customizable. Open Source. And Next.js
+              14 Ready.
             </p>
           </div>
-          <div className="flex gap-4">
-            <Link
-              href={"/"}
-              target="_blank"
-              rel="noreferrer"
-              className={buttonVariants()}
-            >
-              Documentation
-            </Link>
-            <Link
-              target="_blank"
-              rel="noreferrer"
-              href={"/"}
-              className={buttonVariants({ variant: "link" })}
-            >
-              GitHub
-            </Link>
-          </div>
 
-          <div className="max-w-[1336px] bg-white border rounded-lg ">
+          <div className="max-w-[1336px] border bg-background rounded-lg">
             <PlateEditor />
           </div>
         </section>
       </Container>
-    </main>
+    </TooltipProvider>
   );
 }

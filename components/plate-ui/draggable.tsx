@@ -125,7 +125,7 @@ export const Draggable = withRef<"div", DraggableProps>(
                 classNames.blockToolbar
               )}
             >
-              <div
+              <div //
                 // @ts-ignore
                 ref={handleRef}
                 className="size-4"
