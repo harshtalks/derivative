@@ -9,10 +9,19 @@ import withError from "@/lib/sever/with-error";
 import { NextRequest, NextResponse, userAgent } from "next/server";
 import WebAuthRoute from "@/app/(routes)/webauth/route.info";
 import WorkspaceRouteInfo from "@/app/(routes)/workspaces/route.info";
+import { ErrorWrapperResponse } from "@/types/api.type";
+import SignInPage from "@/app/(routes)/sign-in/route.info";
 
-export const GET = withError(
+export const GET = withError<ErrorWrapperResponse<string>>(
   async (request: NextRequest) => {
     const url = new URL(request.url);
+    const redirectUrl = cookies().get("github_oauth_redirect")?.value ?? null;
+
+    const webAuthUrl = redirectUrl
+      ? WebAuthRoute({}, { search: { redirectUrl } })
+      : WebAuthRoute({});
+
+    const destination = redirectUrl ?? WorkspaceRouteInfo({});
 
     const { device, ua } = userAgent(request);
 
@@ -23,13 +32,19 @@ export const GET = withError(
     const storedState = cookies().get("github_oauth_state")?.value ?? null;
 
     if (!code || !state || !storedState || state !== storedState) {
-      return new NextResponse(null, {
-        status: StatusCodes["TEMPORARY_REDIRECT"],
-        statusText: "Temporary Redirect due to missing code or state",
-        headers: {
-          Location: "/sign-in",
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Invalid code or state",
         },
-      });
+        {
+          status: StatusCodes["TEMPORARY_REDIRECT"],
+          statusText: "Temporary Redirect due to missing code or state",
+          headers: {
+            Location: "/sign-in",
+          },
+        }
+      );
     }
 
     const token = await github.validateAuthorizationCode(code);
@@ -71,14 +86,20 @@ export const GET = withError(
         sessionCookie.attributes
       );
 
-      return new NextResponse(null, {
-        status: StatusCodes["MOVED_TEMPORARILY"],
-        headers: {
-          Location: checkIfUserExists[0].twoFactorEnabled
-            ? WebAuthRoute({})
-            : WorkspaceRouteInfo({}),
+      return NextResponse.json(
+        {
+          success: true,
+          response: "User already exists",
         },
-      });
+        {
+          status: StatusCodes["MOVED_TEMPORARILY"],
+          headers: {
+            Location: checkIfUserExists[0].twoFactorEnabled
+              ? webAuthUrl
+              : destination,
+          },
+        }
+      );
     }
 
     const user = await db
@@ -105,12 +126,20 @@ export const GET = withError(
       sessionCookie.attributes
     );
 
-    return new NextResponse(null, {
-      status: StatusCodes["MOVED_TEMPORARILY"],
-      headers: {
-        Location: WebAuthRoute({}),
+    return NextResponse.json(
+      {
+        success: true,
+        response: "User created successfully",
       },
-    });
+      {
+        status: StatusCodes["MOVED_TEMPORARILY"],
+        headers: {
+          Location: checkIfUserExists[0].twoFactorEnabled
+            ? webAuthUrl
+            : destination,
+        },
+      }
+    );
   },
   {
     error: (e) => {
@@ -120,13 +149,19 @@ export const GET = withError(
         e.message === "bad_verification_code"
       ) {
         // invalid code
-        return new NextResponse(null, {
-          status: StatusCodes["BAD_REQUEST"],
-          statusText: e.message,
-          headers: {
-            Location: "/404",
+        return NextResponse.json<ErrorWrapperResponse>(
+          {
+            message: e.message,
+            success: false,
           },
-        });
+          {
+            status: StatusCodes["BAD_REQUEST"],
+            statusText: e.message,
+            headers: {
+              Location: SignInPage({}),
+            },
+          }
+        );
       }
     },
   }

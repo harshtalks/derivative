@@ -14,6 +14,7 @@ import { useRouter } from "next/navigation";
 import WorkspaceRouteInfo from "@/app/(routes)/workspaces/route.info";
 import { useTempehRouter } from "@/route.config";
 import WebAuthRoute from "../../route.info";
+import { ErrorWrapperResponse } from "@/types/api.type";
 
 const TFSignup = () => {
   const [state, setState] = useState<FetchingState>("idle");
@@ -55,7 +56,13 @@ const TFSignup = () => {
         throw new Error(verification.statusText);
       }
 
-      const { verified } = (await verification.json()) as { verified: boolean };
+      const resp = (await verification.json()) as ErrorWrapperResponse<{
+        message: string;
+      }>;
+
+      if (!resp.success) {
+        throw new Error(resp.message);
+      }
 
       redirectUrl
         ? tempehPush({ path: redirectUrl })
@@ -63,10 +70,6 @@ const TFSignup = () => {
             // as it accepts empty object
             params: {},
           });
-
-      return {
-        verified,
-      };
     } catch (e) {
       console.log(e);
       if (e instanceof Error) {
@@ -104,10 +107,8 @@ const TFSignup = () => {
       onClick={() => {
         toast.promise(handler, {
           loading: "Wait while registering...",
-          success: ({ verified }) => {
-            return verified
-              ? "Successfully registered for two factor authentication"
-              : "Failed to register for two factor authentication";
+          success: () => {
+            return "Successfully registered for two factor authentication";
           },
           error: (e) => e.message,
         });

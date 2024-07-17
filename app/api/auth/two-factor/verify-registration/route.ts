@@ -1,5 +1,5 @@
 import { validateRequest } from "@/auth/validate-request";
-import db from "@/database/db";
+import db, { eq } from "@/database/db";
 import { authenticators } from "@/database/schema";
 import { env } from "@/env";
 import withError from "@/lib/sever/with-error";
@@ -8,8 +8,11 @@ import { verifyRegistrationResponse } from "@simplewebauthn/server";
 import { StatusCodes } from "http-status-codes";
 import { NextResponse } from "next/server";
 import { isoBase64URL } from "@simplewebauthn/server/helpers";
+import { ErrorWrapperResponse } from "@/types/api.type";
+import { COOKIE_NAME, createJWT } from "@/auth/tf";
+import { cookies } from "next/headers";
 
-export const POST = withError<null | { verified: boolean }>(
+export const POST = withError<ErrorWrapperResponse<{ message: string }>>(
   async (request) => {
     // get the user
     const { user } = await validateRequest();
@@ -64,24 +67,83 @@ export const POST = withError<null | { verified: boolean }>(
           backupEligible: credentialBackedUp,
         });
       }
+
+      // check for jwt here, we will do our two factor cookie submission and stuff here httpOnly
+      const passkeys = await db
+        .select()
+        .from(authenticators)
+        .where(eq(authenticators.webAuthnUserId, body.webAuthUserId));
+
+      if (passkeys.length === 0) {
+        return NextResponse.json(
+          {
+            success: false,
+            message: `Could not find authenticator for user ${user.id}`,
+          },
+          {
+            status: StatusCodes.NOT_FOUND,
+            statusText: "Not found",
+          }
+        );
+      }
+
+      // get the authenticator
+      const authenticator = passkeys[0];
+
+      // sign the authenticator
+
+      const jwtSignResponse = await createJWT({
+        userId: user.id,
+        authenticatorId: authenticator.id,
+        userAuthId: authenticator.webAuthnUserId,
+      });
+
+      // set cookie here
+
+      cookies().set(COOKIE_NAME, jwtSignResponse, {
+        expires: new Date(Date.now() + 1000 * 60 * 60 * 24),
+        sameSite: "strict",
+        httpOnly: true,
+      });
+
+      return NextResponse.json(
+        {
+          success: true,
+          response: {
+            message:
+              "Your authentication is verified and registered successfully",
+          },
+        },
+        {
+          status: StatusCodes["OK"],
+          statusText: "Registration successful",
+        }
+      );
     }
 
     return NextResponse.json(
-      { verified },
       {
-        status: verified ? StatusCodes["OK"] : StatusCodes["FORBIDDEN"],
-        statusText: verified
-          ? "Registration successful"
-          : "Registration failed",
+        success: false,
+        message: "Registration failed",
+      },
+      {
+        status: StatusCodes["BAD_REQUEST"],
+        statusText: "Bad request",
       }
     );
   },
   {
     error(e) {
-      return new NextResponse(null, {
-        status: StatusCodes["BAD_REQUEST"],
-        statusText: e instanceof Error ? e.message : "Bad request",
-      });
+      return NextResponse.json<ErrorWrapperResponse>(
+        {
+          success: false,
+          message: e instanceof Error ? e.message : "Bad request",
+        },
+        {
+          status: StatusCodes["BAD_REQUEST"],
+          statusText: e instanceof Error ? e.message : "Bad request",
+        }
+      );
     },
   }
 );

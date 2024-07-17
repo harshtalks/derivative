@@ -37,4 +37,19 @@ export const RequestErrorSchema = z.object({
 export const RequestResponseSchema = <T extends z.ZodType>(schema: T) =>
   z.union([RequestSuccessSchema(schema), RequestErrorSchema]);
 
-export type NullResponseType = null | { success: boolean; message: string };
+export type NullResponseType =
+  | {
+      success: false;
+      error: string;
+    }
+  | { success: boolean; message: string };
+
+export type ErrorWrapperResponse<T = unknown> =
+  | {
+      success: false;
+      message: string;
+    }
+  | {
+      success: true;
+      response: T;
+    };

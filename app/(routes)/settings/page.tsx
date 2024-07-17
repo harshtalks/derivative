@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Menu, Package2 } from "lucide-react";
+import { Menu, Package2, Settings } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 
@@ -15,7 +15,10 @@ import AuthInterceptor from "@/auth/authIntercepter";
 import SettingsRouteInfo from "./route.info";
 
 export default async function Dashboard() {
-  await new AuthInterceptor(SettingsRouteInfo({})).withTwoFactor().execute();
+  await new AuthInterceptor(SettingsRouteInfo({}))
+    .withTwoFactor()
+    .withRedirect()
+    .check();
 
   return (
     <div className="flex min-h-screen w-full flex-col">

@@ -1,15 +1,18 @@
-import { NextHandler } from "@/types/api.type";
+import { ErrorWrapperResponse, NextHandler } from "@/types/api.type";
 import { StatusCodes } from "http-status-codes";
 import { NextResponse } from "next/server";
 import { ZodError } from "zod";
 import { fromError } from "zod-validation-error";
 
+type ErrorCallbackReturn =
+  | NextResponse<ErrorWrapperResponse>
+  | void
+  | Promise<ErrorCallbackReturn>;
+
 const withError = <TBody = unknown>(
   handler: NextHandler<TBody>,
   config?: {
-    error?: (error: unknown) => NextResponse<null | {
-      error: string;
-    }> | void;
+    error?: (error: unknown) => ErrorCallbackReturn;
     finally?: () => void;
     logError?: boolean;
     withAuth?: boolean;
@@ -26,27 +29,32 @@ const withError = <TBody = unknown>(
 
       // zod error
       if (error instanceof ZodError) {
-        return new NextResponse(null, {
-          status: StatusCodes["BAD_REQUEST"],
-          statusText: fromError(error).message,
-        });
+        return NextResponse.json<ErrorWrapperResponse>(
+          { success: false, message: fromError(error).message },
+          {
+            status: StatusCodes["BAD_REQUEST"],
+            statusText: "Bad Request",
+          }
+        );
       }
 
       return error instanceof Error
         ? // thrown error here
-          NextResponse.json(
+          NextResponse.json<ErrorWrapperResponse>(
             {
-              error: error.message,
+              success: false,
+              message: error.message,
             },
             {
               status: StatusCodes["INTERNAL_SERVER_ERROR"],
-              statusText: error.message,
+              statusText: "Internal Server Error",
             }
           )
         : // fallback error here
-          NextResponse.json(
+          NextResponse.json<ErrorWrapperResponse>(
             {
-              error: "Internal Server Error",
+              success: false,
+              message: "Internal Server Error",
             },
             {
               status: StatusCodes["INTERNAL_SERVER_ERROR"],

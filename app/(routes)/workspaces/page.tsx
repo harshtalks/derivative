@@ -11,7 +11,11 @@ import WorkspaceRouteInfo from "./route.info";
 import AuthInterceptor from "@/auth/authIntercepter";
 
 export default async function Page() {
-  await new AuthInterceptor(WorkspaceRouteInfo({})).withTwoFactor().execute();
+  await new AuthInterceptor(WorkspaceRouteInfo({}))
+    .withTwoFactor()
+    .withRedirect()
+    .check();
+
   const user = await api.user.get();
   return (
     <>

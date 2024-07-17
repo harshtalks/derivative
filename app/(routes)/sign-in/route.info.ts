@@ -6,6 +6,9 @@ const SignInPage = createRoute({
   name: "sign-in",
   fn: () => "/sign-in",
   paramsSchema: EmptyRouteConfig,
+  searchParamsSchema: object({
+    redirectUrl: string().optional(),
+  }),
 });
 
 export default SignInPage;

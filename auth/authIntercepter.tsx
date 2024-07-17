@@ -13,10 +13,6 @@ type PromiseLike<T> = T | Promise<T>;
 
 // it should be a chain of functions
 export default class AuthInterceptor {
-  private beforeOAuth?: () => PromiseLike<void>;
-  private afterOAuth?: () => PromiseLike<void>;
-  private beforeWebAuth?: () => PromiseLike<void>;
-  private afterWebAuth?: () => PromiseLike<void>;
   private withTF?: boolean;
   private signInPage: string;
   private webAuthPage: string;
@@ -38,32 +34,6 @@ export default class AuthInterceptor {
     return this;
   }
 
-  beforeOAuthHook(fn: () => PromiseLike<void>) {
-    this.beforeOAuth = fn;
-    return this;
-  }
-
-  afterOAuthHook(fn: () => PromiseLike<void>) {
-    this.afterOAuth = fn;
-    return this;
-  }
-
-  beforeWebAuthHook(fn: () => PromiseLike<void>) {
-    if (!this.withTF) {
-      throw new Error("You must enable two factor authentication");
-    }
-    this.beforeWebAuth = fn;
-    return this;
-  }
-
-  afterWebAuthHook(fn: () => PromiseLike<void>) {
-    if (!this.withTF) {
-      throw new Error("You must enable two factor authentication");
-    }
-    this.afterWebAuth = fn;
-    return this;
-  }
-
   authSignInPath(path: string) {
     this.signInPage = path;
     return this;
@@ -77,89 +47,88 @@ export default class AuthInterceptor {
     return this;
   }
 
-  setRedirect(url: string) {
-    if (![this.webAuthPage, this.signInPage].includes(this.pathname)) {
-      throw new Error(
-        "You must be on the web auth page to set the redirect url"
-      );
-    }
+  withRedirect() {
+    const redirectUrl = headers().get("x-derivative-url") || undefined;
 
-    try {
-      this.redirectUrl = new URL(url).toString();
-    } catch (e) {
-      this.redirectUrl = new URL(url, this.base).toString();
-    }
+    this.signInPage = SignInPage(
+      {},
+      {
+        search: {
+          redirectUrl: redirectUrl,
+        },
+      }
+    );
+
+    this.webAuthPage = WebAuthRoute(
+      {},
+      {
+        search: {
+          redirectUrl: redirectUrl,
+        },
+      }
+    );
+
     return this;
   }
 
-  async execute() {
-    // before oauth, if it exists
-    if (this.beforeOAuth) {
-      await this.beforeOAuth();
-    }
-
+  async check() {
     // check if the user session is valid
     const { session, user } = await validateRequestCached();
 
-    // if the session or user is not found
+    // check auth
     if (!session || !user) {
-      this.pathname !== this.signInPage && redirect(this.signInPage);
-      return;
+      // auth failed
+      if (this.pathname === SignInPage({})) {
+        // if the user is on the sign in page, we return
+        return;
+      } else {
+        // if the user is not on the sign in page, we redirect to the sign in page
+        redirect(this.signInPage);
+      }
     }
 
-    // if two factor is enabled
+    // now check if two factor is enabled
     if (this.withTF) {
-      // Check if user has enabled two factor
-      const tfEnabled = user.twoFactorEnabled;
-
-      if (!tfEnabled) {
-        // redirect to the redirect url
-        if (this.pathname === this.webAuthPage) {
-          redirect(
-            this.redirectUrl ??
-              new URL(WorkspaceRouteInfo({}), this.base).toString()
-          );
-        }
-      } else {
-        // if two factor is enabled, then run the before web auth hook
-        if (this.beforeWebAuth) {
-          await this.beforeWebAuth();
-        }
-
+      if (user.twoFactorEnabled) {
+        // we are in the two factor enabled state
         // validate the two factor auth
         const tfSession = await validateTFAuthCached();
-
         //  if the two factor auth is not successful
         if (!tfSession.success) {
           // redirect to the auth
-          this.pathname !== this.webAuthPage && redirect(this.webAuthPage);
+          this.pathname !== WebAuthRoute({}) && redirect(this.webAuthPage);
           return;
         } else {
-          if (this.afterWebAuth) {
-            await this.afterWebAuth();
-          }
-
-          // redirect to the redirect url
-
-          if (this.pathname === this.webAuthPage) {
+          // success check
+          if (this.pathname === WebAuthRoute({})) {
             redirect(
               this.redirectUrl ??
                 new URL(WorkspaceRouteInfo({}), this.base).toString()
             );
+          } else {
+            return;
           }
         }
+      } else {
+        // redirect to the redirect url
+        this.pathname === WebAuthRoute({}) &&
+          redirect(
+            this.redirectUrl ??
+              new URL(WorkspaceRouteInfo({}), this.base).toString()
+          );
+
+        return;
       }
     } else {
-      if (this.afterOAuth) {
-        await this.afterOAuth();
+      // redirect to the redirect url
+      if (this.pathname === SignInPage({})) {
+        redirect(
+          this.redirectUrl ??
+            new URL(WorkspaceRouteInfo({}), this.base).toString()
+        );
       }
 
-      // redirect to the redirect url
-      if (this.redirectUrl) {
-        if (this.pathname === this.signInPage) {
-          redirect(this.redirectUrl);
-        }
-      }
+      return;
     }
   }
 }

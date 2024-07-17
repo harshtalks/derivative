@@ -1,15 +1,18 @@
+import { COOKIE_NAME, createJWT } from "@/auth/tf";
 import { validateRequest } from "@/auth/validate-request";
 import db, { and, eq } from "@/database/db";
 import { authenticators } from "@/database/schema";
 import { env } from "@/env";
 import withError from "@/lib/sever/with-error";
+import { ErrorWrapperResponse } from "@/types/api.type";
 import { verifyAuthenticationResponse } from "@simplewebauthn/server";
 import { isoBase64URL } from "@simplewebauthn/server/helpers";
 import { AuthenticationResponseJSON } from "@simplewebauthn/types";
 import { StatusCodes } from "http-status-codes";
+import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
-export const POST = withError<null | { success: boolean; message: string }>(
+export const POST = withError<ErrorWrapperResponse<{ message: string }>>(
   async (request) => {
     // 0. get body
     const body = (await request.json()) as {
@@ -21,18 +24,30 @@ export const POST = withError<null | { success: boolean; message: string }>(
 
     // 2. verify the user
     if (!user) {
-      return new NextResponse(null, {
-        status: StatusCodes.UNAUTHORIZED,
-        statusText: "Unauthorized",
-      });
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Unauthorized",
+        },
+        {
+          status: StatusCodes.UNAUTHORIZED,
+          statusText: "Unauthorized",
+        }
+      );
     }
 
     // 3. verify the user has enabled two factor authentication
     if (!Boolean(user.twoFactorEnabled)) {
-      return new NextResponse(null, {
-        status: StatusCodes.CONFLICT,
-        statusText: "Conflict",
-      });
+      return NextResponse.json(
+        {
+          success: false,
+          message: "You have not enabled two factor authentication yet",
+        },
+        {
+          status: StatusCodes.CONFLICT,
+          statusText: "Conflict",
+        }
+      );
     }
 
     // 4. Retrieve a passkey from the DB that should match the `id` in the returned credential
@@ -48,10 +63,16 @@ export const POST = withError<null | { success: boolean; message: string }>(
       );
 
     if (passkeys.length === 0) {
-      return NextResponse.json(null, {
-        status: StatusCodes.NOT_FOUND,
-        statusText: `Could not find passkey ${body.response.id} for user ${user.id}`,
-      });
+      return NextResponse.json(
+        {
+          success: false,
+          message: `Could not find passkey ${body.response.id} for user ${user.id}`,
+        },
+        {
+          status: StatusCodes.NOT_FOUND,
+          statusText: `Could not find passkey ${body.response.id} for user ${user.id}`,
+        }
+      );
     }
 
     // get the passkey
@@ -83,11 +104,57 @@ export const POST = withError<null | { success: boolean; message: string }>(
       .set({ counter: newCounter })
       .where(eq(authenticators.id, passkey.id));
 
+    if (verified) {
+      const passkeys = await db
+        .select()
+        .from(authenticators)
+        .where(eq(authenticators.id, body.response.id));
+
+      if (passkeys.length === 0) {
+        return new NextResponse(null, {
+          status: StatusCodes.NOT_FOUND,
+          statusText: `Could not find authenticator for user ${user.id}`,
+        });
+      }
+
+      // get the authenticator
+      const authenticator = passkeys[0];
+
+      // sign the authenticator
+
+      const jwtSignResponse = await createJWT({
+        userId: user.id,
+        authenticatorId: authenticator.id,
+        userAuthId: authenticator.webAuthnUserId,
+      });
+
+      // set cookie here
+
+      cookies().set(COOKIE_NAME, jwtSignResponse, {
+        expires: new Date(Date.now() + 1000 * 60 * 60 * 24),
+        sameSite: "strict",
+        httpOnly: true,
+      });
+
+      return NextResponse.json(
+        {
+          success: true,
+          response: {
+            message: "You are authenticated successfully",
+          },
+        },
+        {
+          status: StatusCodes.OK,
+          statusText: "OK",
+        }
+      );
+    }
+
     return NextResponse.json(
-      { success: verified, message: verified ? "OK" : "Forbidden" },
+      { success: false, message: "Verification failed" },
       {
-        status: verified ? StatusCodes.OK : StatusCodes.FORBIDDEN,
-        statusText: verified ? "OK" : "Forbidden",
+        status: StatusCodes.FORBIDDEN,
+        statusText: "Forbidden",
       }
     );
   },

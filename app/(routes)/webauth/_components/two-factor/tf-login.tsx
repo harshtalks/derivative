@@ -11,6 +11,7 @@ import WebAuthRoute from "../../route.info";
 import { useRouter } from "next/navigation";
 import WorkspaceRouteInfo from "@/app/(routes)/workspaces/route.info";
 import { useTempehRouter } from "@/route.config";
+import { ErrorWrapperResponse } from "@/types/api.type";
 
 const TfLogin = () => {
   const [state, setState] = useState<FetchingState>("idle");
@@ -53,27 +54,12 @@ const TfLogin = () => {
         throw new Error(verification.statusText);
       }
 
-      const { success } = (await verification.json()) as {
-        success: boolean;
+      const resp = (await verification.json()) as ErrorWrapperResponse<{
         message: string;
-      };
+      }>;
 
-      if (!success) {
-        throw new Error("Failed to register for two factor authentication");
-      }
-
-      // signing jwt
-
-      const signedJWT = await signJWT({
-        params: {},
-        body: {
-          type: "authenticationFlow",
-          authId: attResp.id,
-        },
-      });
-
-      if (!signedJWT.success) {
-        throw new Error(signedJWT.message);
+      if (!resp.success) {
+        throw new Error(resp.message);
       }
 
       redirectUrl
@@ -83,8 +69,6 @@ const TfLogin = () => {
         : workspacePush({
             params: {},
           });
-
-      return { success: true };
     } catch (e) {
       console.log(e);
       if (e instanceof Error) {
@@ -108,10 +92,8 @@ const TfLogin = () => {
       onClick={() => {
         toast.promise(handler, {
           loading: "Authenticating...",
-          success: ({ success }) => {
-            return success
-              ? "Successfully registered for two factor authentication"
-              : "Something went wrong while authenticating for two factor authentication";
+          success: () => {
+            return "Successfully registered for two factor authentication";
           },
           error: (e) => e.message,
         });

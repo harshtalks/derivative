@@ -1,18 +1,20 @@
 import GithubAuth from "@/app/api/auth/github/route.info";
 import HomePageRoute from "@/app/route.info";
 import { Button } from "@/components/ui/button";
-import api from "@/trpc/server";
 import { GitHubLogoIcon } from "@radix-ui/react-icons";
 import { HomeIcon } from "lucide-react";
 import React from "react";
-import WorkspaceRouteInfo from "../workspaces/route.info";
 import AuthInterceptor from "@/auth/authIntercepter";
 import SignInPage from "./route.info";
 
-const Page = async () => {
-  await new AuthInterceptor(SignInPage({}))
-    .setRedirect(WorkspaceRouteInfo({}))
-    .execute();
+const Page = async ({
+  searchParams,
+}: {
+  searchParams: {
+    [key: string]: string | undefined | string[];
+  };
+}) => {
+  await new AuthInterceptor(SignInPage({})).check();
 
   return (
     <section>
@@ -29,7 +31,12 @@ const Page = async () => {
             </p>
           </div>
           <div className="mt-8 gap-4 w-full flex flex-col items-center justify-center">
-            <GithubAuth.Link params={{}}>
+            <GithubAuth.Link
+              params={{}}
+              searchParams={{
+                redirectUrl: searchParams.redirectUrl?.toString(),
+              }}
+            >
               <Button
                 className="inline-flex items-center justify-center w-full h-12 gap-3 px-5 py-3 font-medium duration-200 rounded-xl focus:ring-2 focus:ring-offset-2 focus:ring-zinc-500"
                 aria-label="Sign in with Google"
