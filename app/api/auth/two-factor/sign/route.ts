@@ -4,7 +4,6 @@ import db, { eq } from "@/database/db";
 import { authenticators } from "@/database/schema";
 import withError from "@/lib/sever/with-error";
 import { NullResponseType } from "@/types/api.type";
-import { request } from "http";
 import { StatusCodes } from "http-status-codes";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";

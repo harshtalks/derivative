@@ -6,7 +6,10 @@ import AuthInterceptor from "@/auth/authIntercepter";
 import AddNewWorkspaceRoute from "./route.info";
 
 const NewWorkspace = async () => {
-  await new AuthInterceptor(AddNewWorkspaceRoute({})).withTwoFactor().execute();
+  await new AuthInterceptor(AddNewWorkspaceRoute({}))
+    .withRedirect()
+    .withTwoFactor()
+    .check();
 
   return (
     <main>
