@@ -1,8 +1,8 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "972506d6-50a9-4c39-92ba-1b4cf525eac9",
-  "prevId": "00000000-0000-0000-0000-000000000000",
+  "id": "718cbfbd-19bd-40f2-b01c-c6186d047bdb",
+  "prevId": "972506d6-50a9-4c39-92ba-1b4cf525eac9",
   "tables": {
     "authenticators": {
       "name": "authenticators",
@@ -379,7 +379,7 @@
           "name": "description",
           "type": "text",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "autoincrement": false
         },
         "created_at": {

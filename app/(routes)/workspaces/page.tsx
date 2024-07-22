@@ -9,6 +9,7 @@ import AddNewWorkspaceRoute from "./add-new-workspace/route.info";
 import withAuth from "@/auth/wrappers/withAuth";
 import WorkspaceRouteInfo from "./route.info";
 import AuthInterceptor from "@/auth/authIntercepter";
+import Workspaces from "./_components/workspaces";
 
 export default async function Page() {
   await new AuthInterceptor(WorkspaceRouteInfo({}))
@@ -65,7 +66,7 @@ export default async function Page() {
             </p>
           </div>
 
-          <div className="mt-10 flex max-w-[400px] mx-auto justify-center items-center gap-x-1 sm:gap-x-3">
+          {/* <div className="mt-10 flex max-w-[400px] mx-auto justify-center items-center gap-x-1 sm:gap-x-3">
             <Alert variant="default">
               <ExclamationTriangleIcon />
               <AlertDescription>
@@ -73,7 +74,8 @@ export default async function Page() {
                 get started.
               </AlertDescription>
             </Alert>
-          </div>
+          </div> */}
+          <Workspaces />
           {/* Buttons */}
           <div className="mt-8 gap-3 flex justify-center">
             <AddNewWorkspaceRoute.Link params={{}}>

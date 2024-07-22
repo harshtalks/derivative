@@ -42,7 +42,7 @@ const Page = async ({
                 aria-label="Sign in with Google"
               >
                 <GitHubLogoIcon className="size-6" />
-                <span>Sign in with Google</span>
+                <span>Sign in with Github</span>
               </Button>
             </GithubAuth.Link>
             <HomePageRoute.Link params={{}}>

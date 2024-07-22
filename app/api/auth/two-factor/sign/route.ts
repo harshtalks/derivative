@@ -54,7 +54,7 @@ export const POST = withError<NullResponseType>(
     // set cookie here
 
     cookies().set(COOKIE_NAME, jwtSignResponse, {
-      expires: new Date(Date.now() + 1000 * 60 * 60 * 24),
+      expires: new Date(Date.now() + 1000 * 60 * 60 * 24), // 1 day
       sameSite: "strict",
       httpOnly: true,
     });

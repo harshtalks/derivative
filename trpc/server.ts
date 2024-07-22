@@ -20,6 +20,6 @@ const createContextRSC = cache(() => {
 });
 
 // Create a server-side caller -> use this for server-side calls
-const api = createCaller(createContextRSC);
+const serverApiTrpc = createCaller(createContextRSC);
 
-export default api;
+export default serverApiTrpc;

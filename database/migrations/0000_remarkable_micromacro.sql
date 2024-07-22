@@ -20,6 +20,7 @@ CREATE TABLE `members` (
 	`updated_at` integer DEFAULT (cast(unixepoch() as int)),
 	`member_role` text NOT NULL,
 	`permissions` text,
+	`is_creator` integer NOT NULL,
 	FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON UPDATE no action ON DELETE cascade,
 	FOREIGN KEY (`workspace_id`) REFERENCES `workspaces`(`id`) ON UPDATE no action ON DELETE cascade
 );
@@ -55,7 +56,8 @@ CREATE TABLE `workspaces` (
 	`status` text NOT NULL,
 	`note` text,
 	`tags` text,
-	FOREIGN KEY (`created_by`) REFERENCES `users`(`id`) ON UPDATE no action ON DELETE set null
+	`workspace_type` text NOT NULL,
+	FOREIGN KEY (`created_by`) REFERENCES `users`(`id`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
 CREATE UNIQUE INDEX `authenticators_webauthn_user_id_unique` ON `authenticators` (`webauthn_user_id`);--> statement-breakpoint

@@ -13,6 +13,7 @@
     "db:push": "drizzle-kit push"
   },
   "dependencies": {
+    "@formkit/auto-animate": "^0.8.2",
     "@hookform/resolvers": "^3.9.0",
     "@libsql/client": "^0.6.0",
     "@lucia-auth/adapter-drizzle": "^1.0.7",
@@ -93,6 +94,8 @@
     "cmdk": "^1.0.0",
     "date-fns": "^3.6.0",
     "drizzle-orm": "^0.30.10",
+    "drizzle-zod": "^0.5.1",
+    "emblor": "^1.4.0",
     "http-status-codes": "^2.3.0",
     "jotai": "^2.8.1",
     "lucia": "^3.2.0",
@@ -122,7 +125,8 @@
     "trpc-openapi": "^1.2.0",
     "tsx": "^4.10.2",
     "zod": "^3.23.8",
-    "zod-validation-error": "^3.3.0"
+    "zod-validation-error": "^3.3.0",
+    "zustand": "^4.5.4"
   },
   "devDependencies": {
     "@types/node": "^20",

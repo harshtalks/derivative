@@ -22,6 +22,8 @@ export const memberRoles = [
 
 export type Permission = "read" | "write" | "delete" | "admin";
 
+export const workspaceTypes = ["personal", "enterprise", "standard"] as const;
+
 export const workspaceStatus = ["active", "inactive", "archived"] as const;
 
 export const createdAtSchema = integer("created_at").default(
@@ -106,6 +108,7 @@ export const members = sqliteTable(
     updatedAt: updatedAtSchema,
     role: text("member_role", { enum: memberRoles }).notNull(),
     permissions: text("permissions", { mode: "json" }).$type<Permission[]>(),
+    isCreator: integer("is_creator", { mode: "boolean" }).notNull(),
   },
   (table) => {
     return {
@@ -120,20 +123,23 @@ export const workspaces = sqliteTable("workspaces", {
     .primaryKey()
     .$defaultFn(() => `workspace_${crypto.randomUUID()}`),
   name: text("name").notNull(),
-  description: text("description"),
+  description: text("description").notNull(),
   createdAt: createdAtSchema,
   updatedAt: updatedAtSchema,
-  createdBy: text("created_by").references(() => users.id, {
-    onDelete: "set null",
-  }),
+  createdBy: text("created_by")
+    .references(() => users.id, {
+      onDelete: "cascade",
+    })
+    .notNull(),
   status: text("status", {
     enum: workspaceStatus,
   }).notNull(),
   note: text("note"),
   tags: text("tags", { mode: "json" }).$type<string[]>(),
+  workspaceType: text("workspace_type", {
+    enum: workspaceTypes,
+  }).notNull(),
 });
-
-// RELATIONS
 
 // user relations
 export const userRelations = relations(users, ({ many }) => ({
