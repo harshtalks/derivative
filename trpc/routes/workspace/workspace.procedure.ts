@@ -95,6 +95,13 @@ const workspaceRouter = createTRPCRouter({
       const dbResult = await db.transaction(async (ctx) => {
         const workspaceDB = await ctx.query.workspaces.findFirst({
           where: (workspaces, { eq }) => eq(workspaces.id, workspaceId),
+          with: {
+            members: {
+              columns: {
+                id: true,
+              },
+            },
+          },
         });
 
         if (!workspaceDB) {

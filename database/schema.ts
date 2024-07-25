@@ -152,3 +152,9 @@ export const userRelations = relations(users, ({ many }) => ({
 export const workspaceRelations = relations(workspaces, ({ many }) => ({
   members: many(members),
 }));
+
+// member relations
+export const memberRelations = relations(members, ({ one }) => ({
+  user: one(users),
+  workspace: one(workspaces),
+}));

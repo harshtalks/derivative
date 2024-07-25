@@ -186,7 +186,7 @@ const WorkspaceList = ({
             <DashboardRoute.Link
               params={{ workspaceId: item.id }}
               key={item.id}
-              className="w-full"
+              className="w-full min-w-[500px"
             >
               <button
                 className={cn(

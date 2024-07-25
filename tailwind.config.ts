@@ -89,6 +89,15 @@ const config = {
             backgroundPosition: "var(--bg-size) 0",
           },
         },
+        grid: {
+          "0%": { transform: "translateY(-50%)" },
+          "100%": { transform: "translateY(0)" },
+        },
+        "border-beam": {
+          "100%": {
+            "offset-distance": "100%",
+          },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -96,6 +105,8 @@ const config = {
         "background-shine": "background-shine 2s linear infinite",
         meteor: "meteor 5s linear infinite",
         gradient: "gradient 8s linear infinite",
+        grid: "grid 15s linear infinite",
+        "border-beam": "border-beam calc(var(--duration)*1s) infinite linear",
       },
       fontFamily: {
         sans: ["var(--font-sans)", ...fontFamily.sans],
