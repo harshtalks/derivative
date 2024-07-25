@@ -1,7 +1,7 @@
 import { lucia } from "@/auth/lucia";
 import { COOKIE_NAME } from "@/auth/tf";
 import { invalidateAuth } from "@/auth/validate-request";
-import { users } from "@/database/schema";
+import { authenticators, users } from "@/database/schema";
 import { authenticatedProcedure, createTRPCRouter } from "@/trpc/trpc";
 import { TRPCError } from "@trpc/server";
 import { eq } from "drizzle-orm";
@@ -31,6 +31,14 @@ const userRouter = createTRPCRouter({
       // deleting the cookie as a preventive measure
       cookieStore.delete(COOKIE_NAME);
 
+      if (input.action === "disable") {
+        // delete all authenticators for the user if they are disabling 2FA. we don't need them anymore
+        await db
+          .delete(authenticators)
+          .where(eq(authenticators.userId, user.id));
+      }
+
+      // update the user's two factor status
       const output = await db
         .update(users)
         .set({ twoFactorEnabled: input.action === "enable" })
