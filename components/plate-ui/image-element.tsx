@@ -16,7 +16,7 @@ export const ImageElement = withHOC(
   ResizableProvider,
   withRef<typeof PlateElement>(
     ({ className, children, nodeProps, ...props }, ref) => {
-      const { readOnly, focused, selected, align = "left" } = useMediaState();
+      const { readOnly, focused, selected, align } = useMediaState();
       const width = useResizableStore().get.width();
 
       return (

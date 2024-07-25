@@ -1,6 +1,8 @@
 import { members, workspaces } from "@/database/schema";
 import { insertWorkspaceSchema } from "@/database/schema.zod";
 import { createTRPCRouter, twoFactorAuthenticatedProcedure } from "@/trpc/trpc";
+import { getWorkspaceByIdInputSchema } from "./workspace.schema";
+import { TRPCError } from "@trpc/server";
 
 const workspaceRouter = createTRPCRouter({
   create: twoFactorAuthenticatedProcedure
@@ -82,6 +84,42 @@ const workspaceRouter = createTRPCRouter({
 
     return dbResult;
   }),
+  // get the workspace by id
+  workspace: twoFactorAuthenticatedProcedure
+    .input(getWorkspaceByIdInputSchema)
+    .query(async ({ ctx, input }) => {
+      const { db, user } = ctx;
+      const { workspaceId } = input;
+
+      // get the workspace
+      const dbResult = await db.transaction(async (ctx) => {
+        const workspaceDB = await ctx.query.workspaces.findFirst({
+          where: (workspaces, { eq }) => eq(workspaces.id, workspaceId),
+        });
+
+        if (!workspaceDB) {
+          throw new TRPCError({
+            message: "Workspace not found with given id " + workspaceId,
+            code: "BAD_REQUEST",
+          });
+        }
+
+        const creator = await ctx.query.users.findFirst({
+          where: (users, { eq }) => eq(users.id, workspaceDB.createdBy),
+        });
+
+        if (!creator) {
+          throw new TRPCError({
+            message: "Creator not found for workspace",
+            code: "INTERNAL_SERVER_ERROR",
+          });
+        }
+
+        return { workspaceDB, creator };
+      });
+
+      return dbResult;
+    }),
 });
 
 export default workspaceRouter;

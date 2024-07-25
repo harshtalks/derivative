@@ -1,5 +1,14 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { CsrfError, createCsrfProtect } from "@edge-csrf/nextjs";
+import { env } from "./env";
+
+// initalize csrf protection method
+const csrfProtect = createCsrfProtect({
+  cookie: {
+    secure: env.mode === "production",
+  },
+});
 
 export const config = {
   matcher: [
@@ -15,10 +24,20 @@ export const config = {
 };
 
 // This function can be marked `async` if using `await` inside
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const requestHeaders = request.headers;
 
   requestHeaders.set("x-derivative-url", request.nextUrl.toString());
 
-  return NextResponse.next({ headers: requestHeaders });
+  const response = NextResponse.next({ headers: requestHeaders });
+
+  try {
+    await csrfProtect(request, response);
+  } catch (err) {
+    if (err instanceof CsrfError)
+      return new NextResponse("invalid csrf token", { status: 403 });
+    throw err;
+  }
+
+  return response;
 }

@@ -134,6 +134,7 @@ export const POST = withError<ErrorWrapperResponse<{ message: string }>>(
         expires: new Date(Date.now() + 1000 * 60 * 60 * 24),
         sameSite: "strict",
         httpOnly: true,
+        secure: env.mode === "production",
       });
 
       return NextResponse.json(

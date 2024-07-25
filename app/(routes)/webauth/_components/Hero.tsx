@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import { Button } from "@/components/ui/button";
 import {
   Tooltip,
@@ -27,8 +28,12 @@ const Hero = () => {
                 later on as well.
               </p>
             </div>
-            <div className="p-2 overflow-hidden border rounded-3xl relative shadow-lg bg-gray-50 -z-20 min-w-full max-w-xl lg:row-span-4 lg:w-[64rem] lg:max-w-none">
-              <div className="h-[400px]" />
+            <div className="h-[400px] overflow-hidden border rounded-3xl relative shadow-lg bg-gray-50 -z-20 min-w-full max-w-xl lg:row-span-4 lg:w-[64rem] lg:max-w-none">
+              <img
+                src="https://images.unsplash.com/photo-1591161760893-ab808cf5109b?q=80&w=2936&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                alt="hero"
+                className="object-cover w-full h-full"
+              />
             </div>
             <div className="py-12 flex items-center gap-2">
               <TFDialog />

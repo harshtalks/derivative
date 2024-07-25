@@ -8,3 +8,8 @@ export const insertWorkspaceSchema = createInsertSchema(workspaces, {
   // remove the tags field type here
   tags: string().array(),
 });
+
+export const selectWorkspaceSchema = createSelectSchema(workspaces, {
+  // remove the tags field type here
+  tags: string().array(),
+});

@@ -16,6 +16,8 @@ import { toast } from "sonner";
 import { Cross2Icon } from "@radix-ui/react-icons";
 import { Alert } from "@/components/ui/alert";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
+import AddNewWorkspaceRoute from "../add-new-workspace/route.info";
+import DashboardRoute from "../[workspaceId]/dashboard/route.info";
 
 const filters = ["Name", "Type", "Status", "Tags"] as const;
 
@@ -181,64 +183,64 @@ const WorkspaceList = ({
         </div>
         <div ref={parent} className="flex flex-col w-full gap-2 p-4 pt-0">
           {filteredWorkspaces.map((item) => (
-            <button
+            <DashboardRoute.Link
+              params={{ workspaceId: item.id }}
               key={item.id}
-              className={cn(
-                "flex flex-col items-start gap-2 rounded-lg border p-3 text-left text-sm transition-all hover:bg-accent",
-                "hover:bg-muted group"
-              )}
+              className="w-full"
             >
-              <div className="flex w-full flex-col gap-1">
-                <div className="flex items-center">
-                  <div className="flex items-center gap-2">
-                    <div className="font-semibold">{item.name}</div>
-                    {/* {!item.read && ( */}
-                    <span
-                      className={cn(
-                        "flex h-2 w-2 rounded-full",
-                        workspaceStatusToColor(item.status)
-                      )}
-                    />
-                    {/* )} */}
-                  </div>
-                  <div
-                    className={cn(
-                      "ml-auto text-xs text-muted-foreground",
-                      "group-hover:text-foreground"
-                    )}
-                  >
-                    {item.createdAt &&
-                      formatDistanceToNow(item.createdAt * 1000, {
-                        addSuffix: true,
-                      })}
-                  </div>
-                </div>
-                {item.note && (
-                  <div className="text-xs w-fit font-medium">{item.note}</div>
+              <button
+                className={cn(
+                  "flex flex-col w-full items-start gap-2 rounded-lg border p-3 text-left text-sm transition-all hover:bg-accent",
+                  "hover:bg-muted group"
                 )}
-              </div>
-              <div className="line-clamp-2 w-fit text-xs text-muted-foreground">
-                {item.description.substring(0, 300)}
-              </div>
-              {item.tags?.length ? (
-                <div className="flex flex-wrap items-center gap-2">
-                  <Badge>{item.workspaceType}</Badge>
-                  {item.createdBy === user?.id && (
-                    <Badge
-                      className="text-xs w-fit font-medium"
-                      variant={"secondary"}
+              >
+                <div className="flex w-full flex-col gap-1">
+                  <div className="flex items-center">
+                    <div className="flex items-center gap-2">
+                      <div className="font-semibold">{item.name}</div>
+                      {/* {!item.read && ( */}
+                      <span
+                        className={cn(
+                          "flex h-2 w-2 rounded-full",
+                          workspaceStatusToColor(item.status)
+                        )}
+                      />
+                      {/* )} */}
+                    </div>
+                    <div
+                      className={cn(
+                        "ml-auto text-xs text-muted-foreground",
+                        "group-hover:text-foreground"
+                      )}
                     >
-                      Owner
-                    </Badge>
+                      {item.createdAt &&
+                        formatDistanceToNow(item.createdAt * 1000, {
+                          addSuffix: true,
+                        })}
+                    </div>
+                  </div>
+                  {item.note && (
+                    <div className="text-xs w-fit font-medium">{item.note}</div>
                   )}
-                  {item.tags.map((label) => (
-                    <Badge key={label} variant={"outline"}>
-                      {label}
-                    </Badge>
-                  ))}
                 </div>
-              ) : null}
-            </button>
+                <div className="line-clamp-2 w-fit text-xs text-muted-foreground">
+                  {item.description.substring(0, 300)}
+                </div>
+                {item.tags?.length ? (
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Badge>{item.workspaceType}</Badge>
+                    {item.createdBy === user?.id && (
+                      <Badge className="text-xs w-fit font-medium">Owner</Badge>
+                    )}
+                    {item.tags.map((label) => (
+                      <Badge key={label} variant={"outline"}>
+                        {label}
+                      </Badge>
+                    ))}
+                  </div>
+                ) : null}
+              </button>
+            </DashboardRoute.Link>
           ))}
         </div>
       </ScrollArea>
