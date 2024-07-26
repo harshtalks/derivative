@@ -141,6 +141,9 @@ export const workspaces = sqliteTable("workspaces", {
   }).notNull(),
 });
 
+// activities
+// making a table to store all the activities to the workspace in this.
+
 // user relations
 export const userRelations = relations(users, ({ many }) => ({
   authenticators: many(authenticators),

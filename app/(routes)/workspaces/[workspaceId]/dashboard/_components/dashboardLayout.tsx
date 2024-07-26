@@ -59,10 +59,13 @@ export async function DashboardLayout({
 }: {
   workspaceId: string;
 }) {
-  const { workspaceDB: workspace, creator } =
-    await serverApiTrpc.workspace.workspace({
-      workspaceId,
-    });
+  const {
+    workspaceDB: workspace,
+    creator,
+    membersCount,
+  } = await serverApiTrpc.workspace.workspace({
+    workspaceId,
+  });
 
   return (
     <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8 lg:grid-cols-3 xl:grid-cols-3">
@@ -463,7 +466,7 @@ export async function DashboardLayout({
           </CardContent>
           <CardFooter className="flex flex-row items-center border-t bg-muted/50 px-6 py-3">
             <div className="text-xs text-muted-foreground">
-              Updated <time dateTime="2023-11-23">November 23, 2023</time>
+              Navigate across multiple workspaces.
             </div>
             <Pagination className="ml-auto mr-0 w-auto">
               <PaginationContent>

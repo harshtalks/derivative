@@ -95,13 +95,6 @@ const workspaceRouter = createTRPCRouter({
       const dbResult = await db.transaction(async (ctx) => {
         const workspaceDB = await ctx.query.workspaces.findFirst({
           where: (workspaces, { eq }) => eq(workspaces.id, workspaceId),
-          with: {
-            members: {
-              columns: {
-                id: true,
-              },
-            },
-          },
         });
 
         if (!workspaceDB) {
@@ -110,6 +103,13 @@ const workspaceRouter = createTRPCRouter({
             code: "BAD_REQUEST",
           });
         }
+
+        const members = await ctx.query.members.findMany({
+          columns: {
+            id: true,
+          },
+          where: (members, { eq }) => eq(members.workspaceId, workspaceId),
+        });
 
         const creator = await ctx.query.users.findFirst({
           where: (users, { eq }) => eq(users.id, workspaceDB.createdBy),
@@ -122,7 +122,7 @@ const workspaceRouter = createTRPCRouter({
           });
         }
 
-        return { workspaceDB, creator };
+        return { workspaceDB, creator, membersCount: members.length };
       });
 
       return dbResult;
