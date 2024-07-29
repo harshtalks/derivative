@@ -150,9 +150,9 @@ export async function DashboardLayout({
           <TabsContent value="week">
             <Card x-chunk="dashboard-05-chunk-3">
               <CardHeader className="px-7">
-                <CardTitle>Orders</CardTitle>
+                <CardTitle>Workspace Activities</CardTitle>
                 <CardDescription>
-                  Recent orders from your store.
+                  Recent activities for all things related to your workspaces.
                 </CardDescription>
               </CardHeader>
               <CardContent>

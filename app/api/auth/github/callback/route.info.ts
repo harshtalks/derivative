@@ -1,42 +1,71 @@
 import createRoute from "@/route.config";
 import { createEndPoint } from "tempeh";
-import { array, object, string, boolean } from "zod";
+import { array, object, string, boolean, infer as infer_ } from "zod";
+import { effective } from "@/lib/effect.stuff";
+import {
+  HttpClient,
+  HttpClientRequest,
+  HttpClientResponse,
+} from "@effect/platform";
+import { Effect } from "effect";
 
-const getGithubUserEmails = createEndPoint({
-  httpMethod: "GET",
-  path: createRoute({
-    name: "/user/emails",
-    fn: () => "/user/emails",
-    paramsSchema: object({}),
-    baseUrl: "GITHUB_API",
-  }),
-  SafeResponse: true,
-  responseSchema: array(
-    object({
-      email: string().email(),
-      primary: boolean(),
-      verified: boolean(),
-      visibility: string().nullable(),
-    })
-  ),
+export const githubUserEmailsResponseSchema = array(
+  object({
+    email: string().email(),
+    primary: boolean(),
+    verified: boolean(),
+    visibility: string().nullable(),
+  })
+);
+
+export const githubUserSchema = object({
+  login: string().min(1),
+  avatar_url: string().url(),
+  name: string(),
 });
 
-const getGithubUser = createEndPoint({
-  httpMethod: "GET",
-  path: createRoute({
-    fn: () => "/user",
-    baseUrl: "GITHUB_API",
-    paramsSchema: object({}),
-    name: "getGithubUser",
-  }),
-  SafeResponse: true,
-  responseSchema: object({
-    login: string().min(1),
-    avatar_url: string().url(),
-    name: string(),
-  }),
-});
+export type GithubUserEmails = infer_<typeof githubUserEmailsResponseSchema>;
 
-const githubHandlers = { getGithubUserEmails, getGithubUser };
+export type GithubUser = infer_<typeof githubUserSchema>;
+// Actual Code for the fetching database
+
+const getGithubUserEmailsEffect = (token: string) =>
+  effective<GithubUserEmails>()(
+    HttpClientRequest.get("https://api.github.com/user/emails").pipe(
+      HttpClientRequest.setHeader("Authorization", `Bearer ${token}`),
+      HttpClient.fetchOk,
+      HttpClientResponse.json,
+      Effect.andThen((value) => {
+        const parsed = githubUserEmailsResponseSchema.safeParse(value);
+        if (!parsed.success) {
+          return Effect.fail(parsed.error);
+        } else {
+          return Effect.succeed(parsed.data);
+        }
+      })
+    )
+  );
+
+const getGithubUserEffect = (token: string) =>
+  effective<GithubUser>()(
+    HttpClientRequest.get("https://api.github.com/user").pipe(
+      HttpClientRequest.setHeader("Authorization", `Bearer ${token}`),
+      HttpClient.fetchOk,
+      HttpClientResponse.json,
+      Effect.andThen((value) => {
+        const parsed = githubUserSchema.safeParse(value);
+        if (!parsed.success) {
+          return Effect.fail(parsed.error);
+        } else {
+          return Effect.succeed(parsed.data);
+        }
+      })
+    )
+  );
+
+const githubHandlers = {
+  getGithubUserEffect,
+  getGithubUserEmailsEffect,
+};
 
 export default githubHandlers;

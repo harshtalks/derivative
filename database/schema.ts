@@ -20,6 +20,15 @@ export const memberRoles = [
   "marketing",
 ] as const;
 
+export const workspaceActivitiesEvents = [
+  "created",
+  "members_added",
+  "members_removed",
+] as const;
+
+export type WorkspaceActivitiesEvents =
+  (typeof workspaceActivitiesEvents)[number];
+
 export type Permission = "read" | "write" | "delete" | "admin";
 
 export const workspaceTypes = ["personal", "enterprise", "standard"] as const;
@@ -143,7 +152,20 @@ export const workspaces = sqliteTable("workspaces", {
 
 // activities
 // making a table to store all the activities to the workspace in this.
-
+const workspaceActivities = sqliteTable("workspaceActivities", {
+  id: text("id"),
+  workspaceId: text("workspace_id")
+    .notNull()
+    .references(() => workspaces.id, { onDelete: "cascade" }),
+  performer: text("performer")
+    .notNull()
+    .references(() => members.id, { onDelete: "no action" }),
+  event: text("event", {
+    enum: workspaceActivitiesEvents,
+  }).notNull(),
+  payload: text("payload", { mode: "json" }),
+  createdAt: createdAtSchema,
+});
 // user relations
 export const userRelations = relations(users, ({ many }) => ({
   authenticators: many(authenticators),
@@ -154,6 +176,7 @@ export const userRelations = relations(users, ({ many }) => ({
 // workspace relations
 export const workspaceRelations = relations(workspaces, ({ many }) => ({
   members: many(members),
+  activities: many(workspaceActivities),
 }));
 
 // member relations

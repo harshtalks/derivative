@@ -11,6 +11,8 @@ import WebAuthRoute from "@/app/(routes)/webauth/route.info";
 import WorkspaceRouteInfo from "@/app/(routes)/workspaces/route.info";
 import { ErrorWrapperResponse } from "@/types/api.type";
 import SignInPage from "@/app/(routes)/sign-in/route.info";
+import * as Http from "@effect/platform/HttpClient";
+import { Effect } from "effect";
 
 export const GET = withError<ErrorWrapperResponse<string>>(
   async (request: NextRequest) => {
@@ -49,23 +51,19 @@ export const GET = withError<ErrorWrapperResponse<string>>(
 
     const token = await github.validateAuthorizationCode(code);
 
-    const githubUserResponse = await githubHandlers.getGithubUser({
-      params: {},
-      requestConfig: {
-        headers: {
-          Authorization: `Bearer ${token.accessToken}`,
-        },
-      },
-    });
+    const githubUserEffect = githubHandlers.getGithubUserEffect(
+      token.accessToken
+    );
 
-    const githubUserEmailsResponse = await githubHandlers.getGithubUserEmails({
-      params: {},
-      requestConfig: {
-        headers: {
-          Authorization: `Bearer ${token.accessToken}`,
-        },
-      },
-    });
+    const githubUserResponse = await Effect.runPromise(githubUserEffect);
+
+    const githubUserEmailsEffect = githubHandlers.getGithubUserEmailsEffect(
+      token.accessToken
+    );
+
+    const githubUserEmailsResponse = await Effect.runPromise(
+      githubUserEmailsEffect
+    );
 
     const checkIfUserExists = await db
       .select()
