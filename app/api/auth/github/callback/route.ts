@@ -11,7 +11,6 @@ import WebAuthRoute from "@/app/(routes)/webauth/route.info";
 import WorkspaceRouteInfo from "@/app/(routes)/workspaces/route.info";
 import { ErrorWrapperResponse } from "@/types/api.type";
 import SignInPage from "@/app/(routes)/sign-in/route.info";
-import * as Http from "@effect/platform/HttpClient";
 import { Effect } from "effect";
 
 export const GET = withError<ErrorWrapperResponse<string>>(

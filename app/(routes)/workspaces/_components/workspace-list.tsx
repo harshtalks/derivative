@@ -175,7 +175,7 @@ const WorkspaceList = ({
           <Button className="self-end">Apply Filter</Button>
         </form>
       </Form>
-      <ScrollArea className="h-[400px] mx-auto">
+      <ScrollArea className="w-full mx-auto">
         <div>
           {filteredWorkspaces.length === 0 && (
             <Alert>No workspaces found</Alert>
