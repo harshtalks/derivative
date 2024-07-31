@@ -152,7 +152,7 @@ export const workspaces = sqliteTable("workspaces", {
 
 // activities
 // making a table to store all the activities to the workspace in this.
-const workspaceActivities = sqliteTable("workspaceActivities", {
+export const workspaceActivities = sqliteTable("workspaceActivities", {
   id: text("id"),
   workspaceId: text("workspace_id")
     .notNull()
@@ -166,6 +166,38 @@ const workspaceActivities = sqliteTable("workspaceActivities", {
   payload: text("payload", { mode: "json" }),
   createdAt: createdAtSchema,
 });
+
+// templates
+export const templates = sqliteTable(
+  "invoiceTemplates",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => `template_${crypto.randomUUID()}`),
+    workspaceId: text("workspace_id")
+      .notNull()
+      .references(() => workspaces.id, { onDelete: "set null" }),
+    createdAt: createdAtSchema,
+    updatedAt: updatedAtSchema,
+    name: text("name").notNull(),
+    createdBy: text("createdBy")
+      .notNull()
+      .references(() => members.id, { onDelete: "no action" }),
+    schema: text("schema", { mode: "json" }).notNull(),
+    jsonSchema: text("jsonSchema", { mode: "json" }).notNull(),
+    description: text("description"),
+    tags: text("tags", { mode: "json" }).$type<string[]>(),
+  },
+  (table) => {
+    return {
+      uniqueMember: unique("unique_template_identifier").on(
+        table.workspaceId,
+        table.name
+      ),
+    };
+  }
+);
+
 // user relations
 export const userRelations = relations(users, ({ many }) => ({
   authenticators: many(authenticators),
