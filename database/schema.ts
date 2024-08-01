@@ -60,6 +60,7 @@ export const users = sqliteTable("users", {
   twoFactorEnabled: integer("two_factor_enabled", { mode: "boolean" })
     .notNull()
     .default(false),
+  dob: integer("dob"),
 });
 
 /**
@@ -188,6 +189,7 @@ export const templates = sqliteTable(
     description: text("description"),
     tags: text("tags", { mode: "json" }).$type<string[]>(),
   },
+  // each workspace should have unique name for the template
   (table) => {
     return {
       uniqueMember: unique("unique_template_identifier").on(
@@ -197,6 +199,34 @@ export const templates = sqliteTable(
     };
   }
 );
+
+export const templateMarkups = sqliteTable("templateMarkup", {
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => `markup_${crypto.randomUUID()}`),
+  fontFamily: text("font").notNull(),
+  templateId: text("template_id")
+    .notNull()
+    .references(() => templates.id, { onDelete: "cascade" }),
+  createdAt: createdAtSchema,
+  updatedAt: updatedAtSchema,
+  markup: text("markup", { mode: "text" }).notNull(),
+});
+
+export const invoices = sqliteTable("invoices", {
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => `invoice_${crypto.randomUUID()}`),
+  createdAt: createdAtSchema,
+  updatedAt: updatedAtSchema,
+  templateId: text("template_id")
+    .notNull()
+    .references(() => templates.id, { onDelete: "cascade" }),
+});
+
+/**
+ * Relations
+ */
 
 // user relations
 export const userRelations = relations(users, ({ many }) => ({
@@ -215,4 +245,10 @@ export const workspaceRelations = relations(workspaces, ({ many }) => ({
 export const memberRelations = relations(members, ({ one }) => ({
   user: one(users),
   workspace: one(workspaces),
+}));
+
+// template relations
+export const templateRelations = relations(templates, ({ many, one }) => ({
+  template_markup: one(templateMarkups),
+  invoices: many(invoices),
 }));

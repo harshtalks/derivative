@@ -99,6 +99,7 @@ export const GET = withError<ErrorWrapperResponse<string>>(
       );
     }
 
+    // User already exists here.
     const user = await db
       .insert(users)
       .values({
@@ -131,9 +132,7 @@ export const GET = withError<ErrorWrapperResponse<string>>(
       {
         status: StatusCodes["MOVED_TEMPORARILY"],
         headers: {
-          Location: checkIfUserExists[0].twoFactorEnabled
-            ? webAuthUrl
-            : destination,
+          Location: webAuthUrl,
         },
       }
     );

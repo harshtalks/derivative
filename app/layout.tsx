@@ -12,7 +12,7 @@ import { SessionProvider } from "@/providers/session.provider";
 
 const fontSans = FontSans({
   subsets: ["latin"],
-  variable: "--font-sans",
+  variable: "--font-sans--inter",
 });
 
 export const metadata: Metadata = {
@@ -32,7 +32,7 @@ export default async function RootLayout({
       <body
         className={cn(
           "min-h-screen bg-background font-sans antialiased",
-          fontSans.variable
+          fontSans.className
         )}
       >
         <SessionProvider sessionValue={{ session: session, user: user }}>
