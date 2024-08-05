@@ -54,15 +54,14 @@ export const GET = withError<ErrorWrapperResponse<string>>(
       token.accessToken
     );
 
-    const githubUserResponse = await Effect.runPromise(githubUserEffect);
-
     const githubUserEmailsEffect = githubHandlers.getGithubUserEmailsEffect(
       token.accessToken
     );
 
-    const githubUserEmailsResponse = await Effect.runPromise(
-      githubUserEmailsEffect
-    );
+    const [githubUserResponse, githubUserEmailsResponse] = await Effect.all([
+      githubUserEffect,
+      githubUserEmailsEffect,
+    ]).pipe(Effect.runPromise);
 
     const checkIfUserExists = await db
       .select()

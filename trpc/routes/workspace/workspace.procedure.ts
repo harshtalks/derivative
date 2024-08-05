@@ -3,6 +3,7 @@ import { insertWorkspaceSchema } from "@/database/schema.zod";
 import { createTRPCRouter, twoFactorAuthenticatedProcedure } from "@/trpc/trpc";
 import { getWorkspaceByIdInputSchema } from "./workspace.schema";
 import { TRPCError } from "@trpc/server";
+import Branded from "@/types/branded.type";
 
 const workspaceRouter = createTRPCRouter({
   create: twoFactorAuthenticatedProcedure
@@ -34,7 +35,7 @@ const workspaceRouter = createTRPCRouter({
             .insert(members)
             .values({
               userId: userId,
-              workspaceId: workspace.id,
+              workspaceId: Branded.WorkspaceId(workspace.id),
               role: "admin",
               isCreator: true,
               permissions: ["admin"],

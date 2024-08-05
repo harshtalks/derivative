@@ -11,8 +11,8 @@ import { validateRequestCached } from "@/auth/validate-request";
 import { SessionProvider } from "@/providers/session.provider";
 
 const fontSans = FontSans({
-  subsets: ["latin"],
-  variable: "--font-sans--inter",
+  subsets: ["latin-ext"],
+  variable: "--font-sans",
 });
 
 export const metadata: Metadata = {
@@ -32,7 +32,7 @@ export default async function RootLayout({
       <body
         className={cn(
           "min-h-screen bg-background font-sans antialiased",
-          fontSans.className
+          fontSans.variable
         )}
       >
         <SessionProvider sessionValue={{ session: session, user: user }}>

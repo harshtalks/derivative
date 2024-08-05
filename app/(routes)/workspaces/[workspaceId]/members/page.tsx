@@ -31,10 +31,13 @@ import {
 } from "@/components/ui/table";
 import AuthInterceptor from "@/auth/authIntercepter";
 import WorkspaceMembersRouteInfo from "./route.info";
+import Branded from "@/types/branded.type";
 
 const Members = async ({ params }: { params: { workspaceId: string } }) => {
   await new AuthInterceptor(
-    WorkspaceMembersRouteInfo({ workspaceId: params.workspaceId })
+    WorkspaceMembersRouteInfo({
+      workspaceId: Branded.WorkspaceId(params.workspaceId),
+    })
   )
     .withTwoFactor()
     .withRedirect()

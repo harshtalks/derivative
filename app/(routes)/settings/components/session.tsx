@@ -2,6 +2,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import client from "@/trpc/client";
+import Branded from "@/types/branded.type";
 import { Session } from "lucia";
 import { Loader } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -73,7 +74,7 @@ const SessionCard = ({
       </div>
       <Button
         onClick={() => {
-          mutate({ sessionId: session.id });
+          mutate({ sessionId: Branded.SessionId(session.id) });
         }}
         disabled={isPending}
         size="sm"

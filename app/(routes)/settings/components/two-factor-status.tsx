@@ -30,10 +30,7 @@ const TwoFactorStatus = async () => {
             You are currently using two factor authentication.
           </Alert>
         ) : (
-          <Alert
-            variant="destructive"
-            className="flex w-fit items-center gap-2"
-          >
+          <Alert variant="default" className="flex w-fit items-center gap-2">
             <div className="size-3 rounded-full shrink-0 bg-red-500"></div> You
             are not using two factor authentication. Enable it now to secure
             your account.

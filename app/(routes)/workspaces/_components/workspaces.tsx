@@ -13,7 +13,6 @@ import WorkspaceList from "./workspace-list";
 
 const Workspaces = async () => {
   const workspaces = await serverApiTrpc.workspace.myWorkspaces();
-  const user = await serverApiTrpc.user.get();
 
   return workspaces.length ? (
     <WorkspaceList workspaceList={workspaces} />

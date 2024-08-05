@@ -8,6 +8,7 @@ import {
   HttpClientResponse,
 } from "@effect/platform";
 import { Effect } from "effect";
+import { EmptyRouteConfig } from "@/app/route.info";
 
 export const githubUserEmailsResponseSchema = array(
   object({
@@ -24,6 +25,20 @@ export const githubUserSchema = object({
   name: string(),
 });
 
+export const githubUserRoute = createRoute({
+  name: "githubUser",
+  baseUrl: "GITHUB_API",
+  fn: () => `/user`,
+  paramsSchema: EmptyRouteConfig,
+});
+
+export const githubUserEmailsRoute = createRoute({
+  name: "githubUser",
+  baseUrl: "GITHUB_API",
+  fn: () => `/user/emails`,
+  paramsSchema: EmptyRouteConfig,
+});
+
 export type GithubUserEmails = infer_<typeof githubUserEmailsResponseSchema>;
 
 export type GithubUser = infer_<typeof githubUserSchema>;
@@ -31,7 +46,7 @@ export type GithubUser = infer_<typeof githubUserSchema>;
 
 const getGithubUserEmailsEffect = (token: string) =>
   effective<GithubUserEmails>()(
-    HttpClientRequest.get("https://api.github.com/user/emails").pipe(
+    HttpClientRequest.get(githubUserEmailsRoute({})).pipe(
       HttpClientRequest.setHeader("Authorization", `Bearer ${token}`),
       HttpClient.fetchOk,
       HttpClientResponse.json,
@@ -48,7 +63,7 @@ const getGithubUserEmailsEffect = (token: string) =>
 
 const getGithubUserEffect = (token: string) =>
   effective<GithubUser>()(
-    HttpClientRequest.get("https://api.github.com/user").pipe(
+    HttpClientRequest.get(githubUserRoute({})).pipe(
       HttpClientRequest.setHeader("Authorization", `Bearer ${token}`),
       HttpClient.fetchOk,
       HttpClientResponse.json,

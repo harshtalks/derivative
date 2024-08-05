@@ -18,6 +18,7 @@ import { Alert } from "@/components/ui/alert";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
 import AddNewWorkspaceRoute from "../add-new-workspace/route.info";
 import DashboardRoute from "../[workspaceId]/dashboard/route.info";
+import Branded from "@/types/branded.type";
 
 const filters = ["Name", "Type", "Status", "Tags"] as const;
 
@@ -184,7 +185,7 @@ const WorkspaceList = ({
         <div ref={parent} className="flex flex-col w-full gap-2 p-4 pt-0">
           {filteredWorkspaces.map((item) => (
             <DashboardRoute.Link
-              params={{ workspaceId: item.id }}
+              params={{ workspaceId: Branded.WorkspaceId(item.id) }}
               key={item.id}
               className="w-full min-w-[500px"
             >

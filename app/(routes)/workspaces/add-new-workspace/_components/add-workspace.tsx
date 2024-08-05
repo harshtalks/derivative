@@ -50,6 +50,7 @@ export function AddWorkspace() {
       description: "",
       type: "personal",
       tags: [],
+      note: "",
     },
   });
 
@@ -67,9 +68,8 @@ export function AddWorkspace() {
       // reset the form
       form.reset();
       // redirect to the workspace
-      push({
-        params: {},
-      });
+
+      push({ params: {} });
     },
   });
   // fetching state
