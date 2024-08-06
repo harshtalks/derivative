@@ -1,4 +1,4 @@
-import { members, workspaces } from "@/database/schema";
+import { members, workspaceActivities, workspaces } from "@/database/schema";
 import { insertWorkspaceSchema } from "@/database/schema.zod";
 import { createTRPCRouter, twoFactorAuthenticatedProcedure } from "@/trpc/trpc";
 import { getWorkspaceByIdInputSchema } from "./workspace.schema";
@@ -10,7 +10,7 @@ const workspaceRouter = createTRPCRouter({
     .input(
       insertWorkspaceSchema.omit({
         createdBy: true,
-      })
+      }),
     )
     .mutation(async ({ ctx, input }) => {
       // get database instance
@@ -42,6 +42,15 @@ const workspaceRouter = createTRPCRouter({
             })
             .returning()
         )[0];
+
+        // log the event -> new workspace
+        await ctx.insert(workspaceActivities).values({
+          workspaceId: workspace.id,
+          event: "created",
+          payload: workspace,
+          // performer is going to be the member not user
+          performerId: member.id,
+        });
 
         return { workspace, member };
       });
@@ -75,7 +84,7 @@ const workspaceRouter = createTRPCRouter({
         where: (workspaces, { inArray: $in }) =>
           $in(
             workspaces.id,
-            membersDB.map((m) => m.workspaceId)
+            membersDB.map((m) => m.workspaceId),
           ),
         orderBy: (workspaces, { desc }) => desc(workspaces.createdAt),
       });

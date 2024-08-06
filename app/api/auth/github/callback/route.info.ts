@@ -16,7 +16,7 @@ export const githubUserEmailsResponseSchema = array(
     primary: boolean(),
     verified: boolean(),
     visibility: string().nullable(),
-  })
+  }),
 );
 
 export const githubUserSchema = object({
@@ -33,7 +33,7 @@ export const githubUserRoute = createRoute({
 });
 
 export const githubUserEmailsRoute = createRoute({
-  name: "githubUser",
+  name: "githubUserEmail",
   baseUrl: "GITHUB_API",
   fn: () => `/user/emails`,
   paramsSchema: EmptyRouteConfig,
@@ -57,8 +57,8 @@ const getGithubUserEmailsEffect = (token: string) =>
         } else {
           return Effect.succeed(parsed.data);
         }
-      })
-    )
+      }),
+    ),
   );
 
 const getGithubUserEffect = (token: string) =>
@@ -74,8 +74,8 @@ const getGithubUserEffect = (token: string) =>
         } else {
           return Effect.succeed(parsed.data);
         }
-      })
-    )
+      }),
+    ),
   );
 
 const githubHandlers = {

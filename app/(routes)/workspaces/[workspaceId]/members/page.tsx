@@ -32,12 +32,13 @@ import {
 import AuthInterceptor from "@/auth/authIntercepter";
 import WorkspaceMembersRouteInfo from "./route.info";
 import Branded from "@/types/branded.type";
+import { brandedCurrentWorkspace } from "../layout";
 
-const Members = async ({ params }: { params: { workspaceId: string } }) => {
+const Members = async () => {
   await new AuthInterceptor(
     WorkspaceMembersRouteInfo({
-      workspaceId: Branded.WorkspaceId(params.workspaceId),
-    })
+      workspaceId: brandedCurrentWorkspace(),
+    }),
   )
     .withTwoFactor()
     .withRedirect()

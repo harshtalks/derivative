@@ -32,8 +32,26 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import WorkspaceRouteInfo from "../route.info";
+import serverContext from "@/lib/sever/context";
+import Branded from "@/types/branded.type";
 
-const Layout = ({ children }: { children: ReactNode }) => {
+const [currentWorkspace, setCurrentWorkspace] = serverContext("");
+
+const brandedCurrentWorkspace = () => {
+  return Branded.WorkspaceId(currentWorkspace());
+};
+
+export { brandedCurrentWorkspace, setCurrentWorkspace };
+
+const Layout = ({
+  children,
+  params,
+}: {
+  children: ReactNode;
+  params: { workspaceId: string };
+}) => {
+  // setting the current worksapce
+  setCurrentWorkspace(Branded.WorkspaceId(params.workspaceId));
   return (
     <TooltipProvider>
       <div className="flex min-h-screen w-full flex-col bg-muted/40">

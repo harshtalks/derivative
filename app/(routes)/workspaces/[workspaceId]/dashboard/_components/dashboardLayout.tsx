@@ -32,7 +32,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Input } from "@/components/ui/input";
 import {
   Pagination,
   PaginationContent,
@@ -40,25 +39,17 @@ import {
 } from "@/components/ui/pagination";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import serverApiTrpc from "@/trpc/server";
 import { formatDistanceToNow } from "date-fns";
-import { Avatar, AvatarImage } from "@/components/ui/avatar";
+import WorkspaceLogs, { WorkspaceLogsLoading } from "./workspace-logs";
+import { brandedCurrentWorkspace } from "../../layout";
+import { Suspense } from "react";
 
-export async function DashboardLayout({
-  workspaceId,
-}: {
-  workspaceId: string;
-}) {
+export async function DashboardLayout() {
+  const workspaceId = brandedCurrentWorkspace();
+
   const {
     workspaceDB: workspace,
     creator,
@@ -148,195 +139,9 @@ export async function DashboardLayout({
             </div>
           </div>
           <TabsContent value="week">
-            <Card x-chunk="dashboard-05-chunk-3">
-              <CardHeader className="px-7">
-                <CardTitle>Workspace Activities</CardTitle>
-                <CardDescription>
-                  Recent activities for all things related to your workspaces.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Customer</TableHead>
-                      <TableHead className="hidden sm:table-cell">
-                        Type
-                      </TableHead>
-                      <TableHead className="hidden sm:table-cell">
-                        Status
-                      </TableHead>
-                      <TableHead className="hidden md:table-cell">
-                        Date
-                      </TableHead>
-                      <TableHead className="text-right">Amount</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    <TableRow className="bg-accent">
-                      <TableCell>
-                        <div className="font-medium">Liam Johnson</div>
-                        <div className="hidden text-sm text-muted-foreground md:inline">
-                          liam@example.com
-                        </div>
-                      </TableCell>
-                      <TableCell className="hidden sm:table-cell">
-                        Sale
-                      </TableCell>
-                      <TableCell className="hidden sm:table-cell">
-                        <Badge className="text-xs" variant="secondary">
-                          Fulfilled
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="hidden md:table-cell">
-                        2023-06-23
-                      </TableCell>
-                      <TableCell className="text-right">$250.00</TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell>
-                        <div className="font-medium">Olivia Smith</div>
-                        <div className="hidden text-sm text-muted-foreground md:inline">
-                          olivia@example.com
-                        </div>
-                      </TableCell>
-                      <TableCell className="hidden sm:table-cell">
-                        Refund
-                      </TableCell>
-                      <TableCell className="hidden sm:table-cell">
-                        <Badge className="text-xs" variant="outline">
-                          Declined
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="hidden md:table-cell">
-                        2023-06-24
-                      </TableCell>
-                      <TableCell className="text-right">$150.00</TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell>
-                        <div className="font-medium">Noah Williams</div>
-                        <div className="hidden text-sm text-muted-foreground md:inline">
-                          noah@example.com
-                        </div>
-                      </TableCell>
-                      <TableCell className="hidden sm:table-cell">
-                        Subscription
-                      </TableCell>
-                      <TableCell className="hidden sm:table-cell">
-                        <Badge className="text-xs" variant="secondary">
-                          Fulfilled
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="hidden md:table-cell">
-                        2023-06-25
-                      </TableCell>
-                      <TableCell className="text-right">$350.00</TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell>
-                        <div className="font-medium">Emma Brown</div>
-                        <div className="hidden text-sm text-muted-foreground md:inline">
-                          emma@example.com
-                        </div>
-                      </TableCell>
-                      <TableCell className="hidden sm:table-cell">
-                        Sale
-                      </TableCell>
-                      <TableCell className="hidden sm:table-cell">
-                        <Badge className="text-xs" variant="secondary">
-                          Fulfilled
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="hidden md:table-cell">
-                        2023-06-26
-                      </TableCell>
-                      <TableCell className="text-right">$450.00</TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell>
-                        <div className="font-medium">Liam Johnson</div>
-                        <div className="hidden text-sm text-muted-foreground md:inline">
-                          liam@example.com
-                        </div>
-                      </TableCell>
-                      <TableCell className="hidden sm:table-cell">
-                        Sale
-                      </TableCell>
-                      <TableCell className="hidden sm:table-cell">
-                        <Badge className="text-xs" variant="secondary">
-                          Fulfilled
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="hidden md:table-cell">
-                        2023-06-23
-                      </TableCell>
-                      <TableCell className="text-right">$250.00</TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell>
-                        <div className="font-medium">Liam Johnson</div>
-                        <div className="hidden text-sm text-muted-foreground md:inline">
-                          liam@example.com
-                        </div>
-                      </TableCell>
-                      <TableCell className="hidden sm:table-cell">
-                        Sale
-                      </TableCell>
-                      <TableCell className="hidden sm:table-cell">
-                        <Badge className="text-xs" variant="secondary">
-                          Fulfilled
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="hidden md:table-cell">
-                        2023-06-23
-                      </TableCell>
-                      <TableCell className="text-right">$250.00</TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell>
-                        <div className="font-medium">Olivia Smith</div>
-                        <div className="hidden text-sm text-muted-foreground md:inline">
-                          olivia@example.com
-                        </div>
-                      </TableCell>
-                      <TableCell className="hidden sm:table-cell">
-                        Refund
-                      </TableCell>
-                      <TableCell className="hidden sm:table-cell">
-                        <Badge className="text-xs" variant="outline">
-                          Declined
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="hidden md:table-cell">
-                        2023-06-24
-                      </TableCell>
-                      <TableCell className="text-right">$150.00</TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell>
-                        <div className="font-medium">Emma Brown</div>
-                        <div className="hidden text-sm text-muted-foreground md:inline">
-                          emma@example.com
-                        </div>
-                      </TableCell>
-                      <TableCell className="hidden sm:table-cell">
-                        Sale
-                      </TableCell>
-                      <TableCell className="hidden sm:table-cell">
-                        <Badge className="text-xs" variant="secondary">
-                          Fulfilled
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="hidden md:table-cell">
-                        2023-06-26
-                      </TableCell>
-                      <TableCell className="text-right">$450.00</TableCell>
-                    </TableRow>
-                  </TableBody>
-                </Table>
-              </CardContent>
-            </Card>
+            <Suspense fallback={<WorkspaceLogsLoading />}>
+              <WorkspaceLogs />
+            </Suspense>
           </TabsContent>
         </Tabs>
       </div>

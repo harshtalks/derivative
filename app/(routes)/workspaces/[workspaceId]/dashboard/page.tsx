@@ -3,20 +3,20 @@ import AuthInterceptor from "@/auth/authIntercepter";
 import DashboardRoute from "./route.info";
 
 import DashboardLayout from "./_components/dashboardLayout";
-import Branded from "@/types/branded.type";
+import { brandedCurrentWorkspace } from "../layout";
 
-const page = async ({ params }: { params: { workspaceId: string } }) => {
+const page = async () => {
   // Validate the request
   await new AuthInterceptor(
     DashboardRoute({
-      workspaceId: Branded.WorkspaceId(params.workspaceId),
-    })
+      workspaceId: brandedCurrentWorkspace(),
+    }),
   )
     .withTwoFactor()
     .withRedirect()
     .check();
 
-  return <DashboardLayout workspaceId={params.workspaceId} />;
+  return <DashboardLayout />;
 };
 
 export default page;

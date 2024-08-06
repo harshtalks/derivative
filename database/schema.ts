@@ -36,11 +36,11 @@ export const workspaceTypes = ["personal", "enterprise", "standard"] as const;
 export const workspaceStatus = ["active", "inactive", "archived"] as const;
 
 export const createdAtSchema = integer("created_at").default(
-  sql`(cast(unixepoch() as int))`
+  sql`(cast(unixepoch() as int))`,
 );
 
 const updatedAtSchema = integer("updated_at").default(
-  sql`(cast(unixepoch() as int))`
+  sql`(cast(unixepoch() as int))`,
 );
 
 // TABLES
@@ -124,7 +124,7 @@ export const members = sqliteTable(
     return {
       uniqueMember: unique("unique_member").on(table.userId, table.workspaceId),
     };
-  }
+  },
 );
 
 // workspaces -> what do you ideally need in the workspaces?
@@ -158,13 +158,13 @@ export const workspaceActivities = sqliteTable("workspaceActivities", {
   workspaceId: text("workspace_id")
     .notNull()
     .references(() => workspaces.id, { onDelete: "cascade" }),
-  performer: text("performer")
+  performerId: text("performer_id")
     .notNull()
     .references(() => members.id, { onDelete: "no action" }),
   event: text("event", {
     enum: workspaceActivitiesEvents,
   }).notNull(),
-  payload: text("payload", { mode: "json" }),
+  payload: text("payload", { mode: "json" }).notNull(),
   createdAt: createdAtSchema,
 });
 
@@ -194,10 +194,10 @@ export const templates = sqliteTable(
     return {
       uniqueMember: unique("unique_template_identifier").on(
         table.workspaceId,
-        table.name
+        table.name,
       ),
     };
-  }
+  },
 );
 
 export const templateMarkups = sqliteTable("templateMarkup", {
@@ -237,14 +237,24 @@ export const userRelations = relations(users, ({ many }) => ({
 
 // workspace relations
 export const workspaceRelations = relations(workspaces, ({ many }) => ({
-  members: many(members),
-  activities: many(workspaceActivities),
+  members: many(members, {
+    relationName: "workspace_members",
+  }),
+  activities: many(workspaceActivities, {
+    relationName: "workspace_activities",
+  }),
 }));
 
 // member relations
 export const memberRelations = relations(members, ({ one }) => ({
-  user: one(users),
-  workspace: one(workspaces),
+  user: one(users, {
+    fields: [members.userId],
+    references: [users.id],
+  }),
+  workspace: one(workspaces, {
+    fields: [members.workspaceId],
+    references: [workspaces.id],
+  }),
 }));
 
 // template relations
@@ -252,3 +262,17 @@ export const templateRelations = relations(templates, ({ many, one }) => ({
   template_markup: one(templateMarkups),
   invoices: many(invoices),
 }));
+
+export const workspaceActivityRelations = relations(
+  workspaceActivities,
+  ({ one }) => ({
+    workspace: one(workspaces, {
+      fields: [workspaceActivities.workspaceId],
+      references: [workspaces.id],
+    }),
+    performedBy: one(members, {
+      fields: [workspaceActivities.performerId],
+      references: [members.id],
+    }),
+  }),
+);

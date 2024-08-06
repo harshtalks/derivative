@@ -1,6 +1,6 @@
 // zod schemas for all the drizzle schema
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
-import { members, workspaces } from "./schema";
+import { members, workspaceActivities, workspaces } from "./schema";
 import { string } from "zod";
 
 // this is the schema for the workspaces table, pass this to the trpc query/mutation
@@ -15,3 +15,5 @@ export const selectWorkspaceSchema = createSelectSchema(workspaces, {
 
 export const selectMemberSchema = createSelectSchema(members);
 export const insertMemberSchema = createInsertSchema(members);
+
+export const activityLogSchema = createInsertSchema(workspaceActivities);
