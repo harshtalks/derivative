@@ -5,7 +5,7 @@ import { useState } from "react";
 
 export const useFetchingState = (initialState?: FetchingState) => {
   const [fetchState, setFetchState] = useState<FetchingState>(
-    initialState ?? "idle"
+    initialState ?? "idle",
   );
 
   return {
