@@ -19,7 +19,7 @@ const QueryProvider = ({ children }: { children: ReactNode }) => {
           transformer: superjson,
         }),
       ],
-    })
+    }),
   );
 
   return (

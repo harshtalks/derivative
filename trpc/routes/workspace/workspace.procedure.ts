@@ -6,7 +6,10 @@ import {
 } from "@/database/schema";
 import { insertWorkspaceSchema } from "@/database/schema.zod";
 import { createTRPCRouter, twoFactorAuthenticatedProcedure } from "@/trpc/trpc";
-import { getWorkspaceByIdInputSchema } from "./workspace.schema";
+import {
+  getWorkspaceByIdInputSchema,
+  inviteFlowWorkspaceSchema,
+} from "./workspace.schema";
 import { TRPCError } from "@trpc/server";
 import Branded from "@/types/branded.type";
 import { INVITE_COUNT, WEEKS_TO_EXPIRE, createInviteLink } from "@/auth/invite";
@@ -195,6 +198,23 @@ const workspaceRouter = createTRPCRouter({
         .returning();
 
       return response;
+    }),
+  inviteFlow: twoFactorAuthenticatedProcedure
+    .input(inviteFlowWorkspaceSchema)
+    .query(async ({ ctx, input: { inviteFlowStep, workspaceId } }) => {
+      // sleep of (inviteflowstep + 1) * 2 seconds with promise
+      // starts from 0 to 6
+
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+
+      if (inviteFlowStep === 4) {
+        throw new Error("Failed to invite user");
+      }
+      return {
+        success: true,
+        nextStep: inviteFlowStep + 1,
+        hasNext: inviteFlowStep < 6,
+      };
     }),
 });
 
