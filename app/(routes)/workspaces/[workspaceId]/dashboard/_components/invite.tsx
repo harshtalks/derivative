@@ -4,16 +4,20 @@ import clientApiTrpc from "@/trpc/client";
 import DashboardRoute from "../route.info";
 import Branded from "@/types/branded.type";
 import { match } from "ts-pattern";
-import { Loader } from "lucide-react";
-import { Alert } from "@/components/ui/alert";
+import { AlertOctagon, Check, Copy, Loader } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { toast } from "sonner";
 import WorkspaceInvitationRoute from "../../invitation/route.info";
+import { useEffect, useReducer } from "react";
 
 const InviteMembers = () => {
   const { workspaceId } = DashboardRoute.useParams();
-  const query = clientApiTrpc.workspace.meta.useQuery({
-    workspaceId: Branded.WorkspaceId(workspaceId),
-  });
+  const query = clientApiTrpc.workspace.meta.useQuery(
+    {
+      workspaceId: Branded.WorkspaceId(workspaceId),
+    },
+    { retry: 0 },
+  );
   const utils = clientApiTrpc.useUtils();
   const mutation = clientApiTrpc.workspace.generateLink.useMutation({
     onError: (error) => {
@@ -25,6 +29,8 @@ const InviteMembers = () => {
     },
   });
 
+  const [copied, setCopied] = useReducer((prev) => !prev, false);
+
   return match(query)
     .with({ status: "pending" }, () => (
       <div className="flex items-stretch justify-center gap-2">
@@ -34,7 +40,13 @@ const InviteMembers = () => {
     .with({ status: "error" }, ({ error }) => {
       return (
         <div className="flex items-stretch gap-2">
-          <Alert className="w-fit mx-auto">{error.message}</Alert>
+          <Alert className="w-fit mx-auto mb-1">
+            <AlertTitle className="flex items-center gap-1">
+              <AlertOctagon className="shrink-0 size-4" />
+              <span>Error</span>
+            </AlertTitle>
+            <AlertDescription>{error.message}</AlertDescription>
+          </Alert>
         </div>
       );
     })
@@ -48,8 +60,40 @@ const InviteMembers = () => {
             )}
             readOnly
           />
-          <Button size="sm" className="shrink-0 text-xs">
-            Copy Link
+          <Button
+            color=""
+            onClick={() => {
+              if (!data.inviteCode) {
+                return;
+              }
+              navigator.clipboard.writeText(
+                WorkspaceInvitationRoute(
+                  { workspaceId: Branded.WorkspaceId(workspaceId) },
+                  { search: { invite: data.inviteCode } },
+                ),
+              );
+
+              toast.success("Link copied to clipboard");
+              setCopied();
+
+              setTimeout(() => {
+                setCopied();
+              }, 2000);
+            }}
+            size="sm"
+            className="shrink-0 text-xs"
+          >
+            {copied ? (
+              <span className="inline-flex items-center">
+                <Check className="shrink-0 size-4 mr-1" />
+                Link Copied
+              </span>
+            ) : (
+              <span className="inline-flex items-center">
+                <Copy className="shrink-0 size-4 mr-1" />
+                Copy Link
+              </span>
+            )}
           </Button>
         </div>
       ) : (

@@ -9,11 +9,7 @@ const Page = async ({ params }: { params: TemplatePageSchema }) => {
     .withTwoFactor()
     .check();
 
-  return (
-    <div className="mx-auto pt-4">
-      <TemplateTabs />
-    </div>
-  );
+  return <div className="mx-auto pt-4"></div>;
 };
 
 export default Page;

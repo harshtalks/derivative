@@ -151,7 +151,7 @@ export async function DashboardLayout() {
           className="overflow-hidden shadow-none "
           x-chunk="dashboard-05-chunk-4"
         >
-          <CardHeader className="flex flex-row items-start bg-muted/50">
+          <CardHeader className="flex flex-row justify-between flex-wrap items-start gap-2 bg-muted/50">
             <div className="grid gap-0.5">
               <CardTitle className="flex items-center gap-2 text-lg">
                 {workspace.name}
@@ -165,7 +165,7 @@ export async function DashboardLayout() {
                 </CardDescription>
               )}
             </div>
-            <div className="ml-auto flex items-center gap-1">
+            <div className="flex items-center gap-1">
               <AddMembers />
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>

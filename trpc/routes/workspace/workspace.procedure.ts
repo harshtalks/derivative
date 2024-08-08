@@ -169,7 +169,7 @@ const workspaceRouter = createTRPCRouter({
       if (!response) {
         throw new TRPCError({
           code: "BAD_REQUEST",
-          message: "Workspace not found with given id " + workspaceId,
+          message: "Workspace metadata not found for given workspace.",
         });
       }
 
