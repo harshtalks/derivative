@@ -31,6 +31,7 @@ import clientApiTrpc from "@/trpc/client";
 import { toast } from "sonner";
 import WorkspaceRouteInfo from "../../route.info";
 import { useRouter } from "next/navigation";
+import { revalidate } from "@/actions/revalidate";
 
 const addWorkspaceFormSchema = object({
   name: string().min(1),
@@ -60,15 +61,15 @@ export function AddWorkspace() {
     onError: (error) => {
       toast.error(error.message);
     },
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       toast.success(
         "we have created the workspace for you with the name - " +
-          data.workspace.name
+          data.workspace.name,
       );
       // reset the form
       form.reset();
       // redirect to the workspace
-
+      await revalidate({ path: WorkspaceRouteInfo({}) });
       push({ params: {} });
     },
   });

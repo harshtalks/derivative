@@ -2,14 +2,10 @@ import {
   CalendarPlus,
   ChevronLeft,
   ChevronRight,
-  Copy,
   CreditCard,
   File,
   ListFilter,
   MoreVertical,
-  Truck,
-  UserPlus,
-  Users2,
 } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
@@ -46,6 +42,8 @@ import { formatDistanceToNow } from "date-fns";
 import WorkspaceLogs, { WorkspaceLogsLoading } from "./workspace-logs";
 import { brandedCurrentWorkspace } from "../../layout";
 import { Suspense } from "react";
+import NewTemplateRouteInfo from "../../templates/new-template/route.info";
+import AddMembers from "./add-members";
 
 export async function DashboardLayout() {
   const workspaceId = brandedCurrentWorkspace();
@@ -70,7 +68,11 @@ export async function DashboardLayout() {
               </CardDescription>
             </CardHeader>
             <CardFooter>
-              <Button>Create New Template</Button>
+              <NewTemplateRouteInfo.Link
+                params={{ workspaceId: brandedCurrentWorkspace() }}
+              >
+                <Button>Create New Template</Button>
+              </NewTemplateRouteInfo.Link>
             </CardFooter>
           </Card>
           <Card x-chunk="dashboard-05-chunk-1">
@@ -146,21 +148,13 @@ export async function DashboardLayout() {
       </div>
       <div>
         <Card
-          className="overflow-hidden shadow-none"
+          className="overflow-hidden shadow-none "
           x-chunk="dashboard-05-chunk-4"
         >
           <CardHeader className="flex flex-row items-start bg-muted/50">
             <div className="grid gap-0.5">
-              <CardTitle className="group flex items-center gap-2 text-lg">
+              <CardTitle className="flex items-center gap-2 text-lg">
                 {workspace.name}
-                <Button
-                  size="icon"
-                  variant="outline"
-                  className="h-6 w-6 opacity-0 transition-opacity group-hover:opacity-100"
-                >
-                  <Copy className="h-3 w-3 shrink-0 inline-block" />
-                  <span className="sr-only">Copy Order ID</span>
-                </Button>
               </CardTitle>
               {workspace.createdAt && (
                 <CardDescription className="inline-flex items-center gap-1">
@@ -172,12 +166,7 @@ export async function DashboardLayout() {
               )}
             </div>
             <div className="ml-auto flex items-center gap-1">
-              <Button size="sm" variant="outline" className="h-8 gap-1">
-                <UserPlus className="h-3.5 w-3.5" />
-                <span className="lg:sr-only xl:not-sr-only xl:whitespace-nowrap">
-                  Add Members
-                </span>
-              </Button>
+              <AddMembers />
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button size="icon" variant="outline" className="h-8 w-8">

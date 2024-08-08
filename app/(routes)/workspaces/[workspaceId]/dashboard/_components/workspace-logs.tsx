@@ -66,9 +66,11 @@ const WorkspaceLogs = async () => {
               {logs.map((log) => (
                 <TableRow key={log.id}>
                   <TableCell>
-                    <div className="font-medium">Liam Johnson</div>
+                    <div className="font-medium !capitalize">
+                      {log.performedBy.user.name}
+                    </div>
                     <div className="hidden text-sm text-muted-foreground md:inline">
-                      liam@example.com
+                      {log.performedBy.user.email}
                     </div>
                   </TableCell>
                   <TableCell className="hidden sm:table-cell">

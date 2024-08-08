@@ -1,3 +1,4 @@
+"use client";
 import Image from "next/image";
 import Link from "next/link";
 import { ChevronLeft, PlusCircle, Upload } from "lucide-react";
@@ -16,16 +17,7 @@ import {
 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { Textarea } from "@/components/ui/textarea";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import {
   Select,
   SelectContent,
@@ -33,8 +25,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Fragment, useState } from "react";
+import { Invoice } from "@/static/invoice";
 
 export function TemplateForm() {
+  const [categoryKey, setCategoryKey] =
+    useState<Invoice.Keys>("expenseInvoices");
+
+  const subCategory = Invoice.getSubCategory(categoryKey);
+
   return (
     <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
       <div className="mx-auto grid container max-w-6xl py-12 flex-1 auto-rows-max gap-4">
@@ -96,108 +95,29 @@ export function TemplateForm() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="w-[100px]">SKU</TableHead>
-                      <TableHead>Stock</TableHead>
-                      <TableHead>Price</TableHead>
-                      <TableHead className="w-[100px]">Size</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    <TableRow>
-                      <TableCell className="font-semibold">GGPC-001</TableCell>
-                      <TableCell>
-                        <Label htmlFor="stock-1" className="sr-only">
-                          Stock
-                        </Label>
-                        <Input id="stock-1" type="number" defaultValue="100" />
-                      </TableCell>
-                      <TableCell>
-                        <Label htmlFor="price-1" className="sr-only">
-                          Price
-                        </Label>
-                        <Input
-                          id="price-1"
-                          type="number"
-                          defaultValue="99.99"
-                        />
-                      </TableCell>
-                      <TableCell>
-                        <ToggleGroup
-                          type="single"
-                          defaultValue="s"
-                          variant="outline"
-                        >
-                          <ToggleGroupItem value="s">S</ToggleGroupItem>
-                          <ToggleGroupItem value="m">M</ToggleGroupItem>
-                          <ToggleGroupItem value="l">L</ToggleGroupItem>
-                        </ToggleGroup>
-                      </TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell className="font-semibold">GGPC-002</TableCell>
-                      <TableCell>
-                        <Label htmlFor="stock-2" className="sr-only">
-                          Stock
-                        </Label>
-                        <Input id="stock-2" type="number" defaultValue="143" />
-                      </TableCell>
-                      <TableCell>
-                        <Label htmlFor="price-2" className="sr-only">
-                          Price
-                        </Label>
-                        <Input
-                          id="price-2"
-                          type="number"
-                          defaultValue="99.99"
-                        />
-                      </TableCell>
-                      <TableCell>
-                        <ToggleGroup
-                          type="single"
-                          defaultValue="m"
-                          variant="outline"
-                        >
-                          <ToggleGroupItem value="s">S</ToggleGroupItem>
-                          <ToggleGroupItem value="m">M</ToggleGroupItem>
-                          <ToggleGroupItem value="l">L</ToggleGroupItem>
-                        </ToggleGroup>
-                      </TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell className="font-semibold">GGPC-003</TableCell>
-                      <TableCell>
-                        <Label htmlFor="stock-3" className="sr-only">
-                          Stock
-                        </Label>
-                        <Input id="stock-3" type="number" defaultValue="32" />
-                      </TableCell>
-                      <TableCell>
-                        <Label htmlFor="price-3" className="sr-only">
-                          Stock
-                        </Label>
-                        <Input
-                          id="price-3"
-                          type="number"
-                          defaultValue="99.99"
-                        />
-                      </TableCell>
-                      <TableCell>
-                        <ToggleGroup
-                          type="single"
-                          defaultValue="s"
-                          variant="outline"
-                        >
-                          <ToggleGroupItem value="s">S</ToggleGroupItem>
-                          <ToggleGroupItem value="m">M</ToggleGroupItem>
-                          <ToggleGroupItem value="l">L</ToggleGroupItem>
-                        </ToggleGroup>
-                      </TableCell>
-                    </TableRow>
-                  </TableBody>
-                </Table>
+                <pre className="px-4 py-3 font-mono text-left bg-transparent border rounded border-zinc-600 focus:border-zinc-100/80 focus:ring-0 sm:text-sm text-zinc-100">
+                  <div className="flex items-start px-1 text-sm">
+                    <div
+                      aria-hidden="true"
+                      className="pr-4 font-mono border-r select-none border-zinc-300/5 text-zinc-700"
+                    >
+                      {Array.from({
+                        length: 5,
+                      }).map((_, index) => (
+                        <Fragment key={index}>
+                          {(index + 1).toString().padStart(2, "0")}
+                          <br />
+                        </Fragment>
+                      ))}
+                    </div>
+                    <textarea
+                      minLength={1}
+                      rows={Math.max(5)}
+                      // placeholder={JSON.stringify(dummySchema, null, 2)}
+                      className="w-full p-0 pl-2 text-base !resize-none bg-transparent border-0 appearance-none hover:resize text-zinc-100 placeholder-zinc-500 focus-visible:outline-0 focus:ring-0 sm:text-sm"
+                    />
+                  </div>
+                </pre>
               </CardContent>
               <CardFooter className="justify-center border-t p-4">
                 <Button size="sm" variant="ghost" className="gap-1">
@@ -208,25 +128,37 @@ export function TemplateForm() {
             </Card>
             <Card x-chunk="dashboard-07-chunk-2" className="shadow-none">
               <CardHeader>
-                <CardTitle>Product Category</CardTitle>
+                <CardTitle>Invoice Categories</CardTitle>
+                <CardDescription>
+                  It is always adviced to categorize your invoices for better.
+                  This can be used for better reporting, analytics, and
+                  filtering also.
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="grid gap-6 sm:grid-cols-3">
                   <div className="grid gap-3">
                     <Label htmlFor="category">Category</Label>
-                    <Select>
+                    <Select
+                      defaultValue={categoryKey}
+                      onValueChange={(e) => {
+                        setCategoryKey(e as Invoice.Keys);
+                      }}
+                    >
                       <SelectTrigger id="category" aria-label="Select category">
                         <SelectValue placeholder="Select category" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="clothing">Clothing</SelectItem>
-                        <SelectItem value="electronics">Electronics</SelectItem>
-                        <SelectItem value="accessories">Accessories</SelectItem>
+                        {Invoice.getKeys().map((key) => (
+                          <SelectItem key={key} value={key}>
+                            {Invoice.getCategory(key)}
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                   </div>
                   <div className="grid gap-3">
-                    <Label htmlFor="subcategory">Subcategory (optional)</Label>
+                    <Label htmlFor="subcategory">Subcategory</Label>
                     <Select>
                       <SelectTrigger
                         id="subcategory"
@@ -235,9 +167,11 @@ export function TemplateForm() {
                         <SelectValue placeholder="Select subcategory" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="t-shirts">T-Shirts</SelectItem>
-                        <SelectItem value="hoodies">Hoodies</SelectItem>
-                        <SelectItem value="sweatshirts">Sweatshirts</SelectItem>
+                        {subCategory.map((key) => (
+                          <SelectItem key={key} value={key}>
+                            {key}
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                   </div>
@@ -248,7 +182,7 @@ export function TemplateForm() {
           <div className="grid auto-rows-max items-start gap-4 lg:gap-8">
             <Card x-chunk="dashboard-07-chunk-3" className="shadow-none">
               <CardHeader>
-                <CardTitle>Product Status</CardTitle>
+                <CardTitle>Template Status</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="grid gap-6">

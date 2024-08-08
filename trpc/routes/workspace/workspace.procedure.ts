@@ -1,9 +1,15 @@
-import { members, workspaceActivities, workspaces } from "@/database/schema";
+import {
+  members,
+  workspaceActivities,
+  workspaceMetadata,
+  workspaces,
+} from "@/database/schema";
 import { insertWorkspaceSchema } from "@/database/schema.zod";
 import { createTRPCRouter, twoFactorAuthenticatedProcedure } from "@/trpc/trpc";
 import { getWorkspaceByIdInputSchema } from "./workspace.schema";
 import { TRPCError } from "@trpc/server";
 import Branded from "@/types/branded.type";
+import { INVITE_COUNT } from "@/auth/invite";
 
 const workspaceRouter = createTRPCRouter({
   create: twoFactorAuthenticatedProcedure
@@ -42,6 +48,13 @@ const workspaceRouter = createTRPCRouter({
             })
             .returning()
         )[0];
+
+        // workspace metadata
+        await ctx.insert(workspaceMetadata).values({
+          inviteCount: 0,
+          inviteLimit: INVITE_COUNT,
+          workspaceId: workspace.id,
+        });
 
         // log the event -> new workspace
         await ctx.insert(workspaceActivities).values({
@@ -105,6 +118,9 @@ const workspaceRouter = createTRPCRouter({
       const dbResult = await db.transaction(async (ctx) => {
         const workspaceDB = await ctx.query.workspaces.findFirst({
           where: (workspaces, { eq }) => eq(workspaces.id, workspaceId),
+          with: {
+            metadata: true,
+          },
         });
 
         if (!workspaceDB) {

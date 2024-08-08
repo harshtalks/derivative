@@ -4,9 +4,10 @@ import { revalidatePath } from "next/cache";
 import { createAction } from "tempeh";
 import { object, string } from "zod";
 
-export const reloadPage = createAction({
+export const revalidate = createAction({
   handler: async ({ path }) => {
     console.log("reloading page thru action");
+    revalidatePath(path || "/");
 
     return {
       success: true,

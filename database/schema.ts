@@ -151,6 +151,20 @@ export const workspaces = sqliteTable("workspaces", {
   }).notNull(),
 });
 
+// workspace metadata
+export const workspaceMetadata = sqliteTable("workspaceMetadata", {
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  workspaceId: text("workspace_id")
+    .notNull()
+    .references(() => workspaces.id, { onDelete: "cascade" }),
+  inviteCode: text("invite_code"),
+  inviteExpiry: integer("invite_expiry"),
+  inviteLimit: integer("invite_limit").notNull(),
+  inviteCount: integer("invite_count").notNull(),
+});
+
 // activities
 // making a table to store all the activities to the workspace in this.
 export const workspaceActivities = sqliteTable("workspaceActivities", {
@@ -236,14 +250,30 @@ export const userRelations = relations(users, ({ many }) => ({
 }));
 
 // workspace relations
-export const workspaceRelations = relations(workspaces, ({ many }) => ({
+export const workspaceRelations = relations(workspaces, ({ many, one }) => ({
   members: many(members, {
     relationName: "workspace_members",
   }),
   activities: many(workspaceActivities, {
     relationName: "workspace_activities",
   }),
+  metadata: one(workspaceMetadata),
+  creator: one(users, {
+    fields: [workspaces.createdBy],
+    references: [users.id],
+  }),
 }));
+
+// metadata relationship
+export const workspaceMetadataRelations = relations(
+  workspaceMetadata,
+  ({ one }) => ({
+    workspace: one(workspaces, {
+      fields: [workspaceMetadata.workspaceId],
+      references: [workspaces.id],
+    }),
+  }),
+);
 
 // member relations
 export const memberRelations = relations(members, ({ one }) => ({

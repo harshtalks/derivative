@@ -20,7 +20,7 @@ const logRouter = createTRPCRouter({
       await db.insert(workspaceActivities).values({
         event: input.event,
         payload: input.payload,
-        performer: ctx.user.id,
+        performerId: ctx.user.id,
         workspaceId: input.workspaceId,
       });
 
@@ -37,7 +37,20 @@ const logRouter = createTRPCRouter({
 
       const logs = await db.query.workspaceActivities.findMany({
         with: {
-          performedBy: true,
+          performedBy: {
+            with: {
+              user: {
+                columns: {
+                  avatar: true,
+                  email: true,
+                  name: true,
+                },
+              },
+            },
+            columns: {
+              userId: true,
+            },
+          },
         },
         where: (workspaceActivities, { eq }) =>
           eq(workspaceActivities.workspaceId, workspaceId),
