@@ -66,17 +66,7 @@ export default async function Page() {
             </p>
           </div>
 
-          {/* <div className="mt-10 flex max-w-[400px] mx-auto justify-center items-center gap-x-1 sm:gap-x-3">
-            <Alert variant="default">
-              <ExclamationTriangleIcon />
-              <AlertDescription>
-                We could not find any workspaces for you. Create a workspace to
-                get started.
-              </AlertDescription>
-            </Alert>
-          </div> */}
           <Workspaces />
-          {/* Buttons */}
           <div className="mt-8 gap-3 flex justify-center">
             <AddNewWorkspaceRoute.Link params={{}}>
               <Button variant="ringHover" size={"lg"}>
@@ -84,10 +74,8 @@ export default async function Page() {
               </Button>
             </AddNewWorkspaceRoute.Link>
           </div>
-          {/* End Buttons */}
         </div>
       </div>
-      {/* End Hero */}
     </>
   );
 }

@@ -120,6 +120,7 @@
     "react-lite-youtube-embed": "^2.4.0",
     "react-resizable-panels": "^2.0.19",
     "react-tweet": "^3.2.1",
+    "react-virtuoso": "^4.9.0",
     "server-only": "^0.0.1",
     "slate": "0.102.0",
     "slate-history": "0.100.0",

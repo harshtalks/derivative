@@ -1,13 +1,17 @@
 "use client";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { workspaces, workspaceStatus } from "@/database/schema";
 import { cn } from "@/lib/utils";
 import { useSessionProvider } from "@/providers/session.provider";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { formatDistanceToNow, set } from "date-fns";
-import React, { useState } from "react";
+import React, {
+  ComponentPropsWithoutRef,
+  ElementRef,
+  forwardRef,
+  useState,
+} from "react";
 import { useForm } from "react-hook-form";
 import { object, string, enum as _enum, infer as _infer } from "zod";
 import { Form, FormField, FormMessage } from "@/components/ui/form";
@@ -19,8 +23,25 @@ import { useAutoAnimate } from "@formkit/auto-animate/react";
 import AddNewWorkspaceRoute from "../add-new-workspace/route.info";
 import DashboardRoute from "../[workspaceId]/dashboard/route.info";
 import Branded from "@/types/branded.type";
+import { VirtuosoGrid } from "react-virtuoso";
 
 const filters = ["Name", "Type", "Status", "Tags"] as const;
+
+const gridComponents = {
+  List: forwardRef<ElementRef<"div">, ComponentPropsWithoutRef<"div">>(
+    ({ style, children, ...props }, ref) => (
+      <div
+        ref={ref}
+        {...props}
+        className="grid h-[200px] grid-cols-1 md:grid-cols-2 max-w-[1020px] mx-auto w-full gap-2 p-4 pt-0"
+      >
+        {children}
+      </div>
+    ),
+  ),
+};
+
+gridComponents.List.displayName = "List";
 
 const workspaceStatusToColor = (status: (typeof workspaceStatus)[number]) => {
   switch (status) {
@@ -33,7 +54,7 @@ const workspaceStatusToColor = (status: (typeof workspaceStatus)[number]) => {
     default:
       status satisfies never;
       throw new Error(
-        `workspace status - ${status} not intercepted by switch case`
+        `workspace status - ${status} not intercepted by switch case`,
       );
   }
 };
@@ -57,7 +78,7 @@ const WorkspaceList = ({
     resolver: zodResolver(filterSchema),
   });
 
-  const [parent] = useAutoAnimate();
+  // const [parent] = useAutoAnimate();
 
   const [appliedFilters, setAppliedFilters] = useState<FilterSchema[]>([]);
 
@@ -84,20 +105,20 @@ const WorkspaceList = ({
         default:
           filter.filter satisfies never;
           throw new Error(
-            `filter - ${filter.filter} not intercepted by switch case`
+            `filter - ${filter.filter} not intercepted by switch case`,
           );
       }
     });
   });
 
   return (
-    <div className="gap-y-10 flex flex-col max-w-[500px] mx-auto pt-12">
+    <div className="gap-y-6 flex flex-col pt-12">
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit((e) => {
             // check if the same filter already exists
             const isFilterExists = appliedFilters.find(
-              (el) => el.filter === e.filter
+              (el) => el.filter === e.filter,
             );
 
             if (isFilterExists) {
@@ -108,7 +129,7 @@ const WorkspaceList = ({
               setAppliedFilters([...appliedFilters, e]);
             }
           })}
-          className="w-full flex flex-col gap-y-4 p-4 rounded-md"
+          className="w-full flex flex-col max-w-[500px] mx-auto gap-y-4 p-4 rounded-md"
         >
           <div className="flex items-center gap-2 flex-wrap">
             {appliedFilters.map((filter) => (
@@ -123,7 +144,9 @@ const WorkspaceList = ({
                 <button
                   onClick={() => {
                     setAppliedFilters(
-                      appliedFilters.filter((el) => el.filter !== filter.filter)
+                      appliedFilters.filter(
+                        (el) => el.filter !== filter.filter,
+                      ),
                     );
                   }}
                   className="ml-2"
@@ -161,7 +184,8 @@ const WorkspaceList = ({
                         variant="outline"
                         className={cn(
                           "group-focus-within:border-primary",
-                          field.value === el && "border-primary fill-background"
+                          field.value === el &&
+                            "border-primary fill-background",
                         )}
                       >
                         {el}
@@ -176,23 +200,22 @@ const WorkspaceList = ({
           <Button className="self-end">Apply Filter</Button>
         </form>
       </Form>
-      <ScrollArea className="w-full mx-auto">
-        <div>
-          {filteredWorkspaces.length === 0 && (
-            <Alert>No workspaces found</Alert>
-          )}
-        </div>
-        <div ref={parent} className="flex flex-col w-full gap-2 p-4 pt-0">
-          {filteredWorkspaces.map((item) => (
+      <div>
+        {filteredWorkspaces.length === 0 && <Alert>No workspaces found</Alert>}
+      </div>
+      <VirtuosoGrid
+        components={gridComponents}
+        itemContent={(index, item) => {
+          return (
             <DashboardRoute.Link
               params={{ workspaceId: Branded.WorkspaceId(item.id) }}
-              key={item.id}
-              className="w-full min-w-[500px"
+              key={index}
+              className="w-full max-w-[500px]"
             >
               <button
                 className={cn(
-                  "flex flex-col w-full items-start gap-2 rounded-lg border p-3 text-left text-sm transition-all hover:bg-accent",
-                  "hover:bg-muted group"
+                  "flex flex-col w-full h-full items-start gap-4 rounded-lg border p-3 text-left text-sm transition-all hover:bg-accent",
+                  "hover:bg-muted group",
                 )}
               >
                 <div className="flex w-full flex-col gap-1">
@@ -203,7 +226,7 @@ const WorkspaceList = ({
                       <span
                         className={cn(
                           "flex h-2 w-2 rounded-full",
-                          workspaceStatusToColor(item.status)
+                          workspaceStatusToColor(item.status),
                         )}
                       />
                       {/* )} */}
@@ -211,7 +234,7 @@ const WorkspaceList = ({
                     <div
                       className={cn(
                         "ml-auto text-xs text-muted-foreground",
-                        "group-hover:text-foreground"
+                        "group-hover:text-foreground",
                       )}
                     >
                       {item.createdAt &&
@@ -242,9 +265,11 @@ const WorkspaceList = ({
                 ) : null}
               </button>
             </DashboardRoute.Link>
-          ))}
-        </div>
-      </ScrollArea>
+          );
+        }}
+        data={filteredWorkspaces}
+        style={{ height: 400 }}
+      />
     </div>
   );
 };
