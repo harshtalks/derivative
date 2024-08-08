@@ -9,7 +9,10 @@ import { createTRPCRouter, twoFactorAuthenticatedProcedure } from "@/trpc/trpc";
 import { getWorkspaceByIdInputSchema } from "./workspace.schema";
 import { TRPCError } from "@trpc/server";
 import Branded from "@/types/branded.type";
-import { INVITE_COUNT } from "@/auth/invite";
+import { INVITE_COUNT, WEEKS_TO_EXPIRE, createInviteLink } from "@/auth/invite";
+import { TimeSpan } from "oslo";
+import { Effect } from "effect";
+import { eq } from "drizzle-orm";
 
 const workspaceRouter = createTRPCRouter({
   create: twoFactorAuthenticatedProcedure
@@ -152,6 +155,46 @@ const workspaceRouter = createTRPCRouter({
       });
 
       return dbResult;
+    }),
+  meta: twoFactorAuthenticatedProcedure
+    .input(getWorkspaceByIdInputSchema)
+    .query(async ({ ctx, input }) => {
+      const { workspaceId } = input;
+      const { db } = ctx;
+
+      const response = await db.query.workspaceMetadata.findFirst({
+        where: (metadata, { eq }) => eq(metadata.workspaceId, workspaceId),
+      });
+
+      if (!response) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Workspace not found with given id " + workspaceId,
+        });
+      }
+
+      return response;
+    }),
+  generateLink: twoFactorAuthenticatedProcedure
+    .input(getWorkspaceByIdInputSchema)
+    .mutation(async ({ ctx, input }) => {
+      const { workspaceId } = input;
+      const { db } = ctx;
+
+      const timespan = new TimeSpan(WEEKS_TO_EXPIRE, "w");
+
+      const token = await createInviteLink(timespan, { workspaceId });
+
+      const response = await db
+        .update(workspaceMetadata)
+        .set({
+          inviteCode: token,
+          inviteExpiry: timespan.milliseconds(),
+        })
+        .where(eq(workspaceMetadata.workspaceId, workspaceId))
+        .returning();
+
+      return response;
     }),
 });
 

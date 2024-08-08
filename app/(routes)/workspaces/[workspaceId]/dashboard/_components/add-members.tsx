@@ -1,13 +1,7 @@
 "use client";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardTitle,
-  CardHeader,
-  CardContent,
-  CardDescription,
-} from "@/components/ui/card";
+import { CardTitle, CardDescription } from "@/components/ui/card";
 import {
   Credenza,
   CredenzaBody,
@@ -41,9 +35,9 @@ const AddMembers = () => {
       </CredenzaTrigger>
       <CredenzaContent>
         <CredenzaHeader>
-          <CardTitle>Share this document</CardTitle>
+          <CardTitle>Invite Members</CardTitle>
           <CardDescription>
-            Anyone with the link can view this document.
+            Anyone with the link can join this workspace. Account Required.
           </CardDescription>
         </CredenzaHeader>
         <CredenzaBody>

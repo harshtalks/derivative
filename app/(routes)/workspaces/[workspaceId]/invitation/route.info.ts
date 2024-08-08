@@ -11,6 +11,8 @@ const WorkspaceInvitationRoute = createRoute({
     invite: string().optional(),
   }),
   fn: ({ workspaceId }) => `/workspaces/${workspaceId}/invitation`,
+  baseUrl:
+    typeof window === "undefined" ? env.BASE_URL : env.NEXT_PUBLIC_BASE_URL,
 });
 
 export default WorkspaceInvitationRoute;
