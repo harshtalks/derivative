@@ -3,7 +3,7 @@ import { WorkspaceForm } from "./_components/workspace-form";
 import AuthInterceptor from "@/auth/authIntercepter";
 import WorkspaceSettingsRouteInfo from "./route.info";
 import Branded from "@/types/branded.type";
-import { brandedCurrentWorkspace } from "../layout";
+import { checkAccessForWorkspace } from "@/auth/access-check";
 
 export default async function SettingsWorkspacePage() {
   await new AuthInterceptor(
@@ -12,6 +12,7 @@ export default async function SettingsWorkspacePage() {
     }),
   )
     .withRedirect()
+    .withAfterAuth(checkAccessForWorkspace)
     .withTwoFactor()
     .check();
 

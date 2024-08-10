@@ -40,10 +40,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import serverApiTrpc from "@/trpc/server";
 import { formatDistanceToNow } from "date-fns";
 import WorkspaceLogs, { WorkspaceLogsLoading } from "./workspace-logs";
-import { brandedCurrentWorkspace } from "../../layout";
 import { Suspense } from "react";
 import NewTemplateRouteInfo from "../../templates/new-template/route.info";
 import AddMembers from "./add-members";
+import { brandedCurrentWorkspace } from "../../../route.info";
 
 export async function DashboardLayout() {
   const workspaceId = brandedCurrentWorkspace();

@@ -1,9 +1,9 @@
 import AuthInterceptor from "@/auth/authIntercepter";
 import WorkspaceInvitationRoute from "./route.info";
-import { brandedCurrentWorkspace } from "../layout";
 import { Button } from "@/components/ui/button";
 import { ChevronRightIcon } from "lucide-react";
 import InviteFlow from "./_components/invite-flow";
+import { brandedCurrentWorkspace } from "../../route.info";
 
 const Page = async ({
   searchParams,

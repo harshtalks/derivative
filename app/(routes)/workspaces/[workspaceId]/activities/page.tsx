@@ -7,15 +7,17 @@ import withAuth from "@/auth/wrappers/withAuth";
 import AuthInterceptor from "@/auth/authIntercepter";
 import DashboardRoute from "./route.info";
 import Branded from "@/types/branded.type";
+import { checkAccessForWorkspace } from "@/auth/access-check";
 
 const page = async ({ params }: { params: { workspaceId: string } }) => {
   // Validate the request
   await new AuthInterceptor(
     DashboardRoute({
       workspaceId: Branded.WorkspaceId(params.workspaceId),
-    })
+    }),
   )
     .withTwoFactor()
+    .withAfterAuth(checkAccessForWorkspace)
     .withRedirect()
     .check();
 

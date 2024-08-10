@@ -74,11 +74,16 @@ const InviteFlow = () => {
       inviteFlowStep: currentStep,
       workspaceId: Branded.WorkspaceId(workspaceId),
     },
-    { retry: 0 },
+    {
+      retry: 0,
+      refetchOnMount: false,
+      refetchOnReconnect: false,
+      refetchOnWindowFocus: false,
+    },
   );
 
   useEffect(() => {
-    if (query.isError) {
+    if (query.error) {
       toast.error("Something went wrong: " + query.error.message);
     }
   }, [query.error]);

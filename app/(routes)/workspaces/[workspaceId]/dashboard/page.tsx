@@ -3,7 +3,8 @@ import AuthInterceptor from "@/auth/authIntercepter";
 import DashboardRoute from "./route.info";
 
 import DashboardLayout from "./_components/dashboardLayout";
-import { brandedCurrentWorkspace } from "../layout";
+import { checkAccessForWorkspace } from "@/auth/access-check";
+import { brandedCurrentWorkspace } from "../../route.info";
 
 const page = async () => {
   // Validate the request
@@ -14,6 +15,7 @@ const page = async () => {
   )
     .withTwoFactor()
     .withRedirect()
+    .withAfterAuth(checkAccessForWorkspace)
     .check();
 
   return <DashboardLayout />;

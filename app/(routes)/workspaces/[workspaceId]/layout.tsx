@@ -31,17 +31,9 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import WorkspaceRouteInfo from "../route.info";
+import WorkspaceRouteInfo, { setCurrentWorkspace } from "../route.info";
 import serverContext from "@/lib/sever/context";
 import Branded from "@/types/branded.type";
-
-const [currentWorkspace, setCurrentWorkspace] = serverContext("");
-
-const brandedCurrentWorkspace = () => {
-  return Branded.WorkspaceId(currentWorkspace());
-};
-
-export { brandedCurrentWorkspace, setCurrentWorkspace };
 
 const Layout = ({
   children,

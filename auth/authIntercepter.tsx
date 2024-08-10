@@ -19,6 +19,7 @@ export default class AuthInterceptor {
   private redirectUrl?: string;
   private base: string;
   private pathname: string;
+  private afterAuth?: () => PromiseLike<void>;
 
   constructor(pathname: string) {
     this.signInPage = SignInPage({});
@@ -31,6 +32,11 @@ export default class AuthInterceptor {
 
   withTwoFactor() {
     this.withTF = true;
+    return this;
+  }
+
+  withAfterAuth(afterAuth: () => PromiseLike<void>) {
+    this.afterAuth = afterAuth;
     return this;
   }
 
@@ -56,7 +62,7 @@ export default class AuthInterceptor {
         search: {
           redirectUrl: redirectUrl,
         },
-      }
+      },
     );
 
     this.webAuthPage = WebAuthRoute(
@@ -65,7 +71,7 @@ export default class AuthInterceptor {
         search: {
           redirectUrl: redirectUrl,
         },
-      }
+      },
     );
 
     return this;
@@ -99,11 +105,13 @@ export default class AuthInterceptor {
           this.pathname !== WebAuthRoute({}) && redirect(this.webAuthPage);
           return;
         } else {
+          // run the after auth function to do some stuff
+          this.afterAuth && (await this.afterAuth());
           // success check
           if (this.pathname === WebAuthRoute({})) {
             redirect(
               this.redirectUrl ??
-                new URL(WorkspaceRouteInfo({}), this.base).toString()
+                new URL(WorkspaceRouteInfo({}), this.base).toString(),
             );
           } else {
             return;
@@ -114,17 +122,19 @@ export default class AuthInterceptor {
         this.pathname === WebAuthRoute({}) &&
           redirect(
             this.redirectUrl ??
-              new URL(WorkspaceRouteInfo({}), this.base).toString()
+              new URL(WorkspaceRouteInfo({}), this.base).toString(),
           );
 
         return;
       }
     } else {
+      // run the after auth function to do some stuff
+      this.afterAuth && (await this.afterAuth());
       // redirect to the redirect url
       if (this.pathname === SignInPage({})) {
         redirect(
           this.redirectUrl ??
-            new URL(WorkspaceRouteInfo({}), this.base).toString()
+            new URL(WorkspaceRouteInfo({}), this.base).toString(),
         );
       }
 

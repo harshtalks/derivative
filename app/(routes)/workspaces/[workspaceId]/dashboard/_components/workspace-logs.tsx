@@ -16,10 +16,10 @@ import {
 } from "@/components/ui/table";
 import serverApiTrpc from "@/trpc/server";
 import { Loader } from "lucide-react";
-import { brandedCurrentWorkspace } from "../../layout";
 import { Alert } from "@/components/ui/alert";
 import { formatDistanceToNow } from "date-fns";
 import { Button } from "@/components/ui/button";
+import { brandedCurrentWorkspace } from "../../../route.info";
 
 export const WorkspaceLogsLoading = () => {
   return (

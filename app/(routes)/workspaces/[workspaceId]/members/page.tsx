@@ -32,7 +32,8 @@ import {
 import AuthInterceptor from "@/auth/authIntercepter";
 import WorkspaceMembersRouteInfo from "./route.info";
 import Branded from "@/types/branded.type";
-import { brandedCurrentWorkspace } from "../layout";
+import { checkAccessForWorkspace } from "@/auth/access-check";
+import { brandedCurrentWorkspace } from "../../route.info";
 
 const Members = async () => {
   await new AuthInterceptor(
@@ -41,6 +42,7 @@ const Members = async () => {
     }),
   )
     .withTwoFactor()
+    .withAfterAuth(checkAccessForWorkspace)
     .withRedirect()
     .check();
 
