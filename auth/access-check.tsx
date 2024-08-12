@@ -1,35 +1,27 @@
 import "server-only";
-// everything related to the access check stuff
-// everything on the server
 
 import Branded from "@/types/branded.type";
-import db, { and, eq } from "@/database/db";
-import { members } from "@/database/schema";
 import { redirect } from "next/navigation";
-import serverApiTrpc from "@/trpc/server";
-import { Cache } from "effect";
 import { cache } from "react";
+import { brandedCurrentWorkspace } from "@/app/(routes)/workspaces/route.info";
+import { Effect } from "effect";
+import { mainLiveLayer } from "@/services";
+import { isMemberEffect } from "@/services/effects-wrapped";
 
 // dedupted by the cache
-export const isMember = cache(
-  async (userId: Branded.UserId, workspaceId: Branded.WorkspaceId) => {
-    const dbMembers = await db
-      .select()
-      .from(members)
-      .where(
-        and(eq(members.userId, userId), eq(members.workspaceId, workspaceId)),
-      );
-
-    return dbMembers.length > 0;
-  },
-);
+export const isMember = cache(async (workspaceId: Branded.WorkspaceId) => {
+  return Effect.runPromise(
+    Effect.provide(isMemberEffect(workspaceId), mainLiveLayer),
+  );
+});
 
 // we will use this function to check if the user has access to the workspace on the page level
 // deduped by the cache
 export const checkAccessForWorkspace = cache(async () => {
-  const { id } = await serverApiTrpc.user.get();
   const workspaceId = brandedCurrentWorkspace();
-  const result = await isMember(Branded.UserId(id), workspaceId);
+
+  const result = await isMember(workspaceId);
+
   if (!result) {
     redirect("/404");
   }

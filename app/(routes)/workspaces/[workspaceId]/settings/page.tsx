@@ -4,6 +4,7 @@ import AuthInterceptor from "@/auth/authIntercepter";
 import WorkspaceSettingsRouteInfo from "./route.info";
 import Branded from "@/types/branded.type";
 import { checkAccessForWorkspace } from "@/auth/access-check";
+import { brandedCurrentWorkspace } from "../../route.info";
 
 export default async function SettingsWorkspacePage() {
   await new AuthInterceptor(

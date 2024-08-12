@@ -118,6 +118,8 @@ export default class AuthInterceptor {
           }
         }
       } else {
+        // run the after auth function to do some stuff
+        this.afterAuth && (await this.afterAuth());
         // redirect to the redirect url
         this.pathname === WebAuthRoute({}) &&
           redirect(
@@ -137,7 +139,6 @@ export default class AuthInterceptor {
             new URL(WorkspaceRouteInfo({}), this.base).toString(),
         );
       }
-
       return;
     }
   }
