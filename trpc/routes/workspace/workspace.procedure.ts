@@ -41,6 +41,14 @@ const workspaceRouter = createTRPCRouter({
             .returning()
         )[0];
 
+        if (!workspace) {
+          ctx.rollback();
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Failed to create workspace",
+          });
+        }
+
         // insert the user as a member
         const member = (
           await ctx
@@ -54,6 +62,14 @@ const workspaceRouter = createTRPCRouter({
             })
             .returning()
         )[0];
+
+        if (!member) {
+          ctx.rollback();
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Failed to create workspace",
+          });
+        }
 
         // workspace metadata
         await ctx.insert(workspaceMetadata).values({

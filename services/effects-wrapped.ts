@@ -28,3 +28,33 @@ export const isMemberEffect = (workspaceId: Branded.WorkspaceId) =>
 
     return dbMembers.length > 0;
   });
+
+export const canAddMembersEffect = (workspaceId: Branded.WorkspaceId) => {
+  return Effect.gen(function* () {
+    const services = yield* ServiceLayer;
+    const { auth, db } = yield* services;
+    const { user } = yield* auth;
+
+    if (!user) {
+      return false;
+    }
+
+    const member = yield* Effect.promise(() =>
+      db.query.members.findFirst({
+        where: (members, { and, eq }) =>
+          and(
+            eq(members.userId, user.id),
+            eq(members.workspaceId, workspaceId),
+          ),
+      }),
+    );
+
+    if (!member) {
+      return false;
+    }
+
+    return (
+      member.role === "admin" || member.permissions.includes("memmber_controls")
+    );
+  });
+};

@@ -29,7 +29,12 @@ export const workspaceActivitiesEvents = [
 export type WorkspaceActivitiesEvents =
   (typeof workspaceActivitiesEvents)[number];
 
-export type Permission = "read" | "write" | "delete" | "admin";
+export type Permission =
+  | "read"
+  | "write"
+  | "delete"
+  | "admin"
+  | "memmber_controls";
 
 export const workspaceTypes = ["personal", "enterprise", "standard"] as const;
 
@@ -117,7 +122,9 @@ export const members = sqliteTable(
     createdAt: createdAtSchema,
     updatedAt: updatedAtSchema,
     role: text("member_role", { enum: memberRoles }).notNull(),
-    permissions: text("permissions", { mode: "json" }).$type<Permission[]>(),
+    permissions: text("permissions", { mode: "json" })
+      .$type<Permission[]>()
+      .notNull(),
     isCreator: integer("is_creator", { mode: "boolean" }).notNull(),
   },
   (table) => {

@@ -5,7 +5,10 @@ import { redirect } from "next/navigation";
 import { cache } from "react";
 import { brandedCurrentWorkspace } from "@/app/(routes)/workspaces/route.info";
 import { runWithServices } from "@/services";
-import { isMemberEffect } from "@/services/effects-wrapped";
+import {
+  canAddMembersEffect,
+  isMemberEffect,
+} from "@/services/effects-wrapped";
 
 // dedupted by the cache
 export const isMember = cache(async (workspaceId: Branded.WorkspaceId) => {
@@ -23,3 +26,7 @@ export const checkAccessForWorkspace = cache(async () => {
     redirect("/404");
   }
 });
+
+export const canAddMembers = cache(async (workspaceId: Branded.WorkspaceId) =>
+  runWithServices(canAddMembersEffect(workspaceId)),
+);
