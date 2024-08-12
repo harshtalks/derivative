@@ -4,15 +4,12 @@ import Branded from "@/types/branded.type";
 import { redirect } from "next/navigation";
 import { cache } from "react";
 import { brandedCurrentWorkspace } from "@/app/(routes)/workspaces/route.info";
-import { Effect } from "effect";
-import { mainLiveLayer } from "@/services";
+import { runWithServices } from "@/services";
 import { isMemberEffect } from "@/services/effects-wrapped";
 
 // dedupted by the cache
 export const isMember = cache(async (workspaceId: Branded.WorkspaceId) => {
-  return Effect.runPromise(
-    Effect.provide(isMemberEffect(workspaceId), mainLiveLayer),
-  );
+  return runWithServices(isMemberEffect(workspaceId));
 });
 
 // we will use this function to check if the user has access to the workspace on the page level

@@ -60,8 +60,10 @@ export const serviceLayer = Layer.succeed(
   ),
 );
 
-export const mainLiveLayer = Layer.mergeAll(
-  serviceLayer,
-  dbService,
-  authService,
-);
+const mainLiveLayer = Layer.mergeAll(serviceLayer, dbService, authService);
+
+export const runWithServices = <TData, TError = never>(
+  v: Effect.Effect<TData, TError, Database | Authentication | ServiceLayer>,
+) => Effect.runPromise(Effect.provide(v, mainLiveLayer));
+
+export default mainLiveLayer;
