@@ -8,7 +8,7 @@ import {
   twoFactorAuthenticatedProcedure,
 } from "@/trpc/trpc";
 import { TRPCError } from "@trpc/server";
-import { eq } from "drizzle-orm";
+import { and, eq, like, or } from "drizzle-orm";
 import * as z from "zod";
 import { fetchUsersFilterSchema } from "./user.schema";
 import { usersCursor } from "@/database/cursor";
@@ -96,7 +96,9 @@ const userRouter = createTRPCRouter({
         .select()
         .from(users)
         .orderBy(...usersCursor.orderBy)
-        .where(usersCursor.where())
+        .where(
+          or(like(users.name, `%${query}%`), like(users.email, `%${query}%`)),
+        )
         .limit(10);
 
       return usersFromDB;

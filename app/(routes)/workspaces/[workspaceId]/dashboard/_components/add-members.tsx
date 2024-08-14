@@ -42,7 +42,7 @@ const AddMembers = () => {
               <TabsTrigger value="members">People with Access</TabsTrigger>
               <TabsTrigger value="new-users">Add new people</TabsTrigger>
             </TabsList>
-            <TabsContent className="pt-4" value="members">
+            <TabsContent className="pt-4" value="new-users">
               <UsersList />
             </TabsContent>
           </Tabs>
