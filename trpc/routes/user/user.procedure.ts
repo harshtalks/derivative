@@ -2,10 +2,16 @@ import { lucia } from "@/auth/lucia";
 import { COOKIE_NAME } from "@/auth/tf";
 import { invalidateAuth } from "@/auth/validate-request";
 import { authenticators, users } from "@/database/schema";
-import { authenticatedProcedure, createTRPCRouter } from "@/trpc/trpc";
+import {
+  authenticatedProcedure,
+  createTRPCRouter,
+  twoFactorAuthenticatedProcedure,
+} from "@/trpc/trpc";
 import { TRPCError } from "@trpc/server";
 import { eq } from "drizzle-orm";
 import * as z from "zod";
+import { fetchUsersFilterSchema } from "./user.schema";
+import { usersCursor } from "@/database/cursor";
 
 const userRouter = createTRPCRouter({
   get: authenticatedProcedure.query(async ({ ctx }) => {
@@ -78,6 +84,23 @@ const userRouter = createTRPCRouter({
     }
   }),
   // Routes to fetch users
+  all: twoFactorAuthenticatedProcedure
+    .input(fetchUsersFilterSchema)
+    .query(async ({ ctx, input: { query } }) => {
+      const { db } = ctx;
+
+      console.log("logging", usersCursor.where());
+
+      // getting the users
+      const usersFromDB = await db
+        .select()
+        .from(users)
+        .orderBy(...usersCursor.orderBy)
+        .where(usersCursor.where())
+        .limit(10);
+
+      return usersFromDB;
+    }),
 });
 
 export default userRouter;
