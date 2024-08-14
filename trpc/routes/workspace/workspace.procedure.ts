@@ -221,6 +221,7 @@ const workspaceRouter = createTRPCRouter({
       // sleep of (inviteflowstep + 1) * 2 seconds with promise
       // starts from 0 to 6
 
+      // TODO
       await new Promise((resolve) => setTimeout(resolve, 2000));
 
       if (inviteFlowStep === 4) {

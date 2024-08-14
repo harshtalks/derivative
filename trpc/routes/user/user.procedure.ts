@@ -22,7 +22,7 @@ const userRouter = createTRPCRouter({
     .input(
       z.object({
         action: z.enum(["enable", "disable"]),
-      })
+      }),
     )
     .mutation(async (opts) => {
       const { ctx, input } = opts;
@@ -77,6 +77,7 @@ const userRouter = createTRPCRouter({
       });
     }
   }),
+  // Routes to fetch users
 });
 
 export default userRouter;
