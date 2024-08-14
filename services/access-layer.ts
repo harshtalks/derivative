@@ -7,8 +7,7 @@ import { and, eq } from "drizzle-orm";
 export const isMemberEffect = (workspaceId: Branded.WorkspaceId) =>
   Effect.gen(function* () {
     const services = yield* ServiceLayer;
-    const { auth, db } = yield* services;
-    const { user } = yield* auth;
+    const { session, user, db } = yield* services;
 
     if (!user) {
       return false;
@@ -32,8 +31,7 @@ export const isMemberEffect = (workspaceId: Branded.WorkspaceId) =>
 export const canAddMembersEffect = (workspaceId: Branded.WorkspaceId) => {
   return Effect.gen(function* () {
     const services = yield* ServiceLayer;
-    const { auth, db } = yield* services;
-    const { user } = yield* auth;
+    const { session, user, db } = yield* services;
 
     if (!user) {
       return false;

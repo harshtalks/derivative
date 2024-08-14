@@ -5,10 +5,7 @@ import { redirect } from "next/navigation";
 import { cache } from "react";
 import { brandedCurrentWorkspace } from "@/app/(routes)/workspaces/route.info";
 import { runWithServices } from "@/services";
-import {
-  canAddMembersEffect,
-  isMemberEffect,
-} from "@/services/effects-wrapped";
+import { canAddMembersEffect, isMemberEffect } from "@/services/access-layer";
 
 // dedupted by the cache
 export const isMember = cache(async (workspaceId: Branded.WorkspaceId) => {

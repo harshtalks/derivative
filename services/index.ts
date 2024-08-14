@@ -21,10 +21,8 @@ export class ServiceLayer extends Context.Tag("ServiceLayer")<
   Effect.Effect<
     {
       db: typeof db;
-      auth: Effect.Effect<{
-        session: Session | null;
-        user: User | null;
-      }>;
+      session: Session | null;
+      user: User | null;
     },
     never,
     Database | Authentication
@@ -51,10 +49,12 @@ export const serviceLayer = Layer.succeed(
     Effect.gen(function* () {
       const db = yield* Database;
       const auth = yield* Authentication;
+      const { session, user } = yield* auth;
 
       return {
         db,
-        auth,
+        session,
+        user,
       };
     }),
   ),
