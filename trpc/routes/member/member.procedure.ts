@@ -2,15 +2,23 @@ import { members } from "@/database/schema";
 import { createTRPCRouter, twoFactorAuthenticatedProcedure } from "@/trpc/trpc";
 import { inputAs } from "@/trpc/utils";
 import Branded from "@/types/branded.type";
-import { eq } from "drizzle-orm";
 
 const memberRouter = createTRPCRouter({
   all: twoFactorAuthenticatedProcedure
-    .input(inputAs<Branded.WorkspaceId>())
+    .input(
+      inputAs<{
+        workspaceId: Branded.WorkspaceId;
+      }>(),
+    )
     .query(({ ctx, input }) => {
       const { db } = ctx;
 
-      return db.select().from(members).where(eq(members.workspaceId, input));
+      return db.query.members.findMany({
+        where: (members, { eq }) => eq(members.workspaceId, input.workspaceId),
+        with: {
+          user: true,
+        },
+      });
     }),
 });
 

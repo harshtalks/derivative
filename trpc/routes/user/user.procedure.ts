@@ -1,7 +1,7 @@
 import { lucia } from "@/auth/lucia";
 import { COOKIE_NAME } from "@/auth/tf";
 import { invalidateAuth } from "@/auth/validate-request";
-import { authenticators, users } from "@/database/schema";
+import { authenticators, members, users } from "@/database/schema";
 import {
   authenticatedProcedure,
   createTRPCRouter,
@@ -86,10 +86,11 @@ const userRouter = createTRPCRouter({
   // Routes to fetch users
   all: twoFactorAuthenticatedProcedure
     .input(fetchUsersFilterSchema)
-    .query(async ({ ctx, input: { query } }) => {
+    .query(async ({ ctx, input: { query, cursor, workspaceId } }) => {
       const { db } = ctx;
 
-      console.log("logging", usersCursor.where());
+      // create offset
+      const limit = 10;
 
       // getting the users
       const usersFromDB = await db
@@ -97,11 +98,34 @@ const userRouter = createTRPCRouter({
         .from(users)
         .orderBy(...usersCursor.orderBy)
         .where(
-          or(like(users.name, `%${query}%`), like(users.email, `%${query}%`)),
+          and(
+            usersCursor.where(cursor),
+            or(like(users.name, `%${query}%`), like(users.email, `%${query}%`)),
+          ),
         )
-        .limit(10);
+        .limit(limit);
 
-      return usersFromDB;
+      const membersInWorkspace = await db.query.members.findMany({
+        where: (members, { and, eq, inArray }) =>
+          and(
+            eq(members.workspaceId, workspaceId),
+            usersFromDB.length
+              ? inArray(
+                  members.userId,
+                  usersFromDB.map((user) => user.id),
+                )
+              : undefined,
+          ),
+      });
+
+      // get the users that are not in the workspace
+      const usersNotInWorkspace = usersFromDB.filter((user) => {
+        return !membersInWorkspace.some((member) => member.userId === user.id);
+      });
+
+      const lastToken = usersCursor.serialize(usersNotInWorkspace.at(-1)); // use serialize method/function to send tokens to your FE
+
+      return { nextToken: lastToken, users: usersNotInWorkspace };
     }),
 });
 

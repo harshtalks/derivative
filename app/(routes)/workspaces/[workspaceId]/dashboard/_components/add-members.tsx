@@ -15,6 +15,7 @@ import { UserPlus, X } from "lucide-react";
 import InviteMembers from "./invite";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import UsersList from "./users-list";
+import MembersList from "./members-list";
 
 const AddMembers = () => {
   return (
@@ -44,6 +45,9 @@ const AddMembers = () => {
             </TabsList>
             <TabsContent className="pt-4" value="new-users">
               <UsersList />
+            </TabsContent>{" "}
+            <TabsContent className="pt-4" value="members">
+              <MembersList />
             </TabsContent>
           </Tabs>
         </CredenzaBody>
