@@ -36,7 +36,7 @@ export const permissions = [
   "write",
   "delete",
   "admin",
-  "memmber_controls",
+  "member_controls",
 ] as const;
 
 export const workspaceTypes = ["personal", "enterprise", "standard"] as const;

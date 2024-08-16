@@ -12,6 +12,10 @@
     "db:drop": "drizzle-kit drop",
     "db:push": "drizzle-kit push"
   },
+  "resolutions": {
+    "@radix-ui/react-dismissable-layer": "^1.0.5",
+    "@radix-ui/react-dialog": "^1.0.5"
+  },
   "dependencies": {
     "@edge-csrf/nextjs": "^2.3.0-rc1",
     "@effect/platform": "^0.60.2",

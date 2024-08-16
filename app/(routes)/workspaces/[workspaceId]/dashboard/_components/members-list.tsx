@@ -4,7 +4,7 @@ import Branded from "@/types/branded.type";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { match } from "ts-pattern";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import store from "@/stores/manage-workspae-users";
+import store from "@/stores/manage-workspace-users";
 import { useSelector } from "@xstate/store/react";
 import useDebounce from "@/hooks/use-debounce";
 import { Input } from "@/components/ui/input";

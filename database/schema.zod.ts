@@ -1,7 +1,13 @@
 // zod schemas for all the drizzle schema
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
-import { members, workspaceActivities, workspaces } from "./schema";
-import { string } from "zod";
+import {
+  memberRoles,
+  members,
+  permissions,
+  workspaceActivities,
+  workspaces,
+} from "./schema";
+import { string, array, enum as _enum } from "zod";
 
 // this is the schema for the workspaces table, pass this to the trpc query/mutation
 export const insertWorkspaceSchema = createInsertSchema(workspaces, {
@@ -14,6 +20,9 @@ export const selectWorkspaceSchema = createSelectSchema(workspaces, {
 });
 
 export const selectMemberSchema = createSelectSchema(members);
-export const insertMemberSchema = createInsertSchema(members);
+export const insertMemberSchema = createInsertSchema(members, {
+  permissions: array(_enum(permissions)).min(1),
+  role: _enum(memberRoles),
+});
 
 export const activityLogSchema = createInsertSchema(workspaceActivities);

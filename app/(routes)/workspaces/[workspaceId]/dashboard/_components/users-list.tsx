@@ -3,17 +3,17 @@ import clientApiTrpc from "@/trpc/client";
 import { match } from "ts-pattern";
 import { Loader } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import AddMemberToWorkspace from "./add-member-dialog";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import useDebounce from "@/hooks/use-debounce";
 import { useSelector } from "@xstate/store/react";
-import store from "@/stores/manage-workspae-users";
+import store from "@/stores/manage-workspace-users";
 import { Button } from "@/components/ui/button";
 import { keepPreviousData } from "@tanstack/react-query";
 import DashboardRoute from "../route.info";
 import Branded from "@/types/branded.type";
 import { iife } from "@/lib/utils";
+import AddMemberToWorkspace from "./add-member-dialog";
 
 const UsersList = () => {
   const { userSearchTerm } = useSelector(store, (state) => state.context);
@@ -76,7 +76,9 @@ const UsersList = () => {
                             </p>
                           </div>
                         </div>
-                        <AddMemberToWorkspace user={user} />
+                        <div>
+                          <AddMemberToWorkspace user={user} />
+                        </div>
                       </div>
                     ))}
                     {query.hasNextPage && (
