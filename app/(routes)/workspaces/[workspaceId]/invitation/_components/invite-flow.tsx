@@ -68,11 +68,13 @@ const steps = [
 const InviteFlow = () => {
   const { increase, step: currentStep } = useStepStore();
   const { workspaceId } = WorkspaceInvitationRoute.useParams();
+  const { invite } = WorkspaceInvitationRoute.useSearchParams();
 
   const query = clientApiTrpc.workspace.inviteFlow.useQuery(
     {
       inviteFlowStep: currentStep,
       workspaceId: Branded.WorkspaceId(workspaceId),
+      inviteCode: invite,
     },
     {
       retry: 0,

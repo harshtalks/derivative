@@ -4,6 +4,7 @@ import { CardTitle, CardDescription } from "@/components/ui/card";
 import {
   Credenza,
   CredenzaBody,
+  CredenzaClose,
   CredenzaContent,
   CredenzaFooter,
   CredenzaHeader,
@@ -52,7 +53,9 @@ const AddMembers = () => {
           </Tabs>
         </CredenzaBody>
         <CredenzaFooter>
-          <Button>Add Members</Button>
+          <CredenzaClose asChild>
+            <Button>Close Modal</Button>
+          </CredenzaClose>
         </CredenzaFooter>
       </CredenzaContent>
     </Credenza>

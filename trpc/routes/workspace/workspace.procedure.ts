@@ -12,7 +12,12 @@ import {
 } from "./workspace.schema";
 import { TRPCError } from "@trpc/server";
 import Branded from "@/types/branded.type";
-import { INVITE_COUNT, WEEKS_TO_EXPIRE, createInviteLink } from "@/auth/invite";
+import {
+  INVITE_COUNT,
+  WEEKS_TO_EXPIRE,
+  createInviteLink,
+  verifyInviteLink,
+} from "@/auth/invite";
 import { TimeSpan } from "oslo";
 import { Effect } from "effect";
 import { eq } from "drizzle-orm";
@@ -217,22 +222,158 @@ const workspaceRouter = createTRPCRouter({
     }),
   inviteFlow: twoFactorAuthenticatedProcedure
     .input(inviteFlowWorkspaceSchema)
-    .query(async ({ ctx, input: { inviteFlowStep, workspaceId } }) => {
-      // sleep of (inviteflowstep + 1) * 2 seconds with promise
-      // starts from 0 to 6
+    .query(
+      async ({ ctx, input: { inviteFlowStep, workspaceId, inviteCode } }) => {
+        // sleep of (inviteflowstep + 1) * 2 seconds with promise
+        // starts from 0 to 6
+        //
 
-      // TODO
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+        const { db, user } = ctx;
 
-      if (inviteFlowStep === 4) {
-        throw new Error("Failed to invite user");
-      }
-      return {
-        success: true,
-        nextStep: inviteFlowStep + 1,
-        hasNext: inviteFlowStep < 6,
-      };
-    }),
+        switch (inviteFlowStep) {
+          case 1: {
+            const isWorkspaceThere = await db.query.workspaces.findFirst({
+              where: (workspaces, { eq }) => eq(workspaces.id, workspaceId),
+            });
+
+            if (!isWorkspaceThere) {
+              throw new TRPCError({
+                code: "BAD_REQUEST",
+                message: "No such workspace has been found in our system.",
+              });
+            }
+
+            return {
+              success: true,
+              nextStep: inviteFlowStep + 1,
+              hasNext: inviteFlowStep < 6,
+            };
+          }
+          case 2: {
+            // check if the workspace has an associated metadata
+            const metadata = await db.query.workspaceMetadata.findFirst({
+              where: (workspaceMetadata, { eq }) =>
+                eq(workspaceMetadata.workspaceId, workspaceId),
+            });
+
+            if (!metadata) {
+              throw new TRPCError({
+                code: "BAD_REQUEST",
+                message:
+                  "We could not find any invite code attached to the workspaces",
+              });
+            }
+
+            if (!inviteCode) {
+              throw new TRPCError({
+                code: "BAD_REQUEST",
+                message: "You can not proceed without having a token.",
+              });
+            }
+
+            if (metadata.inviteCode !== inviteCode) {
+              throw new TRPCError({
+                code: "BAD_REQUEST",
+                message: "Sorry, the given token is not valid",
+              });
+            }
+
+            // check it the quota exceeded for the invites.
+            if (metadata.inviteCount >= metadata.inviteLimit) {
+              throw new TRPCError({
+                code: "BAD_REQUEST",
+                message:
+                  "Sorry, the invite quota has been finished for workspace",
+              });
+            }
+
+            // check if the token is valid
+            try {
+              await verifyInviteLink(inviteCode);
+            } catch {
+              throw new TRPCError({
+                code: "BAD_REQUEST",
+                message:
+                  "Sorry, the invite quota has been finished for workspace",
+              });
+            }
+
+            await db
+              .update(workspaceMetadata)
+              .set({
+                inviteCount: metadata.inviteCount + 1,
+              })
+              .where(eq(workspaceMetadata.workspaceId, workspaceId));
+
+            return {
+              success: true,
+              nextStep: 3,
+              hasNext: true,
+            };
+          }
+          case 3: {
+            const isAlreadyAMember = await db.query.members.findFirst({
+              where: (members, { eq, and }) =>
+                and(
+                  eq(members.workspaceId, workspaceId),
+                  eq(members.userId, user.id),
+                ),
+            });
+
+            if (isAlreadyAMember) {
+              throw new TRPCError({
+                code: "BAD_REQUEST",
+                message:
+                  "You are already a member of the workspace. Please navigate to workspaces page to access this workspace.",
+              });
+            }
+
+            return {
+              success: true,
+              nextStep: inviteFlowStep + 1,
+              hasNext: inviteFlowStep < 6,
+            };
+          }
+          case 4: {
+            await db.insert(members).values({
+              isCreator: false,
+              permissions: ["read"],
+              role: "dev",
+              userId: user.id,
+              workspaceId: workspaceId,
+            });
+
+            return {
+              success: true,
+              nextStep: inviteFlowStep + 1,
+              hasNext: inviteFlowStep < 6,
+            };
+          }
+          case 5: {
+            await new Promise((resolve) => setTimeout(resolve, 2000));
+            return {
+              success: true,
+              nextStep: inviteFlowStep + 1,
+              hasNext: inviteFlowStep < 6,
+            };
+          }
+          case 6: {
+            await new Promise((resolve) => setTimeout(resolve, 2000));
+            return {
+              success: true,
+              nextStep: inviteFlowStep + 1,
+              hasNext: inviteFlowStep < 6,
+            };
+          }
+          default: {
+            throw new TRPCError({
+              code: "BAD_REQUEST",
+              message: "Invalid Step",
+            });
+          }
+        }
+      },
+    ),
 });
 
 export default workspaceRouter;

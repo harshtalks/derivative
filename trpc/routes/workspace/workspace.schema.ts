@@ -7,4 +7,5 @@ export const getWorkspaceByIdInputSchema = object({
 export const inviteFlowWorkspaceSchema = object({
   workspaceId: string().min(1),
   inviteFlowStep: number().min(0),
+  inviteCode: string().optional(),
 });

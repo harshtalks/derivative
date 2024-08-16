@@ -2,7 +2,7 @@
 // it makes sense to keep it in auth as it is all jwt related
 
 import { TimeSpan } from "oslo";
-import { createJWT } from "oslo/jwt";
+import { createJWT, validateJWT } from "oslo/jwt";
 import { getKey } from "./tf";
 import WorkspaceInvitationRoute from "@/app/(routes)/workspaces/[workspaceId]/invitation/route.info";
 
@@ -20,4 +20,8 @@ export const createInviteLink = async (
   return createJWT("HS256", getKey(), payload, {
     expiresIn: time,
   });
+};
+
+export const verifyInviteLink = async (token: string) => {
+  return validateJWT("HS256", getKey(), token);
 };
