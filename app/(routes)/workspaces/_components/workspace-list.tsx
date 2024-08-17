@@ -20,7 +20,6 @@ import { toast } from "sonner";
 import { Cross2Icon } from "@radix-ui/react-icons";
 import { Alert } from "@/components/ui/alert";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
-import AddNewWorkspaceRoute from "../add-new-workspace/route.info";
 import DashboardRoute from "../[workspaceId]/dashboard/route.info";
 import Branded from "@/types/branded.type";
 import { VirtuosoGrid } from "react-virtuoso";

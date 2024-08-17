@@ -17,6 +17,7 @@
     "@radix-ui/react-dialog": "^1.0.5"
   },
   "dependencies": {
+    "@codeium/react-code-editor": "^1.0.12",
     "@edge-csrf/nextjs": "^2.3.0-rc1",
     "@effect/platform": "^0.60.2",
     "@formkit/auto-animate": "^0.8.2",
@@ -44,6 +45,9 @@
     "@radix-ui/react-toggle-group": "^1.1.0",
     "@radix-ui/react-toolbar": "^1.1.0",
     "@radix-ui/react-tooltip": "^1.1.2",
+    "@rjsf/core": "^5.20.0",
+    "@rjsf/utils": "^5.20.0",
+    "@rjsf/validator-ajv8": "^5.20.0",
     "@simplewebauthn/browser": "^10.0.0",
     "@simplewebauthn/server": "^10.0.0",
     "@simplewebauthn/types": "^10.0.0",
@@ -110,6 +114,7 @@
     "framer-motion": "^11.3.17",
     "http-status-codes": "^2.3.0",
     "jotai": "^2.8.1",
+    "json-schema": "^0.4.0",
     "lucia": "^3.2.0",
     "lucide-react": "^0.379.0",
     "next": "latest",
@@ -147,6 +152,7 @@
   },
   "devDependencies": {
     "@faker-js/faker": "^8.4.1",
+    "@types/json-schema": "^7.0.15",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",

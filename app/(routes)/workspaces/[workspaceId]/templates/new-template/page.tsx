@@ -6,11 +6,12 @@ import { brandedCurrentWorkspace } from "../../../route.info";
 
 const Page = async () => {
   await new AuthInterceptor(
-    NewTemplateRouteInfo({ workspaceId: brandedCurrentWorkspace() }),
+    NewTemplateRouteInfo({
+      workspaceId: brandedCurrentWorkspace(),
+    }),
   )
     .withTwoFactor()
     .withRedirect()
-    .withAfterAuth(checkAccessForWorkspace)
     .check();
 
   return <TemplateForm />;

@@ -48,13 +48,10 @@ import { brandedCurrentWorkspace } from "../../../route.info";
 export async function DashboardLayout() {
   const workspaceId = brandedCurrentWorkspace();
 
-  const {
-    workspaceDB: workspace,
-    creator,
-    membersCount,
-  } = await serverApiTrpc.workspace.workspace({
-    workspaceId,
-  });
+  const { workspaceDB: workspace, creator } =
+    await serverApiTrpc.workspace.workspace({
+      workspaceId,
+    });
 
   return (
     <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8 lg:grid-cols-3 xl:grid-cols-3">
@@ -68,9 +65,7 @@ export async function DashboardLayout() {
               </CardDescription>
             </CardHeader>
             <CardFooter>
-              <NewTemplateRouteInfo.Link
-                params={{ workspaceId: brandedCurrentWorkspace() }}
-              >
+              <NewTemplateRouteInfo.Link params={{ workspaceId: workspaceId }}>
                 <Button>Create New Template</Button>
               </NewTemplateRouteInfo.Link>
             </CardFooter>

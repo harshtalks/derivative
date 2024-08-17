@@ -13,6 +13,8 @@ export const isMemberEffect = (workspaceId: Branded.WorkspaceId) =>
       return false;
     }
 
+    console.log(workspaceId, user);
+
     const dbMembers = yield* Effect.promise(() =>
       db
         .select()
@@ -24,6 +26,8 @@ export const isMemberEffect = (workspaceId: Branded.WorkspaceId) =>
           ),
         ),
     );
+
+    console.log(dbMembers.length);
 
     return dbMembers.length > 0;
   });

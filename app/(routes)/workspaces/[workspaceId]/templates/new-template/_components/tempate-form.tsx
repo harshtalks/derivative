@@ -27,6 +27,26 @@ import {
 } from "@/components/ui/select";
 import { Fragment, useState } from "react";
 import { Invoice } from "@/static/invoice";
+import TemplateSchemaEditor from "./template-schema-editor";
+import * as z from "zod";
+
+const templateSchema = z.object({
+  name: z.string().min(1),
+  description: z.string().min(1),
+  schema: z
+    .string()
+    .min(1)
+    .refine(
+      (schema) => {
+        return true;
+      },
+      {
+        message: "Please ensure that your schema is valid",
+      },
+    ),
+  category: z.string().min(1),
+  subCategories: z.string().min(1),
+});
 
 export function TemplateForm() {
   const [categoryKey, setCategoryKey] =
@@ -95,29 +115,7 @@ export function TemplateForm() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <pre className="px-4 py-3 font-mono text-left bg-transparent border rounded border-zinc-600 focus:border-zinc-100/80 focus:ring-0 sm:text-sm text-zinc-100">
-                  <div className="flex items-start px-1 text-sm">
-                    <div
-                      aria-hidden="true"
-                      className="pr-4 font-mono border-r select-none border-zinc-300/5 text-zinc-700"
-                    >
-                      {Array.from({
-                        length: 5,
-                      }).map((_, index) => (
-                        <Fragment key={index}>
-                          {(index + 1).toString().padStart(2, "0")}
-                          <br />
-                        </Fragment>
-                      ))}
-                    </div>
-                    <textarea
-                      minLength={1}
-                      rows={Math.max(5)}
-                      // placeholder={JSON.stringify(dummySchema, null, 2)}
-                      className="w-full p-0 pl-2 text-base !resize-none bg-transparent border-0 appearance-none hover:resize text-zinc-100 placeholder-zinc-500 focus-visible:outline-0 focus:ring-0 sm:text-sm"
-                    />
-                  </div>
-                </pre>
+                <TemplateSchemaEditor />
               </CardContent>
               <CardFooter className="justify-center border-t p-4">
                 <Button size="sm" variant="ghost" className="gap-1">
