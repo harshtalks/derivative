@@ -4,6 +4,7 @@ import {
   memberRoles,
   members,
   permissions,
+  templates,
   workspaceActivities,
   workspaces,
 } from "./schema";
@@ -26,3 +27,5 @@ export const insertMemberSchema = createInsertSchema(members, {
 });
 
 export const activityLogSchema = createInsertSchema(workspaceActivities);
+
+export const insertTemplateSchema = createInsertSchema(templates);

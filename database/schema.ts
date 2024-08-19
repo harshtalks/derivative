@@ -51,7 +51,7 @@ const updatedAtSchema = integer("updated_at").default(
   sql`(cast(unixepoch() as int))`,
 );
 
-// TABLES
+export const templateStatus = ["draft", "active", "archived"] as const;
 
 export const users = sqliteTable("users", {
   id: text("id")
@@ -208,10 +208,11 @@ export const templates = sqliteTable(
     createdBy: text("createdBy")
       .notNull()
       .references(() => members.id, { onDelete: "no action" }),
-    schema: text("schema", { mode: "json" }).notNull(),
-    jsonSchema: text("jsonSchema", { mode: "json" }).notNull(),
+    jsonSchema: text("jsonSchema", { mode: "text" }).notNull(),
     description: text("description"),
-    tags: text("tags", { mode: "json" }).$type<string[]>(),
+    category: text("category").notNull(),
+    subcategory: text("subcategory").notNull(),
+    status: text("status", { enum: templateStatus }).notNull(),
   },
   // each workspace should have unique name for the template
   (table) => {

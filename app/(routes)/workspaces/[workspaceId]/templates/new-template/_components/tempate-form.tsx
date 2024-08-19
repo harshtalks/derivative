@@ -27,10 +27,9 @@ import {
 } from "@/components/ui/select";
 import { Fragment, useState } from "react";
 import { Invoice } from "@/static/invoice";
-import TemplateSchemaEditor from "./template-schema-editor";
+import TemplateSchemaEditor, { DEFAULT_SCHEMA } from "./template-schema-editor";
 import * as z from "zod";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { jsonSchemaObject } from "@/template-schema";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -42,43 +41,77 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { templateStatus } from "@/database/schema";
+import clientApiTrpc from "@/trpc/client";
+import { toast } from "sonner";
+import NewTemplateRouteInfo from "../route.info";
+import Branded from "@/types/branded.type";
 
 const templateSchema = z.object({
   name: z.string().min(1),
   description: z.string().min(1),
-  schema: z.discriminatedUnion("type", [
-    z.object({
-      type: z.literal("text"),
-      schema: z.string().min(1),
-    }),
-    z.object({
-      type: z.literal("form"),
-      schema: jsonSchemaObject,
-    }),
-  ]),
+  schema: z.object({
+    type: z.literal("text"),
+    schema: z
+      .string()
+      .min(1)
+      .refine((schema) => {
+        try {
+          const parsed = JSON.parse(schema);
+          return true;
+        } catch {
+          return false;
+        }
+      }),
+  }),
   category: z.string().min(1),
-  subCategories: z.string().min(1),
+  subCategory: z.string().min(1),
+  status: z.enum(templateStatus),
 });
 
 export function TemplateForm() {
   const [categoryKey, setCategoryKey] =
     useState<Invoice.Keys>("expenseInvoices");
 
-  const subCategory = Invoice.getSubCategory(categoryKey);
-
   const form = useForm<z.infer<typeof templateSchema>>({
     resolver: zodResolver(templateSchema),
     defaultValues: {
+      category: "expenseInvoices" satisfies Invoice.Keys,
       schema: {
-        type: "form",
+        schema: DEFAULT_SCHEMA,
+        type: "text",
       },
     },
   });
 
+  const updatedKey = form.watch("category");
+
+  const mutation = clientApiTrpc.template.addNew.useMutation();
+
+  const { workspaceId } = NewTemplateRouteInfo.useParams();
+
   return (
     <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
       <Form {...form}>
-        <form>
+        <form
+          onSubmit={form.handleSubmit((data) => {
+            toast.promise(
+              mutation.mutateAsync({
+                workspaceId: Branded.WorkspaceId(workspaceId),
+                category: data.category,
+                subcategory: data.subCategory,
+                jsonSchema: data.schema.schema,
+                status: data.status,
+                name: data.name,
+                description: data.description,
+              }),
+              {
+                success: () => "Successfully created the template",
+                error: (err) => err.message,
+              },
+            );
+          })}
+        >
           <div className="mx-auto grid container max-w-6xl py-12 flex-1 auto-rows-max gap-4">
             <div className="flex items-center gap-4">
               <Button variant="outline" size="icon" className="h-7 w-7">
@@ -110,20 +143,42 @@ export function TemplateForm() {
                   <CardContent>
                     <div className="grid gap-6">
                       <div className="grid gap-3">
-                        <Label htmlFor="name">What do you call it?</Label>
-                        <Input
-                          id="name"
-                          type="text"
-                          className="w-full"
-                          placeholder="i.e. Invoice Template"
+                        <FormField
+                          control={form.control}
+                          name="name"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>What do you call it?</FormLabel>
+                              <FormControl>
+                                <Input
+                                  {...field}
+                                  className="w-full shadow-none"
+                                  placeholder="i.e. Invoice Template"
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
                         />
                       </div>
                       <div className="grid gap-3">
-                        <Label htmlFor="description">What is it about?</Label>
-                        <Textarea
-                          id="description"
-                          placeholder="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam auctor, nisl nec ultricies ultricies, nunc nisl ultricies nunc, nec ultricies nunc nisl nec nunc."
-                          className="min-h-32 resize-none"
+                        <FormField
+                          control={form.control}
+                          name="description"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>What is it about?</FormLabel>
+                              <FormControl>
+                                <Textarea
+                                  {...field}
+                                  id="description"
+                                  placeholder="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam auctor, nisl nec ultricies ultricies, nunc nisl ultricies nunc, nec ultricies nunc nisl nec nunc."
+                                  className="min-h-32 resize-none shadow-none"
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
                         />
                       </div>
                     </div>
@@ -138,66 +193,24 @@ export function TemplateForm() {
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <Tabs
-                      value={
-                        form.getValues("schema.type") === "text"
-                          ? "editor"
-                          : "form"
-                      }
-                    >
-                      <TabsList className="grid w-full grid-cols-2">
-                        <TabsTrigger value="form">Form</TabsTrigger>
-                        <TabsTrigger value="editor">Editor</TabsTrigger>
-                      </TabsList>
-                      <TabsContent value="editor">
-                        <TemplateSchemaEditor />
-                      </TabsContent>
-                      <TabsContent
-                        value="form"
-                        className="grid grid-cols-2 gap-4"
-                      >
-                        <FormField
-                          control={form.control}
-                          name="schema.schema.title"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Schema Title</FormLabel>
-                              <FormControl>
-                                <Input
-                                  className="shadow-none"
-                                  placeholder="shadcn"
-                                  {...field}
-                                />
-                              </FormControl>
-                              <FormDescription>
-                                Title for the schema
-                              </FormDescription>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          control={form.control}
-                          name="schema.schema.description"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Schema description</FormLabel>
-                              <FormControl>
-                                <Input
-                                  className="shadow-none"
-                                  placeholder="shadcn"
-                                  {...field}
-                                />
-                              </FormControl>
-                              <FormDescription>
-                                Schema description
-                              </FormDescription>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      </TabsContent>
-                    </Tabs>
+                    <FormField
+                      control={form.control}
+                      name="schema.schema"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Add some schema</FormLabel>
+                          <TemplateSchemaEditor
+                            value={field.value}
+                            onChange={field.onChange}
+                          />
+                          <FormDescription>
+                            You can add schema for your template here. This will
+                            be used to generate the invoice.
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
                   </CardContent>
                   <CardFooter className="justify-center border-t p-4">
                     <Button
@@ -223,45 +236,69 @@ export function TemplateForm() {
                   <CardContent>
                     <div className="grid gap-6 sm:grid-cols-3">
                       <div className="grid gap-3">
-                        <Label htmlFor="category">Category</Label>
-                        <Select
-                          defaultValue={categoryKey}
-                          onValueChange={(e) => {
-                            setCategoryKey(e as Invoice.Keys);
-                          }}
-                        >
-                          <SelectTrigger
-                            id="category"
-                            aria-label="Select category"
-                          >
-                            <SelectValue placeholder="Select category" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {Invoice.getKeys().map((key) => (
-                              <SelectItem key={key} value={key}>
-                                {Invoice.getCategory(key)}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                        <FormField
+                          control={form.control}
+                          name="category"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Category</FormLabel>
+                              <Select
+                                value={field.value}
+                                onValueChange={(v) => {
+                                  field.onChange(v);
+                                  form.setValue("subCategory", "");
+                                }}
+                              >
+                                <SelectTrigger
+                                  id="category"
+                                  aria-label="Select category"
+                                >
+                                  <SelectValue placeholder="Select category" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {Invoice.getKeys().map((key) => (
+                                    <SelectItem key={key} value={key}>
+                                      {Invoice.getCategory(key)}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
                       </div>
                       <div className="grid gap-3">
-                        <Label htmlFor="subcategory">Subcategory</Label>
-                        <Select>
-                          <SelectTrigger
-                            id="subcategory"
-                            aria-label="Select subcategory"
-                          >
-                            <SelectValue placeholder="Select subcategory" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {subCategory.map((key) => (
-                              <SelectItem key={key} value={key}>
-                                {key}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                        <FormField
+                          control={form.control}
+                          name="subCategory"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>SubCategory</FormLabel>
+                              <Select
+                                value={field.value}
+                                onValueChange={field.onChange}
+                              >
+                                <SelectTrigger
+                                  id="subcategory"
+                                  aria-label="Select subcategory"
+                                >
+                                  <SelectValue placeholder="Select subcategory" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {Invoice.getSubCategory(
+                                    updatedKey as Invoice.Keys,
+                                  ).map((key) => (
+                                    <SelectItem key={key} value={key}>
+                                      {key}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
                       </div>
                     </div>
                   </CardContent>
@@ -275,17 +312,42 @@ export function TemplateForm() {
                   <CardContent>
                     <div className="grid gap-6">
                       <div className="grid gap-3">
-                        <Label htmlFor="status">Status</Label>
-                        <Select>
-                          <SelectTrigger id="status" aria-label="Select status">
-                            <SelectValue placeholder="Select status" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="draft">Draft</SelectItem>
-                            <SelectItem value="published">Active</SelectItem>
-                            <SelectItem value="archived">Archived</SelectItem>
-                          </SelectContent>
-                        </Select>
+                        <FormField
+                          control={form.control}
+                          name="status"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Select Status</FormLabel>
+                              <Select
+                                value={field.value}
+                                onValueChange={field.onChange}
+                              >
+                                <SelectTrigger
+                                  className="capitalize"
+                                  id="status"
+                                  aria-label="Select status"
+                                >
+                                  <SelectValue
+                                    className="capitalize"
+                                    placeholder="Select status"
+                                  />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {templateStatus.map((el) => (
+                                    <SelectItem
+                                      className="capitalize"
+                                      key={el}
+                                      value={el}
+                                    >
+                                      {el}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
                       </div>
                     </div>
                   </CardContent>
