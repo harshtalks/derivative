@@ -2,9 +2,14 @@ import AuthInterceptor from "@/auth/authIntercepter";
 import NewTemplateRouteInfo from "./route.info";
 import { TemplateForm } from "./_components/tempate-form";
 import { checkAccessForWorkspace } from "@/auth/access-check";
-import { brandedCurrentWorkspace } from "../../../route.info";
+import {
+  brandedCurrentWorkspace,
+  setCurrentWorkspace,
+} from "../../../route.info";
 
-const Page = async () => {
+const Page = async ({ params }: { params: { workspaceId: string } }) => {
+  setCurrentWorkspace(params.workspaceId);
+
   await new AuthInterceptor(
     NewTemplateRouteInfo({
       workspaceId: brandedCurrentWorkspace(),
@@ -12,6 +17,7 @@ const Page = async () => {
   )
     .withTwoFactor()
     .withRedirect()
+    .withAfterAuth(checkAccessForWorkspace)
     .check();
 
   return <TemplateForm />;
