@@ -142,7 +142,7 @@ export const twoFactorAuthenticatedProcedure = authenticatedProcedure.use(
         message: "Your two factor token is invalid. Please login again.",
       });
     }
-  }
+  },
 );
 
 export type TRPCContext = Awaited<ReturnType<typeof createTRPCContext>>;

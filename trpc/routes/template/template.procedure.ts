@@ -2,6 +2,10 @@ import { templates } from "@/database/schema";
 import { insertTemplateSchema } from "@/database/schema.zod";
 import { createTRPCRouter, twoFactorAuthenticatedProcedure } from "@/trpc/trpc";
 import { TRPCError } from "@trpc/server";
+import { templateListSchema } from "./template.schema";
+import { count, eq } from "drizzle-orm";
+
+const TEMPLATES_PER_PAGE = 2;
 
 const templateRouter = createTRPCRouter({
   addNew: twoFactorAuthenticatedProcedure
@@ -10,7 +14,6 @@ const templateRouter = createTRPCRouter({
       const { db, user } = ctx;
 
       // check if user can add members
-
       const isMember = await db.query.members.findFirst({
         where: (members, { and, eq }) =>
           and(
@@ -51,6 +54,54 @@ const templateRouter = createTRPCRouter({
       });
 
       return newTemplate;
+    }),
+  all: twoFactorAuthenticatedProcedure
+    .input(templateListSchema)
+    .query(async ({ ctx, input: { workspaceId, page } }) => {
+      const { db, user } = ctx;
+
+      // check if user can add members
+      const isMember = await db.query.members.findFirst({
+        where: (members, { and, eq }) =>
+          and(
+            eq(members.userId, user.id),
+            eq(members.workspaceId, workspaceId),
+          ),
+      });
+
+      if (!isMember) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message:
+            "You are not a member of this workspace to perform this action",
+        });
+      }
+
+      const templateCounts = await db
+        .select({ count: count() })
+        .from(templates)
+        .where(eq(templates.workspaceId, workspaceId));
+
+      // returning the templates
+
+      // current page
+
+      const offset = TEMPLATES_PER_PAGE * (page - 1);
+
+      const dbTemplates = await db.query.templates.findMany({
+        where: (templates, { eq }) => eq(templates.workspaceId, workspaceId),
+        limit: TEMPLATES_PER_PAGE,
+        offset: offset,
+      });
+
+      return {
+        count: templateCounts
+          .map((el) => el.count)
+          .reduce((acc, curr) => acc + curr, 0),
+        templates: dbTemplates,
+        startingFrom: offset + 1,
+        perPage: TEMPLATES_PER_PAGE,
+      };
     }),
 });
 
