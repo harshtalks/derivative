@@ -8,7 +8,7 @@ const templatesPageRoute = createRoute({
     workspaceId: string(),
   }),
   searchParamsSchema: object({
-    page: number().optional().default(1),
+    page: number({ coerce: true }).default(1),
   }),
 });
 

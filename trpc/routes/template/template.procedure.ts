@@ -100,7 +100,12 @@ const templateRouter = createTRPCRouter({
           .reduce((acc, curr) => acc + curr, 0),
         templates: dbTemplates,
         startingFrom: offset + 1,
-        perPage: TEMPLATES_PER_PAGE,
+        endTo: Math.min(
+          offset + TEMPLATES_PER_PAGE,
+          templateCounts
+            .map((el) => el.count)
+            .reduce((acc, curr) => acc + curr, 0),
+        ),
       };
     }),
 });

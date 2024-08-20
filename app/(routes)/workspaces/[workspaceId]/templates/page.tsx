@@ -41,10 +41,13 @@ export default async function Page({
   params,
   searchParams,
 }: {
-  params: { workspaceId: string };
-  searchParams: { page?: string | string[] | undefined };
+  params: unknown;
+  searchParams: unknown;
 }) {
-  setCurrentWorkspace(Branded.WorkspaceId(params.workspaceId));
+  const parsedParams = templatesPageRoute.parseParams(params);
+  const parsedSearchParams = templatesPageRoute.parseSearchParams(searchParams);
+
+  setCurrentWorkspace(Branded.WorkspaceId(parsedParams.workspaceId));
 
   await new AuthInterceptor(
     templatesPageRoute({
@@ -57,9 +60,10 @@ export default async function Page({
     .check();
 
   // get the data
-  const { templates, count, perPage, startingFrom } =
+  const { templates, count, endTo, startingFrom } =
     await serverApiTrpc.template.all({
       workspaceId: brandedCurrentWorkspace(),
+      page: parsedSearchParams.page,
     });
 
   return (
@@ -186,7 +190,7 @@ export default async function Page({
                   <div className="text-xs text-muted-foreground">
                     Showing{" "}
                     <strong>
-                      {startingFrom}-{perPage}
+                      {startingFrom}-{endTo}
                     </strong>{" "}
                     of <strong>{count}</strong> products
                   </div>
