@@ -54,6 +54,8 @@ const logRouter = createTRPCRouter({
         },
         where: (workspaceActivities, { eq }) =>
           eq(workspaceActivities.workspaceId, workspaceId),
+        orderBy: (workspaceActivities, { desc }) =>
+          desc(workspaceActivities.createdAt),
       });
 
       return logs;

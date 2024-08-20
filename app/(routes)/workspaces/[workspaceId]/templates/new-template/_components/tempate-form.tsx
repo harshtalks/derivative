@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
-import { ChevronLeft, PlusCircle, Upload } from "lucide-react";
+import { ChevronLeft, Loader, PlusCircle, Upload } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 
@@ -46,6 +46,9 @@ import clientApiTrpc from "@/trpc/client";
 import { toast } from "sonner";
 import NewTemplateRouteInfo from "../route.info";
 import Branded from "@/types/branded.type";
+import { useTempehRouter } from "@/route.config";
+import { useRouter } from "next/navigation";
+import templatesPageRoute from "../../route.info";
 
 const templateSchema = z.object({
   name: z.string().min(1),
@@ -73,6 +76,8 @@ export function TemplateForm() {
   const [categoryKey, setCategoryKey] =
     useState<Invoice.Keys>("expenseInvoices");
 
+  const { push: moveToTemplatesPage } = templatesPageRoute.useRouter(useRouter);
+
   const form = useForm<z.infer<typeof templateSchema>>({
     resolver: zodResolver(templateSchema),
     defaultValues: {
@@ -85,10 +90,19 @@ export function TemplateForm() {
   });
 
   const updatedKey = form.watch("category");
-
-  const mutation = clientApiTrpc.template.addNew.useMutation();
-
   const { workspaceId } = NewTemplateRouteInfo.useParams();
+
+  const mutation = clientApiTrpc.template.addNew.useMutation({
+    onSuccess: () => {
+      moveToTemplatesPage({
+        params: {
+          workspaceId: Branded.WorkspaceId(workspaceId),
+        },
+      });
+    },
+  });
+
+  const { back } = useTempehRouter(useRouter);
 
   return (
     <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
@@ -114,7 +128,13 @@ export function TemplateForm() {
         >
           <div className="mx-auto grid container max-w-6xl py-12 flex-1 auto-rows-max gap-4">
             <div className="flex items-center gap-4">
-              <Button variant="outline" size="icon" className="h-7 w-7">
+              <Button
+                type="button"
+                variant="outline"
+                size="icon"
+                className="h-7 w-7"
+                onClick={back}
+              >
                 <ChevronLeft className="h-4 w-4" />
                 <span className="sr-only">Back</span>
               </Button>
@@ -125,10 +145,20 @@ export function TemplateForm() {
                 workspace
               </Badge>
               <div className="hidden items-center gap-2 md:ml-auto md:flex">
-                <Button variant="outline" size="sm">
+                <Button type="button" variant="outline" size="sm">
                   Save as Draft
                 </Button>
-                <Button size="sm">Save Template</Button>
+                <Button
+                  size="sm"
+                  type="submit"
+                  disabled={mutation.isPending}
+                  className="inline-flex items-center gap-2"
+                >
+                  {mutation.isPending ? (
+                    <Loader className="shrink-0 animate-spin size-4" />
+                  ) : null}
+                  {mutation.isPending ? "Saving template" : "Save template"}
+                </Button>
               </div>
             </div>
             <div className="grid gap-4 md:grid-cols-[1fr_250px] lg:grid-cols-3 lg:gap-8">
@@ -400,25 +430,38 @@ export function TemplateForm() {
                 </Card>
                 <Card x-chunk="dashboard-07-chunk-5">
                   <CardHeader>
-                    <CardTitle>Archive Product</CardTitle>
+                    <CardTitle>Workspace templates</CardTitle>
                     <CardDescription>
-                      Lipsum dolor sit amet, consectetur adipiscing elit.
+                      Access all your workspaces from here
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
                     <div></div>
-                    <Button size="sm" variant="secondary">
-                      Archive Product
-                    </Button>
+                    <templatesPageRoute.Link
+                      params={{ workspaceId: Branded.WorkspaceId(workspaceId) }}
+                    >
+                      <Button size="sm" variant="secondary">
+                        Workspace templates
+                      </Button>
+                    </templatesPageRoute.Link>
                   </CardContent>
                 </Card>
               </div>
             </div>
             <div className="flex items-center justify-center gap-2 md:hidden">
-              <Button variant="outline" size="sm">
+              <Button type="button" variant="outline" size="sm">
                 Discard
               </Button>
-              <Button size="sm">Save Product</Button>
+              <Button
+                size="sm"
+                type="submit"
+                className="inline-flex items-center gap-2"
+              >
+                {mutation.isPending ? (
+                  <Loader className="shrink-0 size-4" />
+                ) : null}
+                {mutation.isPending ? "Saving template" : "Save template"}
+              </Button>
             </div>
           </div>
         </form>

@@ -44,6 +44,8 @@ import { Switch } from "@/components/ui/switch";
 import clientApiTrpc from "@/trpc/client";
 import DashboardRoute from "../route.info";
 import { toast } from "sonner";
+import { revalidate } from "@/actions/revalidate";
+import Branded from "@/types/branded.type";
 
 type PermissionsUIList = {
   value: (typeof permissions)[number];
@@ -91,6 +93,8 @@ const AddMemberToWorkspace = ({
 }: {
   user: typeof users.$inferSelect;
 }) => {
+  const { workspaceId } = DashboardRoute.useParams();
+
   const form = useForm<_infer<typeof addMemberSchema>>({
     resolver: zodResolver(addMemberSchema),
     defaultValues: {
@@ -100,7 +104,7 @@ const AddMemberToWorkspace = ({
   });
   const utils = clientApiTrpc.useUtils();
   const mutation = clientApiTrpc.member.add.useMutation({
-    onSuccess: () => {
+    onSuccess: async () => {
       form.reset();
       utils.user.all.invalidate();
       utils.member.all.invalidate();
@@ -108,7 +112,6 @@ const AddMemberToWorkspace = ({
   });
 
   const [isOpen, setIsOpen] = useState(false);
-  const { workspaceId } = DashboardRoute.useParams();
 
   return (
     <Credenza open={isOpen} onOpenChange={setIsOpen}>

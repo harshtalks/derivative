@@ -105,34 +105,23 @@ const workspaceRouter = createTRPCRouter({
       user: { id: userId },
     } = ctx;
 
-    // database call
-    const dbResult = await db.transaction(async (ctx) => {
-      // get all the members
-      const membersDB = await ctx.query.members.findMany({
-        columns: {
-          workspaceId: true,
-        },
-        where: (members, { eq }) => eq(members.userId, userId),
-      });
-
-      if (membersDB.length === 0) {
-        return [];
-      }
-
-      // get all the workspaces
-      const workspacesDB = await ctx.query.workspaces.findMany({
-        where: (workspaces, { inArray: $in }) =>
-          $in(
-            workspaces.id,
-            membersDB.map((m) => m.workspaceId),
-          ),
-        orderBy: (workspaces, { desc }) => desc(workspaces.createdAt),
-      });
-
-      return workspacesDB;
+    const membersDB = await db.query.members.findMany({
+      columns: {
+        workspaceId: true,
+      },
+      where: (members, { eq }) => eq(members.userId, userId),
     });
 
-    return dbResult;
+    if (membersDB.length === 0) {
+      return [];
+    }
+
+    // get all the workspaces
+    const workspacesDB = await db.query.workspaces.findMany({
+      orderBy: (workspaces, { desc }) => desc(workspaces.createdAt),
+    });
+
+    return workspacesDB;
   }),
   // get the workspace by id
   workspace: twoFactorAuthenticatedProcedure
