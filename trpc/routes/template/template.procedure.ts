@@ -4,6 +4,8 @@ import { createTRPCRouter, twoFactorAuthenticatedProcedure } from "@/trpc/trpc";
 import { TRPCError } from "@trpc/server";
 import { templateListSchema } from "./template.schema";
 import { count, eq } from "drizzle-orm";
+import { inputAs } from "@/trpc/utils";
+import Branded from "@/types/branded.type";
 
 const TEMPLATES_PER_PAGE = 2;
 
@@ -107,6 +109,50 @@ const templateRouter = createTRPCRouter({
             .reduce((acc, curr) => acc + curr, 0),
         ),
       };
+    }),
+  get: twoFactorAuthenticatedProcedure
+    .input(
+      inputAs<{
+        templateId: Branded.TemplateId;
+        workspaceId: Branded.WorkspaceId;
+      }>(),
+    )
+    .query(async ({ ctx, input: { templateId, workspaceId } }) => {
+      const { db, user } = ctx;
+
+      // check if user can add members
+      const isMember = await db.query.members.findFirst({
+        where: (members, { and, eq }) =>
+          and(
+            eq(members.userId, user.id),
+            eq(members.workspaceId, workspaceId),
+          ),
+      });
+
+      if (!isMember) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message:
+            "You are not a member of this workspace to perform this action",
+        });
+      }
+
+      const template = await db.query.templates.findFirst({
+        where: (templates, { and, eq }) =>
+          and(
+            eq(templates.id, templateId),
+            eq(templates.workspaceId, workspaceId),
+          ),
+      });
+
+      if (!template) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Template not found",
+        });
+      }
+
+      return template;
     }),
 });
 

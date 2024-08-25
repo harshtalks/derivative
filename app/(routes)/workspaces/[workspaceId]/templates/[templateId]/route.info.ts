@@ -5,7 +5,6 @@ export const templatePageParamsSchema = object({
   workspaceId: string(),
   templateId: string(),
 });
-export type TemplatePageSchema = infer_<typeof templatePageParamsSchema>;
 
 const TemplatePageRouteInfo = createRoute({
   name: "template-schema",

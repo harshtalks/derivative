@@ -55,8 +55,6 @@ export const canAddMembersEffect = (workspaceId: Branded.WorkspaceId) => {
       return false;
     }
 
-    return (
-      member.role === "admin" || member.permissions.includes("memmber_controls")
-    );
+    return member.role === "admin" || member.permissions.includes("member");
   });
 };

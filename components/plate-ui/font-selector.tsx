@@ -10,18 +10,35 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ptSerif } from "@/fonts";
+import { ptSerif, lora, openSans } from "@/fonts";
 import { FontFamilyIcon } from "@radix-ui/react-icons";
 import clsx from "clsx";
+import { useSelector } from "@xstate/store/react";
+import { fontStore } from "@/stores/font-store";
 
 function FontSelector() {
   const [isOpen, setIsOpen] = React.useReducer((prev) => !prev, false);
+  const editorFont = useSelector(
+    fontStore,
+    (state) => state.context.editorFont,
+  );
+
   return (
-    <Select open={isOpen} onOpenChange={setIsOpen}>
+    <Select
+      open={isOpen}
+      value={editorFont}
+      onValueChange={(value) =>
+        fontStore.send({
+          type: "changeEditorFont",
+          value: value as `--${string}`,
+        })
+      }
+      onOpenChange={setIsOpen}
+    >
       <SelectTrigger
         className={clsx(
-          "inline-flex gap-2 hover:bg-muted focus-within:outline-none outline-none border-transparent shadow-none",
-          isOpen && "bg-muted"
+          "inline-flex gap-2 hover:bg-muted focus-within:outline-none focus-within:border-transparent focus:ring-0 outline-none border-transparent shadow-none",
+          isOpen && "bg-muted",
         )}
       >
         <FontFamilyIcon className="shrink-0 size-4" />{" "}
@@ -31,10 +48,8 @@ function FontSelector() {
         <SelectGroup>
           <SelectLabel>Fonts</SelectLabel>
           <SelectItem value={ptSerif.variable}>PT Serif</SelectItem>
-          <SelectItem value="banana">Banana</SelectItem>
-          <SelectItem value="blueberry">Blueberry</SelectItem>
-          <SelectItem value="grapes">Grapes</SelectItem>
-          <SelectItem value="pineapple">Pineapple</SelectItem>
+          <SelectItem value={lora.variable}>Lora</SelectItem>
+          <SelectItem value={openSans.variable}>Open Sans</SelectItem>
         </SelectGroup>
       </SelectContent>
     </Select>

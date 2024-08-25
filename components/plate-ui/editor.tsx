@@ -5,7 +5,11 @@ import { cva } from "class-variance-authority";
 
 import type { PlateContentProps } from "@udecode/plate-common";
 import type { VariantProps } from "class-variance-authority";
-import { ptSerif } from "@/fonts";
+import { ptSerif, lora, openSans } from "@/fonts";
+import { useSelector } from "@xstate/store/react";
+import { fontStore } from "@/stores/font-store";
+
+const fonts = [ptSerif, lora, openSans];
 
 const editorVariants = cva(
   cn(
@@ -13,7 +17,7 @@ const editorVariants = cva(
     "min-h-[80px] w-full rounded-md bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none",
     "[&_[data-slate-placeholder]]:text-muted-foreground [&_[data-slate-placeholder]]:!opacity-100",
     "[&_[data-slate-placeholder]]:top-[auto_!important]",
-    "[&_strong]:font-bold"
+    "[&_strong]:font-bold",
   ),
   {
     variants: {
@@ -41,7 +45,7 @@ const editorVariants = cva(
       focusRing: true,
       size: "sm",
     },
-  }
+  },
 );
 
 export type EditorProps = PlateContentProps &
@@ -59,14 +63,22 @@ const Editor = React.forwardRef<HTMLDivElement, EditorProps>(
       variant,
       ...props
     },
-    ref
+    ref,
   ) => {
+    const currentFontVariable = useSelector(
+      fontStore,
+      (state) => state.context.editorFont,
+    );
+
+    const font =
+      fonts.find((el) => el.variable === currentFontVariable) || ptSerif;
+
     return (
       <div
         ref={ref}
         className={cn(
           "relative border mx-auto my-6 shadow-2xl rounded-md",
-          ptSerif.className
+          font.className,
         )}
         style={{
           maxWidth: "21cm",
@@ -83,7 +95,7 @@ const Editor = React.forwardRef<HTMLDivElement, EditorProps>(
               size,
               variant,
             }),
-            className
+            className,
           )}
           disableDefaultStyles
           readOnly={disabled ?? readOnly}
@@ -92,7 +104,7 @@ const Editor = React.forwardRef<HTMLDivElement, EditorProps>(
         />
       </div>
     );
-  }
+  },
 );
 Editor.displayName = "Editor";
 

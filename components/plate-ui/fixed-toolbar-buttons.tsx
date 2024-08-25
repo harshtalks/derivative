@@ -36,14 +36,13 @@ export function FixedToolbarButtons() {
   return (
     <div className="w-full overflow-hidden">
       <div
-        className="flex flex-wrap"
+        className="flex flex-wrap items-center"
         style={{
           transform: "translateX(calc(-1px))",
         }}
       >
         <>
           <ToolbarGroup noSeparator>
-            <InsertDropdownMenu />
             <TurnIntoDropdownMenu />
           </ToolbarGroup>
 
@@ -111,7 +110,7 @@ export function FixedToolbarButtons() {
 
         <div className="grow" />
 
-        <ToolbarGroup className="pb-2" noSeparator>
+        <ToolbarGroup noSeparator>
           <FontSelector />
         </ToolbarGroup>
       </div>
