@@ -382,52 +382,7 @@ export function TemplateForm() {
                     </div>
                   </CardContent>
                 </Card>
-                <Card
-                  className="overflow-hidden"
-                  x-chunk="dashboard-07-chunk-4"
-                >
-                  <CardHeader>
-                    <CardTitle>Product Images</CardTitle>
-                    <CardDescription>
-                      Lipsum dolor sit amet, consectetur adipiscing elit
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="grid gap-2">
-                      <Image
-                        alt="Product image"
-                        className="aspect-square w-full rounded-md object-cover"
-                        height="300"
-                        src="/placeholder.svg"
-                        width="300"
-                      />
-                      <div className="grid grid-cols-3 gap-2">
-                        <button>
-                          <Image
-                            alt="Product image"
-                            className="aspect-square w-full rounded-md object-cover"
-                            height="84"
-                            src="/placeholder.svg"
-                            width="84"
-                          />
-                        </button>
-                        <button>
-                          <Image
-                            alt="Product image"
-                            className="aspect-square w-full rounded-md object-cover"
-                            height="84"
-                            src="/placeholder.svg"
-                            width="84"
-                          />
-                        </button>
-                        <button className="flex aspect-square w-full items-center justify-center rounded-md border border-dashed">
-                          <Upload className="h-4 w-4 text-muted-foreground" />
-                          <span className="sr-only">Upload</span>
-                        </button>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
+
                 <Card x-chunk="dashboard-07-chunk-5">
                   <CardHeader>
                     <CardTitle>Workspace templates</CardTitle>
@@ -456,9 +411,10 @@ export function TemplateForm() {
                 size="sm"
                 type="submit"
                 className="inline-flex items-center gap-2"
+                disabled={mutation.isPending}
               >
                 {mutation.isPending ? (
-                  <Loader className="shrink-0 size-4" />
+                  <Loader className="shrink-0 animate-spin size-4" />
                 ) : null}
                 {mutation.isPending ? "Saving template" : "Save template"}
               </Button>

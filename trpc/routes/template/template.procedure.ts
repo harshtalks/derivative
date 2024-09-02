@@ -2,10 +2,17 @@ import { templates } from "@/database/schema";
 import { insertTemplateSchema } from "@/database/schema.zod";
 import { createTRPCRouter, twoFactorAuthenticatedProcedure } from "@/trpc/trpc";
 import { TRPCError } from "@trpc/server";
-import { templateListSchema } from "./template.schema";
+import { deleteTemplateSchema, templateListSchema } from "./template.schema";
 import { count, eq } from "drizzle-orm";
 import { inputAs } from "@/trpc/utils";
 import Branded from "@/types/branded.type";
+import {
+  makeMainLiveWithServices,
+  provideAuth,
+  provideDB,
+  runWithServices,
+} from "@/services";
+import { canAddTemplatesEffect, isMemberEffect } from "@/services/access-layer";
 
 const TEMPLATES_PER_PAGE = 10;
 
@@ -13,32 +20,20 @@ const templateRouter = createTRPCRouter({
   addNew: twoFactorAuthenticatedProcedure
     .input(insertTemplateSchema.omit({ createdBy: true }))
     .mutation(async ({ ctx, input }) => {
-      const { db, user } = ctx;
+      const { db, user, session } = ctx;
 
-      // check if user can add members
-      const isMember = await db.query.members.findFirst({
-        where: (members, { and, eq }) =>
-          and(
-            eq(members.userId, user.id),
-            eq(members.workspaceId, input.workspaceId),
-          ),
-      });
+      const dbLayer = provideDB(db);
+      const authLayer = provideAuth({ user, session });
+      const mainLayer = makeMainLiveWithServices(dbLayer, authLayer);
+      const doesUserHaveAccess = await runWithServices(
+        canAddTemplatesEffect(Branded.WorkspaceId(input.workspaceId)),
+        mainLayer,
+      );
 
-      if (!isMember) {
+      if (!doesUserHaveAccess) {
         throw new TRPCError({
           code: "FORBIDDEN",
-          message:
-            "You are not a member of this workspace to perform this action",
-        });
-      }
-
-      const hasAccess =
-        isMember.role === "admin" || isMember.permissions.includes("admin");
-
-      if (!hasAccess) {
-        throw new TRPCError({
-          code: "FORBIDDEN",
-          message: "You do not have permission to add members",
+          message: "You do not have permission to perform this action",
         });
       }
 
@@ -50,7 +45,7 @@ const templateRouter = createTRPCRouter({
         name: input.name,
         description: input.description,
         workspaceId: input.workspaceId,
-        createdBy: isMember.id,
+        createdBy: doesUserHaveAccess.id,
         status: input.status,
         jsonSchema: input.jsonSchema,
       });
@@ -153,6 +148,33 @@ const templateRouter = createTRPCRouter({
       }
 
       return template;
+    }),
+  delete: twoFactorAuthenticatedProcedure
+    .input(deleteTemplateSchema)
+    .mutation(async ({ ctx, input: { templateId, workspaceId } }) => {
+      const { db, user, session } = ctx;
+
+      const dbLayer = provideDB(db);
+      const authLayer = provideAuth({ user, session });
+      const mainLayer = makeMainLiveWithServices(dbLayer, authLayer);
+      const doesUserHaveAccess = await runWithServices(
+        canAddTemplatesEffect(Branded.WorkspaceId(workspaceId)),
+        mainLayer,
+      );
+
+      if (!doesUserHaveAccess) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "You do not have permission to perform this action",
+        });
+      }
+
+      const deleted = await db
+        .delete(templates)
+        .where(eq(templates.id, templateId))
+        .returning();
+
+      return deleted;
     }),
 });
 

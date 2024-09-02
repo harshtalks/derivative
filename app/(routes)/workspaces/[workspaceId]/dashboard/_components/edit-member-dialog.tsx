@@ -246,7 +246,9 @@ const EditWorkspaceMember = ({
                     {mutation.isPending && (
                       <Loader className="shrink-0 size-4 animate-spin" />
                     )}
-                    {mutation.isPending ? "Adding member..." : "Add member"}
+                    {mutation.isPending
+                      ? "Editing membership..."
+                      : "Edit membership"}
                   </Button>
                 </div>
               </CredenzaFooter>

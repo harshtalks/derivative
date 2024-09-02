@@ -43,6 +43,8 @@ import NewTemplateRouteInfo from "../../templates/new-template/route.info";
 import AddMembers from "./add-members";
 import { brandedCurrentWorkspace } from "../../../route.info";
 import { canAddMembers } from "@/auth/access-check";
+import TemplatePageRouteInfo from "../../templates/[templateId]/route.info";
+import templatesPageRoute from "../../templates/route.info";
 
 export async function DashboardLayout() {
   const workspaceId = brandedCurrentWorkspace();
@@ -65,10 +67,17 @@ export async function DashboardLayout() {
                 Create templates for your invoices.
               </CardDescription>
             </CardHeader>
-            <CardFooter>
+            <CardFooter className="flex items-center gap-4">
               <NewTemplateRouteInfo.Link params={{ workspaceId: workspaceId }}>
-                <Button>Create New Template</Button>
+                <Button variant="ringHover" size="sm">
+                  Create New Template
+                </Button>
               </NewTemplateRouteInfo.Link>
+              <templatesPageRoute.Link params={{ workspaceId: workspaceId }}>
+                <Button variant="outline" size="sm">
+                  View All Templates
+                </Button>
+              </templatesPageRoute.Link>
             </CardFooter>
           </Card>
           <Card x-chunk="dashboard-05-chunk-1">
