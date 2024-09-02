@@ -1,4 +1,5 @@
 "use client";
+import { cn } from "@/lib/utils";
 import { CodeiumEditor } from "@codeium/react-code-editor";
 import { useTheme } from "next-themes";
 import { ComponentPropsWithoutRef } from "react";
@@ -31,15 +32,20 @@ export const DEFAULT_SCHEMA = JSON.stringify(
 );
 
 const TemplateSchemaEditor = (
-  props: Partial<ComponentPropsWithoutRef<typeof CodeiumEditor>>,
+  props: Partial<ComponentPropsWithoutRef<typeof CodeiumEditor>> & {
+    containerClassName?: string;
+  },
 ) => {
   const { theme } = useTheme();
   return (
     <CodeiumEditor
       language="json"
       theme={theme === "dark" ? "vs-dark" : "vs-light"}
-      containerClassName="!border overflow-auto !focus-within:ring rounded-md"
       {...props}
+      containerClassName={cn(
+        "!border overflow-auto !focus-within:ring rounded-md",
+        props.containerClassName,
+      )}
     />
   );
 };

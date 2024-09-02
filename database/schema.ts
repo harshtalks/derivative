@@ -31,13 +31,7 @@ export type WorkspaceActivitiesEvents =
 
 export type Permission = (typeof permissions)[number];
 
-export const permissions = [
-  "read",
-  "write",
-  "delete",
-  "admin",
-  "member_controls",
-] as const;
+export const permissions = ["read", "write", "member_controls"] as const;
 
 export const workspaceTypes = ["personal", "enterprise", "standard"] as const;
 

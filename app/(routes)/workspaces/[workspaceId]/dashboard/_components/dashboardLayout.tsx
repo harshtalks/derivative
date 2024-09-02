@@ -42,6 +42,7 @@ import { Suspense } from "react";
 import NewTemplateRouteInfo from "../../templates/new-template/route.info";
 import AddMembers from "./add-members";
 import { brandedCurrentWorkspace } from "../../../route.info";
+import { canAddMembers } from "@/auth/access-check";
 
 export async function DashboardLayout() {
   const workspaceId = brandedCurrentWorkspace();
@@ -50,6 +51,8 @@ export async function DashboardLayout() {
     await serverApiTrpc.workspace.workspace({
       workspaceId,
     });
+
+  const hasPermissionToAddMembers = await canAddMembers(workspaceId);
 
   return (
     <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8 lg:grid-cols-3 xl:grid-cols-3">
@@ -159,7 +162,7 @@ export async function DashboardLayout() {
               )}
             </div>
             <div className="flex items-center gap-1">
-              <AddMembers />
+              {hasPermissionToAddMembers && <AddMembers />}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button size="icon" variant="outline" className="h-8 w-8">

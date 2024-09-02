@@ -19,7 +19,6 @@ import {
   verifyInviteLink,
 } from "@/auth/invite";
 import { TimeSpan } from "oslo";
-import { Effect } from "effect";
 import { eq } from "drizzle-orm";
 
 const workspaceRouter = createTRPCRouter({
@@ -63,7 +62,7 @@ const workspaceRouter = createTRPCRouter({
               workspaceId: Branded.WorkspaceId(workspace.id),
               role: "admin",
               isCreator: true,
-              permissions: ["admin"],
+              permissions: ["member_controls", "read", "write"],
             })
             .returning()
         )[0];

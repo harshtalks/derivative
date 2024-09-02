@@ -7,7 +7,7 @@ import { count, eq } from "drizzle-orm";
 import { inputAs } from "@/trpc/utils";
 import Branded from "@/types/branded.type";
 
-const TEMPLATES_PER_PAGE = 2;
+const TEMPLATES_PER_PAGE = 10;
 
 const templateRouter = createTRPCRouter({
   addNew: twoFactorAuthenticatedProcedure

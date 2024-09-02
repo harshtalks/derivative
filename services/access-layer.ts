@@ -41,7 +41,7 @@ export const canAddMembersEffect = (workspaceId: Branded.WorkspaceId) => {
       return false;
     }
 
-    const member = yield* Effect.promise(() =>
+    const memberDB = yield* Effect.promise(() =>
       db.query.members.findFirst({
         where: (members, { and, eq }) =>
           and(
@@ -51,10 +51,13 @@ export const canAddMembersEffect = (workspaceId: Branded.WorkspaceId) => {
       }),
     );
 
-    if (!member) {
+    if (!memberDB) {
       return false;
     }
 
-    return member.role === "admin" || member.permissions.includes("member");
+    return (
+      memberDB.role === "admin" ||
+      memberDB.permissions.includes("member_controls")
+    );
   });
 };

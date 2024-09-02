@@ -8,8 +8,19 @@ import store from "@/stores/manage-workspace-users";
 import { useSelector } from "@xstate/store/react";
 import useDebounce from "@/hooks/use-debounce";
 import { Input } from "@/components/ui/input";
-import { Loader } from "lucide-react";
+import { Edit3, Loader, MoreVertical } from "lucide-react";
 import { iife } from "@/lib/utils";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
+import EditWorkspaceMember from "./edit-member-dialog";
+import { useSessionProvider } from "@/providers/session.provider";
 
 const MembersList = () => {
   const { workspaceId } = DashboardRoute.useParams();
@@ -22,6 +33,16 @@ const MembersList = () => {
   const query = clientApiTrpc.member.all.useQuery({
     workspaceId: Branded.WorkspaceId(workspaceId),
   });
+
+  const trpcUtils = clientApiTrpc.useUtils();
+
+  const deleteMutation = clientApiTrpc.member.remove.useMutation({
+    onSuccess: () => {
+      trpcUtils.member.all.invalidate();
+    },
+  });
+
+  const { user } = useSessionProvider();
 
   return (
     <>
@@ -80,6 +101,51 @@ const MembersList = () => {
                           </div>
                         </div>
                         {/* // Add  */}
+                        <div className="flex items-center gap-1">
+                          <EditWorkspaceMember member={member} />
+                          <DropdownMenu>
+                            <DropdownMenuTrigger
+                              disabled={deleteMutation.isPending}
+                              asChild
+                            >
+                              <Button
+                                size="icon"
+                                variant="ghost"
+                                className="h-8 w-8"
+                              >
+                                <MoreVertical className="h-3.5 w-3.5" />
+                                <span className="sr-only">More</span>
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem
+                                disabled={
+                                  member.isCreator && member.userId === user?.id
+                                }
+                                onClick={async () => {
+                                  toast.promise(
+                                    deleteMutation.mutateAsync({
+                                      memberId: Branded.MemberId(member.id),
+                                      workspaceId:
+                                        Branded.WorkspaceId(workspaceId),
+                                    }),
+                                    {
+                                      loading: "Removing member...",
+                                      success: () => {
+                                        return `Member removed successfully`;
+                                      },
+                                      error: (error) => {
+                                        return error.message;
+                                      },
+                                    },
+                                  );
+                                }}
+                              >
+                                Remove
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </div>
                       </div>
                     ))}
                   </div>

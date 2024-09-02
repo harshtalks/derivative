@@ -6,8 +6,16 @@ import {
 import { createTRPCRouter, twoFactorAuthenticatedProcedure } from "@/trpc/trpc";
 import { inputAs } from "@/trpc/utils";
 import Branded from "@/types/branded.type";
-import { addMemberSchema } from "./member.schema";
+import {
+  addMemberSchema,
+  removeMemberSchema,
+  updateMemberSchema,
+} from "./member.schema";
 import { TRPCError } from "@trpc/server";
+import { runWithServices } from "@/services";
+import { canAddMembersEffect } from "@/services/access-layer";
+import { eq } from "drizzle-orm";
+import { object, string } from "zod";
 
 const memberRouter = createTRPCRouter({
   all: twoFactorAuthenticatedProcedure
@@ -81,6 +89,59 @@ const memberRouter = createTRPCRouter({
       });
 
       return newMember;
+    }),
+  remove: twoFactorAuthenticatedProcedure
+    .input(removeMemberSchema)
+    .mutation(
+      async ({ ctx: { db, user }, input: { memberId, workspaceId } }) => {
+        // check if the given user has access to add members
+        const result = await runWithServices(
+          canAddMembersEffect(Branded.WorkspaceId(workspaceId)),
+        );
+
+        if (!result) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "You do not have permission to perform this task",
+          });
+        }
+
+        // remove the member
+        const deleted = await db
+          .delete(members)
+          .where(eq(members.id, memberId))
+          .returning();
+
+        return deleted;
+      },
+    ),
+  edit: twoFactorAuthenticatedProcedure
+    .input(updateMemberSchema)
+    .mutation(async ({ ctx: { db, user }, input }) => {
+      // check if the given user has access to add members
+      const result = await runWithServices(
+        canAddMembersEffect(Branded.WorkspaceId(input.workspaceId)),
+      );
+
+      if (!result) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "You do not have permission to perform this task",
+        });
+      }
+
+      // update the member
+      const updated = await db
+        .update(members)
+        .set({
+          permissions: input.permissions,
+          role: input.role,
+          updatedAt: Date.now(),
+        })
+        .where(eq(members.id, input.id))
+        .returning();
+
+      return updated;
     }),
 });
 

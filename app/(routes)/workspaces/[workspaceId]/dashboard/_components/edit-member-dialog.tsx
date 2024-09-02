@@ -17,7 +17,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-import { memberRoles, users, permissions } from "@/database/schema";
+import { memberRoles, users, permissions, members } from "@/database/schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   ShieldPlus,
@@ -26,6 +26,7 @@ import {
   Eraser,
   UserPlus,
   Loader,
+  Edit3,
 } from "lucide-react";
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -44,6 +45,8 @@ import { Switch } from "@/components/ui/switch";
 import clientApiTrpc from "@/trpc/client";
 import DashboardRoute from "../route.info";
 import { toast } from "sonner";
+import { revalidate } from "@/actions/revalidate";
+import { useSessionProvider } from "@/providers/session.provider";
 
 type PermissionsUIList = {
   value: (typeof permissions)[number];
@@ -80,25 +83,32 @@ const addMemberSchema = object({
   }),
 });
 
-const AddMemberToWorkspace = ({
-  user,
+const EditWorkspaceMember = ({
+  member,
 }: {
-  user: typeof users.$inferSelect;
+  member: typeof members.$inferSelect;
 }) => {
   const { workspaceId } = DashboardRoute.useParams();
 
   const form = useForm<_infer<typeof addMemberSchema>>({
     resolver: zodResolver(addMemberSchema),
     defaultValues: {
-      permisions: ["read"],
-      role: "dev",
+      permisions: member.permissions,
+      role: member.role,
     },
   });
+
   const utils = clientApiTrpc.useUtils();
-  const mutation = clientApiTrpc.member.add.useMutation({
+  const { user } = useSessionProvider();
+
+  const mutation = clientApiTrpc.member.edit.useMutation({
     onSuccess: async () => {
-      form.reset();
-      utils.user.invalidate();
+      if (member.userId === user?.id) {
+        window.location.reload();
+      } else {
+        utils.member.all.invalidate();
+      }
+      setIsOpen(false);
     },
   });
 
@@ -107,49 +117,33 @@ const AddMemberToWorkspace = ({
   return (
     <Credenza open={isOpen} onOpenChange={setIsOpen}>
       <CredenzaTrigger asChild>
-        <Button variant="secondary" size="sm">
-          Add
+        <Button size="icon" variant="ghost" className="h-8 w-8">
+          <Edit3 className="shrink-0 size-3.5" />
+          <span className="sr-only">Edit</span>
         </Button>
       </CredenzaTrigger>
 
       <CredenzaContent>
         <CredenzaHeader>
-          <CredenzaTitle>Add new member</CredenzaTitle>
+          <CredenzaTitle>Edit Member Role</CredenzaTitle>
           <CredenzaDescription>
             Please choose the level of permissions and role for this member.
           </CredenzaDescription>
         </CredenzaHeader>
         <CredenzaBody>
-          <div className="flex pb-4 items-center space-x-4">
-            <Avatar>
-              {user.avatar && <AvatarImage src={user.avatar} />}
-              <AvatarFallback>
-                {user.name
-                  .split(" ")
-                  .map((el) => el[0])
-                  .join("")
-                  .toUpperCase()}
-              </AvatarFallback>
-            </Avatar>
-            <div>
-              <p className="text-sm font-medium leading-none">{user.name}</p>
-              <p className="text-sm text-muted-foreground">{user.email}</p>
-            </div>
-          </div>
           <Form {...form}>
             <form
               onSubmit={form.handleSubmit((data) => {
                 toast.promise(
                   mutation.mutateAsync({
-                    isCreator: false,
                     permissions: data.permisions,
                     role: data.role,
-                    userId: user.id,
-                    workspaceId,
+                    workspaceId: workspaceId,
+                    id: member.id,
                   }),
                   {
-                    loading: "Adding member...",
-                    success: "Member added successfully.",
+                    loading: "Updating member...",
+                    success: "Member updated successfully.",
                     error: (err) => err.message,
                   },
                 );
@@ -264,4 +258,4 @@ const AddMemberToWorkspace = ({
   );
 };
 
-export default AddMemberToWorkspace;
+export default EditWorkspaceMember;
