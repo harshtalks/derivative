@@ -29,7 +29,6 @@ import { Fragment, useState } from "react";
 import { Invoice } from "@/static/invoice";
 import TemplateSchemaEditor, { DEFAULT_SCHEMA } from "./template-schema-editor";
 import * as z from "zod";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -46,9 +45,11 @@ import clientApiTrpc from "@/trpc/client";
 import { toast } from "sonner";
 import NewTemplateRouteInfo from "../route.info";
 import Branded from "@/types/branded.type";
-import { useTempehRouter } from "@/route.config";
+import { Navigate, useTempehRouter } from "@/route.config";
 import { useRouter } from "next/navigation";
 import templatesPageRoute from "../../route.info";
+import { validate } from "json-schema";
+import Ajv from "ajv";
 
 const templateSchema = z.object({
   name: z.string().min(1),
@@ -66,6 +67,7 @@ const templateSchema = z.object({
           return false;
         }
       }),
+    json: z.string().min(1),
   }),
   category: z.string().min(1),
   subCategory: z.string().min(1),
@@ -109,6 +111,24 @@ export function TemplateForm() {
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit((data) => {
+            try {
+              const ajv = new Ajv();
+              const schema = JSON.parse(data.schema.schema);
+              const json = JSON.parse(data.schema.json);
+
+              const validate = ajv.compile(schema);
+              const valid = validate(json);
+
+              if (!valid) {
+                throw new Error(
+                  "Oops. looks like the json is invalid against the given schema.",
+                );
+              }
+            } catch (err) {
+              toast.error(err instanceof Error ? err.message : "Invalid JSON");
+              return;
+            }
+
             toast.promise(
               mutation.mutateAsync({
                 workspaceId: Branded.WorkspaceId(workspaceId),
@@ -118,6 +138,7 @@ export function TemplateForm() {
                 status: data.status,
                 name: data.name,
                 description: data.description,
+                json: data.schema.json,
               }),
               {
                 success: () => "Successfully created the template",
@@ -222,7 +243,7 @@ export function TemplateForm() {
                       edit this later depending on your plan.
                     </CardDescription>
                   </CardHeader>
-                  <CardContent>
+                  <CardContent className="space-y-4">
                     <FormField
                       control={form.control}
                       name="schema.schema"
@@ -241,17 +262,41 @@ export function TemplateForm() {
                         </FormItem>
                       )}
                     />
+                    <FormField
+                      control={form.control}
+                      name="schema.json"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Sample JSON Object</FormLabel>
+                          <TemplateSchemaEditor
+                            value={field.value}
+                            onChange={field.onChange}
+                          />
+                          <FormDescription>
+                            Please make sure, that given sample json object is
+                            valid compared to the schema.
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
                   </CardContent>
                   <CardFooter className="justify-center border-t p-4">
-                    <Button
-                      type="button"
-                      size="sm"
-                      variant="ghost"
-                      className="gap-1"
-                    >
-                      <PlusCircle className="h-3.5 w-3.5" />
-                      Add Variant
-                    </Button>
+                    <p className="text-sm text-muted-foreground leading-relaxed">
+                      We need both schema and json object to generate the
+                      invoice in future. this will allow us to generate the
+                      invoice based on the schema and json object. You can
+                      create as complex schema as you want. Use{" "}
+                      <Navigate
+                        base="JSON_SCHEMA_TOOL"
+                        path="/json-to-json-schema"
+                        className="text-primary underline"
+                        target="_blank"
+                      >
+                        json to json-schema helper
+                      </Navigate>{" "}
+                      for help.
+                    </p>
                   </CardFooter>
                 </Card>
                 <Card x-chunk="dashboard-07-chunk-2" className="shadow-none">

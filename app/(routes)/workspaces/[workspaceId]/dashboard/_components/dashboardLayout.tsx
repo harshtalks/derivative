@@ -5,6 +5,7 @@ import {
   CreditCard,
   File,
   ListFilter,
+  Loader,
   MoreVertical,
 } from "lucide-react";
 
@@ -41,18 +42,34 @@ import WorkspaceLogs, { WorkspaceLogsLoading } from "./workspace-logs";
 import { Suspense } from "react";
 import NewTemplateRouteInfo from "../../templates/new-template/route.info";
 import AddMembers from "./add-members";
-import { brandedCurrentWorkspace } from "../../../route.info";
+import WorkspaceRouteInfo, {
+  brandedCurrentWorkspace,
+} from "../../../route.info";
 import { canAddMembers } from "@/auth/access-check";
 import TemplatePageRouteInfo from "../../templates/[templateId]/route.info";
 import templatesPageRoute from "../../templates/route.info";
+import MemberDetails from "./member-details";
+import LeaveWorkspace from "./leave-workspace";
+import { Effect } from "effect";
+import { redirect } from "next/navigation";
 
 export async function DashboardLayout() {
   const workspaceId = brandedCurrentWorkspace();
 
-  const { workspaceDB: workspace, creator } =
-    await serverApiTrpc.workspace.workspace({
-      workspaceId,
-    });
+  const { workspaceDB: workspace, creator } = await Effect.tryPromise({
+    try: async () => {
+      const output = await serverApiTrpc.workspace.workspace({
+        workspaceId,
+      });
+      if (!output) {
+        throw new Error("Workspace not found");
+      }
+      return output;
+    },
+    catch: (error) => {
+      redirect(WorkspaceRouteInfo({}));
+    },
+  }).pipe(Effect.runPromise);
 
   const hasPermissionToAddMembers = await canAddMembers(workspaceId);
 
@@ -199,22 +216,15 @@ export async function DashboardLayout() {
               )}
             </div>
             <Separator className="my-4" />
-            <div className="grid grid-cols-2 gap-4">
-              <div className="grid gap-3">
-                <div className="font-semibold">Creator Information</div>
-                <address className="grid gap-0.5 not-italic text-muted-foreground">
-                  <span>Liam Johnson</span>
-                  <span>1234 Main St.</span>
-                  <span>Anytown, CA 12345</span>
-                </address>
-              </div>
-              <div className="grid auto-rows-max gap-3">
-                <div className="font-semibold">Billing Information</div>
-                <div className="text-muted-foreground">
-                  Same as shipping address
+            <Suspense
+              fallback={
+                <div className="flex items-center justify-center py-12">
+                  <Loader className="shrink-0 animate-spin size-4" />
                 </div>
-              </div>
-            </div>
+              }
+            >
+              <MemberDetails />
+            </Suspense>
             <Separator className="my-4" />
             <div className="grid gap-3">
               <div className="font-semibold flex items-center gap-1">
@@ -250,16 +260,8 @@ export async function DashboardLayout() {
             </div>
             <Separator className="my-4" />
             <div className="grid gap-3">
-              <div className="font-semibold">Payment Information</div>
-              <dl className="grid gap-3">
-                <div className="flex items-center justify-between">
-                  <dt className="flex items-center gap-1 text-muted-foreground">
-                    <CreditCard className="h-4 w-4" />
-                    Visa
-                  </dt>
-                  <dd>**** **** **** 4532</dd>
-                </div>
-              </dl>
+              <div className="font-semibold">Workspace Actions</div>
+              <LeaveWorkspace />
             </div>
           </CardContent>
           <CardFooter className="flex flex-row items-center border-t bg-muted/50 px-6 py-3">

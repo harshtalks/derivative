@@ -182,7 +182,12 @@ export const plugins = createPlugins(
     createCaptionPlugin({
       options: { pluginKeys: [ELEMENT_IMAGE, ELEMENT_MEDIA_EMBED] },
     }),
-    createMentionPlugin(),
+    // use {{ as pattern to trigger mention
+    createMentionPlugin({
+      options: {
+        trigger: "{",
+      },
+    }),
     createTablePlugin(),
     createTodoListPlugin(),
     createExcalidrawPlugin(),
@@ -354,7 +359,7 @@ export const plugins = createPlugins(
               return !!(
                 n.type &&
                 ([ELEMENT_TABLE, ELEMENT_LI, ELEMENT_CODE_BLOCK].includes(
-                  n.type as string
+                  n.type as string,
                 ) ||
                   n[KEY_LIST_STYLE_TYPE])
               );
@@ -423,7 +428,7 @@ export const plugins = createPlugins(
         [MARK_SUPERSCRIPT]: withProps(PlateLeaf, { as: "sup" }),
         [MARK_UNDERLINE]: withProps(PlateLeaf, { as: "u" }),
         [MARK_COMMENT]: CommentLeaf,
-      })
+      }),
     ),
-  }
+  },
 );

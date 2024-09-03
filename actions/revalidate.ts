@@ -5,15 +5,15 @@ import { createAction } from "tempeh";
 import { object, string } from "zod";
 
 export const revalidate = createAction({
-  handler: async ({ path }) => {
+  handler: async (args) => {
     console.log("reloading page thru action");
-    revalidatePath(path || "/");
+    revalidatePath(args?.path || "/");
 
     return {
       success: true,
     };
   },
   inputSchema: object({
-    path: string().optional(),
-  }),
+    path: string(),
+  }).optional(),
 });

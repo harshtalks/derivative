@@ -3,7 +3,9 @@ import "server-only";
 import Branded from "@/types/branded.type";
 import { redirect } from "next/navigation";
 import { cache } from "react";
-import { brandedCurrentWorkspace } from "@/app/(routes)/workspaces/route.info";
+import WorkspaceRouteInfo, {
+  brandedCurrentWorkspace,
+} from "@/app/(routes)/workspaces/route.info";
 import { runWithServices } from "@/services";
 import { canAddMembersEffect, isMemberEffect } from "@/services/access-layer";
 
@@ -20,7 +22,7 @@ export const checkAccessForWorkspace = cache(async () => {
   const result = await isMember(workspaceId);
 
   if (!result) {
-    redirect("/404");
+    redirect(WorkspaceRouteInfo({}));
   }
 });
 

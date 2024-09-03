@@ -23,7 +23,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { object, string, enum as enum_, infer as zInfer, array } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Form, FormField, FormMessage } from "@/components/ui/form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormMessage,
+} from "@/components/ui/form";
 import { workspaceTypes } from "@/database/schema";
 import { InputTags } from "@/components/ui/input-tags";
 import { Loader } from "lucide-react";
@@ -83,7 +88,7 @@ export function AddWorkspace() {
       status: "active",
       workspaceType: values.type,
       tags: values.tags,
-      note: values.note,
+      note: values.note || "",
     });
   }
 
@@ -161,12 +166,13 @@ export function AddWorkspace() {
                 render={({ field }) => (
                   <div className="flex flex-col space-y-1.5">
                     <Label htmlFor="metadata">Tags</Label>
-                    <InputTags
-                      value={field.value}
-                      onChange={field.onChange}
-                      placeholder="e.g. freelance, e-commerce"
-                      className="max-w-[500px]"
-                    />
+                    <FormControl>
+                      <InputTags
+                        {...field}
+                        placeholder="e.g. freelance, e-commerce"
+                        className="max-w-[500px]"
+                      />
+                    </FormControl>
                     <FormMessage />
                   </div>
                 )}

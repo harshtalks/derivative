@@ -19,14 +19,7 @@ import {
 
 import { memberRoles, users, permissions } from "@/database/schema";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  ShieldPlus,
-  AArrowDown as AnyIcon,
-  PencilRuler,
-  Eraser,
-  UserPlus,
-  Loader,
-} from "lucide-react";
+import { AArrowDown as AnyIcon, Loader } from "lucide-react";
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { object, enum as _enum, array, infer as _infer } from "zod";
@@ -44,34 +37,7 @@ import { Switch } from "@/components/ui/switch";
 import clientApiTrpc from "@/trpc/client";
 import DashboardRoute from "../route.info";
 import { toast } from "sonner";
-
-type PermissionsUIList = {
-  value: (typeof permissions)[number];
-  icon: typeof AnyIcon;
-  label: string;
-  description: string;
-};
-
-const permissionsUIList: PermissionsUIList[] = [
-  {
-    value: "read",
-    icon: PencilRuler,
-    label: "Read",
-    description: "Can read everything in the workspace.",
-  },
-  {
-    value: "write",
-    icon: Eraser,
-    label: "Write",
-    description: "Can do the changes in the workspace templates",
-  },
-  {
-    value: "member_controls",
-    icon: UserPlus,
-    label: "Member Controls",
-    description: "Can add and remove members from the workspace.",
-  },
-];
+import permissionsUIList from "../_data/permission-ui-list";
 
 const addMemberSchema = object({
   role: _enum(memberRoles),

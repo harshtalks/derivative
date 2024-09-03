@@ -7,6 +7,7 @@ const { createRoute, useTempehRouter, Navigate } = routeBuilder.getInstance({
   additionalBaseUrls: {
     GITHUB_API: "https://api.github.com",
     APP_BASE_URL: env.NEXT_PUBLIC_BASE_URL,
+    JSON_SCHEMA_TOOL: "https://transform.tools",
   },
 });
 

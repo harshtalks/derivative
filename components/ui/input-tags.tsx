@@ -42,7 +42,7 @@ const InputTags = React.forwardRef<HTMLInputElement, InputTagsProps>(
         className={cn(
           // caveat: :has() variant requires tailwind v3.4 or above: https://tailwindcss.com/blog/tailwindcss-v3-4#new-has-variant
           "has-[:focus-visible]:outline-none has-[:focus-visible]:ring-1 has-[:focus-visible]:ring-ring disabled:cursor-not-allowed disabled:opacity-50 min-h-12 flex w-full flex-wrap gap-2 rounded-md border border-neutral-200 bg-white px-3 py-2 text-sm ring-offset-white dark:border-neutral-800 dark:bg-neutral-950 dark:ring-offset-neutral-950",
-          className
+          className,
         )}
       >
         {value.map((item) => (
@@ -64,7 +64,9 @@ const InputTags = React.forwardRef<HTMLInputElement, InputTagsProps>(
           className="flex-1 bg-white dark:bg-neutral-950 outline-none bg-none placeholder:text-neutral-500 dark:placeholder:text-neutral-400"
           value={pendingDataPoint}
           onChange={(e) => setPendingDataPoint(e.target.value)}
+          onBlur={addPendingDataPoint}
           onKeyDown={(e) => {
+            // fix: it works even when the input is not focused
             if (e.key === "Enter" || e.key === ",") {
               e.preventDefault();
               addPendingDataPoint();
@@ -82,7 +84,7 @@ const InputTags = React.forwardRef<HTMLInputElement, InputTagsProps>(
         />
       </div>
     );
-  }
+  },
 );
 
 InputTags.displayName = "InputTags";

@@ -20,7 +20,7 @@ const createRandomUser = Effect.sync(
 import { Effect } from "effect";
 import { faker } from "@faker-js/faker";
 import { users } from "@/database/schema";
-import { ServiceLayer } from ".";
+import { AuthenticationLayer, DatabaseLayer } from ".";
 
 export const generateFakeUsers = (count: number = 100) => {
   return Effect.gen(function* () {
@@ -28,8 +28,9 @@ export const generateFakeUsers = (count: number = 100) => {
       Effect.runSync(createRandomUser),
     );
 
-    const services = yield* ServiceLayer;
-    const { session, user, db } = yield* services;
+    const db = yield* DatabaseLayer;
+    const auth = yield* AuthenticationLayer;
+    const { session, user } = yield* auth;
 
     yield* Effect.promise(() => db.insert(users).values([...fakeUsers]));
 

@@ -142,7 +142,7 @@ export const workspaces = sqliteTable("workspaces", {
   updatedAt: updatedAtSchema,
   createdBy: text("created_by")
     .references(() => users.id, {
-      onDelete: "cascade",
+      onDelete: "no action",
     })
     .notNull(),
   status: text("status", {
@@ -201,8 +201,9 @@ export const templates = sqliteTable(
     name: text("name").notNull(),
     createdBy: text("createdBy")
       .notNull()
-      .references(() => members.id, { onDelete: "no action" }),
+      .references(() => members.id, { onDelete: "cascade" }),
     jsonSchema: text("jsonSchema", { mode: "text" }).notNull(),
+    json: text("json", { mode: "text" }).notNull(),
     description: text("description"),
     category: text("category").notNull(),
     subcategory: text("subcategory").notNull(),
