@@ -32,8 +32,10 @@ const SidebarContent = () => {
             <p>{data.description}</p>
           </div>
           <div className="py-12">
-            <h2 className="pb-2">Schema</h2>
-            <TemplateSchemaEditor height={600} value={data.jsonSchema} />
+            <h2 className="pb-2">Sample JSON Schema</h2>
+            <pre className="p-2 !font-mono bg-zinc-100 dark:bg-zinc-700 text-xs rounded-md">
+              {data.json}
+            </pre>
           </div>
         </div>
       );

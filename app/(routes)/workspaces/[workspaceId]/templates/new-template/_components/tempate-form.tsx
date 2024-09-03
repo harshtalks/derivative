@@ -27,7 +27,10 @@ import {
 } from "@/components/ui/select";
 import { Fragment, useState } from "react";
 import { Invoice } from "@/static/invoice";
-import TemplateSchemaEditor, { DEFAULT_SCHEMA } from "./template-schema-editor";
+import TemplateSchemaEditor, {
+  DEFAULT_SCHEMA,
+  DEFAULT_SCHEMA_JSON,
+} from "./template-schema-editor";
 import * as z from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -87,6 +90,7 @@ export function TemplateForm() {
       schema: {
         schema: DEFAULT_SCHEMA,
         type: "text",
+        json: DEFAULT_SCHEMA_JSON,
       },
     },
   });

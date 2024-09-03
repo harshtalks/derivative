@@ -26,7 +26,6 @@ import { match } from "ts-pattern";
 import { TComboboxItem } from "@udecode/plate-combobox";
 import { Loader } from "lucide-react";
 import { Alert } from "./ui/alert";
-import { JSONSchema7 } from "json-schema";
 
 export default function PlateEditor() {
   const containerRef = useRef(null);
@@ -49,7 +48,7 @@ export default function PlateEditor() {
     .with({ status: "success" }, ({ data }) => {
       const schemaKeys = () => {
         try {
-          const schema = JSON.parse(data.jsonSchema) as JSONSchema7;
+          const schema = JSON.parse(data.json);
           return deepKeys(schema).map((l, i) => ({ text: l }) as TComboboxItem);
         } catch {
           return [];

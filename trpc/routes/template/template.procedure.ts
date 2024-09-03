@@ -48,6 +48,7 @@ const templateRouter = createTRPCRouter({
         createdBy: doesUserHaveAccess.id,
         status: input.status,
         jsonSchema: input.jsonSchema,
+        json: input.json,
       });
 
       return newTemplate;

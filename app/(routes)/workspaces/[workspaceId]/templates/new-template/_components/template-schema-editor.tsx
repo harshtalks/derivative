@@ -6,26 +6,35 @@ import { ComponentPropsWithoutRef } from "react";
 
 export const DEFAULT_SCHEMA = JSON.stringify(
   {
-    _comment:
-      "Generate valid json schema. you can use ai to generate your schema as well.",
-    title: "Person",
+    $schema: "http://json-schema.org/draft-07/schema#",
+    title: "Generated schema for Root",
     type: "object",
     properties: {
-      firstName: {
-        type: "string",
-        description: "The person's first name.",
+      userId: {
+        type: "number",
       },
-      lastName: {
-        type: "string",
-        description: "The person's last name.",
+      id: {
+        type: "number",
       },
-      age: {
-        description:
-          "Age in years which must be equal to or greater than zero.",
-        type: "integer",
-        minimum: 0,
+      title: {
+        type: "string",
+      },
+      completed: {
+        type: "boolean",
       },
     },
+    required: ["userId", "id", "title", "completed"],
+  },
+  null,
+  2,
+);
+
+export const DEFAULT_SCHEMA_JSON = JSON.stringify(
+  {
+    userId: 1,
+    id: 1,
+    title: "delectus aut autem",
+    completed: false,
   },
   null,
   2,
