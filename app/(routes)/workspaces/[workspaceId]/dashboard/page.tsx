@@ -4,21 +4,30 @@ import DashboardRoute from "./route.info";
 
 import DashboardLayout from "./_components/dashboardLayout";
 import { checkAccessForWorkspace } from "@/auth/access-check";
-import { brandedCurrentWorkspace } from "../../route.info";
+import { brandedCurrentWorkspace, setCurrentWorkspace } from "../../route.info";
+import { RouteProps } from "@/types/next.type";
+import ParserLayout from "@/components/parser-layout";
 
-const page = async () => {
-  // Validate the request
-  await new AuthInterceptor(
-    DashboardRoute({
-      workspaceId: brandedCurrentWorkspace(),
-    }),
-  )
-    .withTwoFactor()
-    .withRedirect()
-    .withAfterAuth(checkAccessForWorkspace)
-    .check();
+const page = async (routeProps: RouteProps) => {
+  return (
+    <ParserLayout routeInfo={DashboardRoute} {...routeProps}>
+      {async ({ params: { workspaceId } }) => {
+        setCurrentWorkspace(workspaceId);
+        // Validate the request
+        await new AuthInterceptor(
+          DashboardRoute({
+            workspaceId: brandedCurrentWorkspace(),
+          }),
+        )
+          .withTwoFactor()
+          .withRedirect()
+          .withAfterAuth(checkAccessForWorkspace)
+          .check();
 
-  return <DashboardLayout />;
+        return <DashboardLayout />;
+      }}
+    </ParserLayout>
+  );
 };
 
 export default page;

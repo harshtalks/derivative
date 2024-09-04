@@ -1,4 +1,5 @@
 // Local DB to preserve template data
+import Branded from "@/types/branded.type";
 import { openDB, DBSchema } from "idb";
 
 interface InvoiceMarkup extends DBSchema {
@@ -15,11 +16,45 @@ interface InvoiceMarkup extends DBSchema {
 }
 
 // Open the local store
-export const localStore = openDB<InvoiceMarkup>("invoice-markup", 0.1, {
-  upgrade(db) {
-    const store = db.createObjectStore("invoice-markup", {
-      keyPath: "templateId",
+export const localStore = async () =>
+  await openDB<InvoiceMarkup>("invoice-markup", 1, {
+    upgrade(db) {
+      const store = db.createObjectStore("invoice-markup", {
+        keyPath: "templateId",
+      });
+      store.createIndex("by-id", "templateId");
+    },
+  });
+
+export const getDraft = async (templateId: Branded.TemplateId) => {
+  try {
+    const db = await localStore();
+    const output = await db.getFromIndex("invoice-markup", "by-id", templateId);
+    if (!output) {
+      return null;
+    }
+
+    return output;
+  } catch (e) {
+    return null;
+  }
+};
+
+export const updateDraft = async (
+  templateId: Branded.TemplateId,
+  markup: string,
+  fontFamily: string,
+) => {
+  try {
+    const result = (await localStore()).put("invoice-markup", {
+      fontFamily: fontFamily,
+      markup: markup,
+      templateId: templateId,
+      lastUpdated: Date.now(),
     });
-    store.createIndex("by-id", "templateId");
-  },
-});
+
+    return result;
+  } catch {
+    return null;
+  }
+};

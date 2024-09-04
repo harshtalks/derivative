@@ -45,9 +45,7 @@ const page = async (props: RouteProps) => {
                   <EditorSidebar />
                 </div>
 
-                <div className="max-w-[1336px] border bg-background rounded-lg">
-                  <PlateEditor />
-                </div>
+                <PlateEditor />
               </section>
             </Container>
           </TooltipProvider>
