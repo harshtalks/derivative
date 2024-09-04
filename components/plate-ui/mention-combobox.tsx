@@ -30,6 +30,10 @@ export function MentionCombobox({
           key: pluginKey,
         })}
         {...props}
+        onRenderItem={(item) => {
+          // @ts-ignore
+          return <p>{item.item.label}</p>;
+        }}
       />
     </div>
   );

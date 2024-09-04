@@ -4,7 +4,7 @@ import { useSelector } from "@xstate/store/react";
 import { Button } from "./ui/button";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
-import { Plate } from "@udecode/plate-common";
+import { Plate, createPlateEditor } from "@udecode/plate-common";
 import { CommentsPopover } from "@/components/plate-ui/comments-popover";
 import { CursorOverlay } from "@/components/plate-ui/cursor-overlay";
 import { Editor } from "@/components/plate-ui/editor";
@@ -18,7 +18,7 @@ import { CommentsProvider } from "@udecode/plate-comments";
 import { cn } from "@udecode/cn";
 import { commentsUsers, myUserId } from "@/lib/plate/comments";
 import { plugins } from "@/lib/plate/plate-plugins";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ELEMENT_PARAGRAPH } from "@udecode/plate-paragraph";
 import { templates } from "@/database/schema";
 import { TComboboxItem } from "@udecode/plate-combobox";
@@ -27,6 +27,7 @@ import { queryOptions, useQuery, useQueryClient } from "@tanstack/react-query";
 import { match } from "ts-pattern";
 import { Loader2 } from "lucide-react";
 import Branded from "@/types/branded.type";
+import handlebars from "handlebars";
 
 const templateMarkQuery = (
   templateId: Branded.TemplateId,
@@ -60,13 +61,19 @@ const Markup = ({ template }: { template: typeof templates.$inferSelect }) => {
   const schemaKeys = () => {
     try {
       const schema = JSON.parse(template.json);
-      return deepKeys(schema).map((l, i) => ({ text: l }) as TComboboxItem);
+      return deepKeys(schema).map((l, i) => ({
+        label: l,
+        text: `{{${l}}}`,
+        key: i.toString(),
+      }));
     } catch {
       return [];
     }
   };
 
   const queryClient = useQueryClient();
+
+  const [html, setHtml] = useState<string>("");
 
   return (
     <div className="max-w-[1336px]">
@@ -94,6 +101,13 @@ const Markup = ({ template }: { template: typeof templates.$inferSelect }) => {
         <Button className="text-xs" size="sm" variant="gooeyLeft">
           Save Markup
         </Button>
+        {html && (
+          <div
+            dangerouslySetInnerHTML={{
+              __html: html,
+            }}
+          />
+        )}
       </div>
       <div className="border bg-background rounded-lg">
         {match(query)

@@ -16,16 +16,14 @@ export const MentionElement = withRef<
   return (
     <PlateElement
       ref={ref}
-      className={cn("inline-block", className)}
+      className={cn("inline", className)}
       data-slate-value={element.value}
       contentEditable={false}
       onClick={getHandler(onClick, element)}
       {...props}
     >
       {prefix}
-      {"{{"}
       {renderLabel ? renderLabel(element) : element.value}
-      {"}}"}
       {children}
     </PlateElement>
   );
