@@ -1,4 +1,5 @@
 import logRouter from "./routes/log/log.procedure";
+import markupRouter from "./routes/markup/markup.procedure";
 import memberRouter from "./routes/member/member.procedure";
 import templateRouter from "./routes/template/template.procedure";
 import userRouter from "./routes/user/user.procedure";
@@ -11,6 +12,7 @@ export const appRouter = createTRPCRouter({
   log: logRouter,
   member: memberRouter,
   template: templateRouter,
+  markup: markupRouter,
 });
 
 export type AppRouter = typeof appRouter;

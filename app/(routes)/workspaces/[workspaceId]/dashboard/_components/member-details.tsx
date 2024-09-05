@@ -4,6 +4,7 @@ import { formatDistanceToNow } from "date-fns";
 import { Badge } from "@/components/ui/badge";
 import permissionsUIList from "../_data/permission-ui-list";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 const MemberDetails = async () => {
   const member = await serverApiTrpc.member.get({
@@ -35,13 +36,19 @@ const MemberDetails = async () => {
         <div className="space-y-4">
           {permissionsUIList.map((permission) => {
             return (
-              <div className="flex items-center" key={permission.value}>
+              <div
+                className={cn(
+                  "flex items-center",
+                  member.permissions.includes(permission.value)
+                    ? "opacity-100"
+                    : "opacity-50",
+                )}
+                key={permission.value}
+              >
                 <permission.icon className="size-4 mr-2" />
                 <div className="flex flex-col">
                   <p className="text-sm font-semibold">{permission.label}</p>
-                  <span className="text-xs text-muted-foreground">
-                    {permission.description}
-                  </span>
+                  <span className="text-xs">{permission.description}</span>
                 </div>
               </div>
             );

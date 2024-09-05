@@ -255,6 +255,22 @@ export const userRelations = relations(users, ({ many }) => ({
   members: many(members),
 }));
 
+// Session relations
+export const sessionRelations = relations(sessions, ({ one }) => ({
+  user: one(users, {
+    fields: [sessions.userId],
+    references: [users.id],
+  }),
+}));
+
+// authenticator relations
+export const authenticatorRelations = relations(authenticators, ({ one }) => ({
+  user: one(users, {
+    fields: [authenticators.userId],
+    references: [users.id],
+  }),
+}));
+
 // workspace relations
 export const workspaceRelations = relations(workspaces, ({ many, one }) => ({
   members: many(members, {
@@ -297,6 +313,23 @@ export const memberRelations = relations(members, ({ one }) => ({
 export const templateRelations = relations(templates, ({ many, one }) => ({
   template_markup: one(templateMarkups),
   invoices: many(invoices),
+}));
+
+export const templateMetadataRelations = relations(
+  templateMarkups,
+  ({ one }) => ({
+    template: one(templates, {
+      fields: [templateMarkups.templateId],
+      references: [templates.id],
+    }),
+  }),
+);
+
+export const invoiceRelations = relations(invoices, ({ one }) => ({
+  template: one(templates, {
+    fields: [invoices.templateId],
+    references: [templates.id],
+  }),
 }));
 
 export const workspaceActivityRelations = relations(

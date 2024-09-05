@@ -2,43 +2,34 @@
 import { fontStore } from "@/stores/font-store";
 import { useSelector } from "@xstate/store/react";
 import { Button } from "./ui/button";
-import { DndProvider } from "react-dnd";
-import { HTML5Backend } from "react-dnd-html5-backend";
-import { Plate, createPlateEditor } from "@udecode/plate-common";
-import { CommentsPopover } from "@/components/plate-ui/comments-popover";
-import { CursorOverlay } from "@/components/plate-ui/cursor-overlay";
-import { Editor } from "@/components/plate-ui/editor";
-import { FixedToolbar } from "@/components/plate-ui/fixed-toolbar";
-import { FixedToolbarButtons } from "@/components/plate-ui/fixed-toolbar-buttons";
-import { FloatingToolbar } from "@/components/plate-ui/floating-toolbar";
-import { FloatingToolbarButtons } from "@/components/plate-ui/floating-toolbar-buttons";
-import { MentionCombobox } from "@/components/plate-ui/mention-combobox";
+
 import { getDraft, updateDraft } from "@/database/local-store";
-import { CommentsProvider } from "@udecode/plate-comments";
-import { cn } from "@udecode/cn";
-import { commentsUsers, myUserId } from "@/lib/plate/comments";
-import { plugins } from "@/lib/plate/plate-plugins";
-import { useEffect, useRef, useState } from "react";
+
 import { ELEMENT_PARAGRAPH } from "@udecode/plate-paragraph";
 import { templates } from "@/database/schema";
-import { TComboboxItem } from "@udecode/plate-combobox";
-import { deepKeys } from "deeks";
 import { queryOptions, useQuery, useQueryClient } from "@tanstack/react-query";
 import { match } from "ts-pattern";
 import { Loader2 } from "lucide-react";
 import Branded from "@/types/branded.type";
-import handlebars from "handlebars";
+import clientApiTrpc from "@/trpc/client";
+import { toast } from "sonner";
+import InvoiceEditor from "./invoice-editor";
 
-const templateMarkQuery = (
-  templateId: Branded.TemplateId,
-  fontFamily?: string,
-) =>
+export const templateMarkQuery = (templateId: Branded.TemplateId) =>
   queryOptions({
     queryKey: ["templateMarkup", templateId],
     queryFn: async () => {
-      return getDraft(templateId);
+      return await getDraft(templateId);
     },
   });
+
+export const initialValue = [
+  {
+    id: "1",
+    type: ELEMENT_PARAGRAPH,
+    children: [{ text: "Hello, World!" }],
+  },
+];
 
 const Markup = ({ template }: { template: typeof templates.$inferSelect }) => {
   const fontfamily = useSelector(
@@ -46,34 +37,25 @@ const Markup = ({ template }: { template: typeof templates.$inferSelect }) => {
     (state) => state.context.editorFont,
   );
 
-  const query = useQuery(templateMarkQuery(Branded.TemplateId(template.id)));
-
-  const containerRef = useRef(null);
-
-  const initialValue = [
-    {
-      id: "1",
-      type: ELEMENT_PARAGRAPH,
-      children: [{ text: "Hello, World!" }],
-    },
-  ];
-
-  const schemaKeys = () => {
-    try {
-      const schema = JSON.parse(template.json);
-      return deepKeys(schema).map((l, i) => ({
-        label: l,
-        text: `{{${l}}}`,
-        key: i.toString(),
-      }));
-    } catch {
-      return [];
-    }
-  };
+  const markupQuery = clientApiTrpc.markup.get.useQuery({
+    templateId: Branded.TemplateId(template.id),
+  });
 
   const queryClient = useQueryClient();
 
-  const [html, setHtml] = useState<string>("");
+  const mutation = clientApiTrpc.markup.add.useMutation();
+
+  const mutationAsync = async () => {
+    const data = await getDraft(Branded.TemplateId(template.id));
+    const output = await mutation.mutateAsync({
+      fontFamily: fontfamily,
+      markup: data ? data.markup : JSON.stringify(initialValue),
+      templateId: template.id,
+      workspaceId: template.workspaceId,
+    });
+
+    return output;
+  };
 
   return (
     <div className="max-w-[1336px]">
@@ -98,65 +80,25 @@ const Markup = ({ template }: { template: typeof templates.$inferSelect }) => {
         >
           Reset to Default
         </Button>
-        <Button className="text-xs" size="sm" variant="gooeyLeft">
+        <Button
+          onClick={async () => {
+            toast.promise(mutationAsync, {
+              loading: "Please wait while the markup is being saved...",
+              success: "Your markup has been saved successfully!",
+              error: (err) => err.message,
+            });
+          }}
+          className="text-xs"
+          size="sm"
+          variant="gooeyLeft"
+        >
           Save Markup
         </Button>
-        {html && (
-          <div
-            dangerouslySetInnerHTML={{
-              __html: html,
-            }}
-          />
-        )}
       </div>
       <div className="border bg-background rounded-lg">
-        {match(query)
+        {match(markupQuery)
           .with({ status: "success" }, ({ data }) => (
-            <DndProvider backend={HTML5Backend}>
-              <Plate
-                plugins={plugins}
-                onChange={async (data) => {
-                  await updateDraft(
-                    Branded.TemplateId(template.id),
-                    JSON.stringify(data),
-                    fontfamily,
-                  );
-                }}
-                initialValue={
-                  data?.markup ? JSON.parse(data.markup) : initialValue
-                }
-              >
-                <div
-                  ref={containerRef}
-                  className={cn(
-                    "relative",
-                    // Block selection
-                    "[&_.slate-start-area-left]:!w-[64px] [&_.slate-start-area-right]:!w-[64px] [&_.slate-start-area-top]:!h-4",
-                  )}
-                >
-                  <FixedToolbar>
-                    <FixedToolbarButtons />
-                  </FixedToolbar>
-
-                  <Editor
-                    className="px-20 py-16"
-                    autoFocus
-                    focusRing={false}
-                    variant="ghost"
-                  />
-
-                  <FloatingToolbar>
-                    <FloatingToolbarButtons />
-                  </FloatingToolbar>
-
-                  <MentionCombobox items={schemaKeys()} />
-
-                  <CommentsPopover />
-
-                  <CursorOverlay containerRef={containerRef} />
-                </div>
-              </Plate>
-            </DndProvider>
+            <InvoiceEditor markup={data} template={template} />
           ))
           .with({ status: "pending" }, () => {
             return (

@@ -4,6 +4,7 @@ import {
   memberRoles,
   members,
   permissions,
+  templateMarkups,
   templates,
   workspaceActivities,
   workspaces,
@@ -29,3 +30,5 @@ export const insertMemberSchema = createInsertSchema(members, {
 export const activityLogSchema = createInsertSchema(workspaceActivities);
 
 export const insertTemplateSchema = createInsertSchema(templates);
+
+export const insertMarkupSchema = createInsertSchema(templateMarkups);
