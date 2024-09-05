@@ -27,6 +27,7 @@ const markupRouter = createTRPCRouter({
 
       const canUserAddMarkup = await runWithServices(
         canAddTemplatesEffect(Branded.WorkspaceId(input.workspaceId)),
+        mainLayer,
       );
 
       if (!canUserAddMarkup) {
@@ -46,7 +47,7 @@ const markupRouter = createTRPCRouter({
 
       // if the markup already exists, update it
 
-      if (!ifAlreadyExists) {
+      if (ifAlreadyExists) {
         return await db
           .update(templateMarkups)
           .set({
@@ -54,7 +55,8 @@ const markupRouter = createTRPCRouter({
             fontFamily: input.fontFamily,
             markup: input.markup,
           })
-          .where(eq(templateMarkups.templateId, input.templateId));
+          .where(eq(templateMarkups.id, ifAlreadyExists.id))
+          .returning();
       }
 
       // if the markup does not exist, insert it
@@ -64,6 +66,7 @@ const markupRouter = createTRPCRouter({
           fontFamily: input.fontFamily,
           templateId: input.templateId,
           markup: input.markup,
+          updatedAt: Date.now(),
         })
         .returning();
     }),
@@ -71,7 +74,8 @@ const markupRouter = createTRPCRouter({
     .input(inputAs<{ templateId: Branded.TemplateId }>())
     .query(async ({ ctx: { db }, input: { templateId } }) => {
       const output = await db.query.templateMarkups.findFirst({
-        where: (templateMarkups, { eq }) => eq(templateMarkups.id, templateId),
+        where: (templateMarkups, { eq }) =>
+          eq(templateMarkups.templateId, templateId),
       });
 
       if (!output) {

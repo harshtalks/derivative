@@ -201,7 +201,7 @@ export const templates = sqliteTable(
     name: text("name").notNull(),
     createdBy: text("createdBy")
       .notNull()
-      .references(() => members.id, { onDelete: "cascade" }),
+      .references(() => members.id, { onDelete: "no action" }),
     jsonSchema: text("jsonSchema", { mode: "text" }).notNull(),
     json: text("json", { mode: "text" }).notNull(),
     description: text("description"),
@@ -313,6 +313,10 @@ export const memberRelations = relations(members, ({ one }) => ({
 export const templateRelations = relations(templates, ({ many, one }) => ({
   template_markup: one(templateMarkups),
   invoices: many(invoices),
+  creator: one(members, {
+    fields: [templates.createdBy],
+    references: [members.id],
+  }),
 }));
 
 export const templateMetadataRelations = relations(

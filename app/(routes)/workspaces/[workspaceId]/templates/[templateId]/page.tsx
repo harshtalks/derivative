@@ -1,37 +1,49 @@
-import React, { Fragment } from "react";
-import TemplatePageRouteInfo from "./route.info";
+import { validateRequestCached } from "@/auth/validate-request";
+import React from "react";
+import { TemplatePage } from "./_components/wrapper";
+import { cookies } from "next/headers";
+import { accounts, mails } from "./_components/data";
+import withAuth from "@/auth/wrappers/withAuth";
 import AuthInterceptor from "@/auth/authIntercepter";
-import TemplateTabs from "./_components/tabs";
+import Branded from "@/types/branded.type";
 import { checkAccessForWorkspace } from "@/auth/access-check";
+import TemplatePageRouteInfo from "./route.info";
 import { RouteProps } from "@/types/next.type";
 import ParserLayout from "@/components/parser-layout";
 import { setCurrentWorkspace } from "../../../route.info";
-import Branded from "@/types/branded.type";
-import TemplatePageEditorRouteInfo from "./editor/route.info";
-import { Button } from "@/components/ui/button";
 
-const Page = async (props: RouteProps) => {
+const page = async (props: RouteProps) => {
+  // Validate the request
   return (
-    <ParserLayout {...props} routeInfo={TemplatePageRouteInfo}>
+    <ParserLayout routeInfo={TemplatePageRouteInfo} {...props}>
       {async ({ params }) => {
-        setCurrentWorkspace(Branded.WorkspaceId(params.workspaceId));
-        await new AuthInterceptor(TemplatePageRouteInfo({ ...params }))
-          .withRedirect()
+        setCurrentWorkspace(params.workspaceId);
+        await new AuthInterceptor(
+          TemplatePageRouteInfo({
+            workspaceId: Branded.WorkspaceId(params.workspaceId),
+            templateId: Branded.TemplateId(params.templateId),
+          }),
+        )
           .withTwoFactor()
           .withAfterAuth(checkAccessForWorkspace)
+          .withRedirect()
           .check();
 
+        const layout = cookies().get("react-resizable-panels:layout");
+        const collapsed = cookies().get("react-resizable-panels:collapsed");
+
         return (
-          <div className="mx-auto pt-4">
-            Welcome to the RoutePage
-            <TemplatePageEditorRouteInfo.Link params={params}>
-              <Button>Go to Editor</Button>
-            </TemplatePageEditorRouteInfo.Link>
-          </div>
+          <TemplatePage
+            accounts={accounts}
+            mails={mails}
+            defaultLayout={undefined}
+            defaultCollapsed={undefined}
+            navCollapsedSize={4}
+          />
         );
       }}
     </ParserLayout>
   );
 };
 
-export default Page;
+export default page;

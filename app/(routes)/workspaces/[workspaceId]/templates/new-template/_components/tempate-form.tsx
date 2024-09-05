@@ -1,7 +1,5 @@
 "use client";
-import Image from "next/image";
-import Link from "next/link";
-import { ChevronLeft, Loader, PlusCircle, Upload } from "lucide-react";
+import { ChevronLeft, Loader } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 
@@ -16,7 +14,6 @@ import {
 } from "@/components/ui/card";
 
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
@@ -78,15 +75,12 @@ const templateSchema = z.object({
 });
 
 export function TemplateForm() {
-  const [categoryKey, setCategoryKey] =
-    useState<Invoice.Keys>("expenseInvoices");
-
   const { push: moveToTemplatesPage } = templatesPageRoute.useRouter(useRouter);
 
   const form = useForm<z.infer<typeof templateSchema>>({
     resolver: zodResolver(templateSchema),
     defaultValues: {
-      category: "expenseInvoices" satisfies Invoice.Keys,
+      category: "Expense Invoices" satisfies Invoice.Keys,
       schema: {
         schema: DEFAULT_SCHEMA,
         type: "text",

@@ -116,7 +116,7 @@ const templateRouter = createTRPCRouter({
     .query(async ({ ctx, input: { templateId, workspaceId } }) => {
       const { db, user } = ctx;
 
-      // check if user can add members
+      // check if user is a member
       const isMember = await db.query.members.findFirst({
         where: (members, { and, eq }) =>
           and(
@@ -139,6 +139,14 @@ const templateRouter = createTRPCRouter({
             eq(templates.id, templateId),
             eq(templates.workspaceId, workspaceId),
           ),
+        with: {
+          creator: {
+            with: {
+              user: true,
+            },
+          },
+          template_markup: true,
+        },
       });
 
       if (!template) {

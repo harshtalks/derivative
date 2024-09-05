@@ -1,5 +1,5 @@
 export const invoiceCategories = {
-  salesInvoices: {
+  "Sales Invoices": {
     name: "Sales Invoices",
     subcategories: [
       "Product Sales",
@@ -8,7 +8,7 @@ export const invoiceCategories = {
       "Custom Orders",
     ],
   },
-  expenseInvoices: {
+  "Expense Invoices": {
     name: "Expense Invoices",
     subcategories: [
       "Vendor Purchases",
@@ -17,7 +17,7 @@ export const invoiceCategories = {
       "Equipment Maintenance",
     ],
   },
-  recurringInvoices: {
+  "Recurring Invoices": {
     name: "Recurring Invoices",
     subcategories: [
       "Monthly Subscriptions",
@@ -26,7 +26,7 @@ export const invoiceCategories = {
       "Retainer Agreements",
     ],
   },
-  projectBasedInvoices: {
+  "Project-based Invoices": {
     name: "Project-based Invoices",
     subcategories: [
       "Milestone Payments",
@@ -35,7 +35,7 @@ export const invoiceCategories = {
       "Change Orders",
     ],
   },
-  internalInvoices: {
+  "Internal Invoices": {
     name: "Internal Invoices",
     subcategories: [
       "Interdepartmental Charges",
