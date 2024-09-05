@@ -18,7 +18,7 @@ const MemberDetails = async () => {
         {member.createdAt && (
           <span>
             Joined{" "}
-            {formatDistanceToNow(member.createdAt * 1000, {
+            {formatDistanceToNow(member.createdAt, {
               addSuffix: true,
             })}
           </span>

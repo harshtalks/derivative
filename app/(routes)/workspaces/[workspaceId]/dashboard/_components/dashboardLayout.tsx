@@ -181,7 +181,7 @@ export async function DashboardLayout() {
               {workspace.createdAt && (
                 <CardDescription className="inline-flex items-center gap-1">
                   <CalendarPlus className="h-3.5 w-3.5" />
-                  {formatDistanceToNow(workspace.createdAt * 1000, {
+                  {formatDistanceToNow(workspace.createdAt, {
                     addSuffix: true,
                   })}
                 </CardDescription>
@@ -250,7 +250,7 @@ export async function DashboardLayout() {
                   <div className="flex items-center justify-between">
                     <dt className="text-muted-foreground">Joined</dt>
                     <dd>
-                      {formatDistanceToNow(creator.createdAt * 1000, {
+                      {formatDistanceToNow(creator.createdAt , {
                         addSuffix: true,
                       })}
                     </dd>

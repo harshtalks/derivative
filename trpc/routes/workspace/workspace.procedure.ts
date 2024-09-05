@@ -80,6 +80,7 @@ const workspaceRouter = createTRPCRouter({
           inviteCount: 0,
           inviteLimit: INVITE_COUNT,
           workspaceId: workspace.id,
+          inviteExpiry: WEEKS_TO_EXPIRE,
         });
 
         // log the event -> new workspace

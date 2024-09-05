@@ -66,7 +66,6 @@ const markupRouter = createTRPCRouter({
           fontFamily: input.fontFamily,
           templateId: input.templateId,
           markup: input.markup,
-          updatedAt: Date.now(),
         })
         .returning();
     }),

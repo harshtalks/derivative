@@ -102,7 +102,7 @@ export function TemplatePage({
                     <div className="flex items-center gap-1">
                       <Clock className="shrink-0 size-3.5 text-muted-foreground" />
                       <p className="text-xs text-muted-foreground">
-                        {formatDistanceToNow(new Date(data.updatedAt * 1000), {
+                        {formatDistanceToNow(new Date(data.updatedAt), {
                           addSuffix: true,
                         })}
                       </p>
@@ -123,26 +123,25 @@ export function TemplatePage({
                   </div>
                   {data.template_markup ? (
                     <div className="flex flex-col gap-2">
-                      {data.updatedAt && (
+                      {data.template_markup.updatedAt && (
                         <p className="text-muted-foreground text-xs">
-                          Markup for this template was last updated on{" "}
+                          Markup for this template was last updated{" "}
                           <strong>
                             {formatDistanceToNow(
-                              new Date(data.updatedAt * 1000),
+                              new Date(data.template_markup.updatedAt),
                               {
                                 addSuffix: true,
                               },
                             )}{" "}
                           </strong>
                           on{" "}
-                          {new Date(data.updatedAt * 1000).toLocaleDateString(
-                            "en-US",
-                            {
-                              year: "numeric",
-                              month: "long",
-                              day: "numeric",
-                            },
-                          )}
+                          {new Date(
+                            data.template_markup.updatedAt,
+                          ).toLocaleDateString("en-US", {
+                            year: "numeric",
+                            month: "long",
+                            day: "numeric",
+                          })}
                         </p>
                       )}
                       <TemplatePageEditorRouteInfo.Link

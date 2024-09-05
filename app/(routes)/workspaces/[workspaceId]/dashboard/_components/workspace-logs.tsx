@@ -83,7 +83,7 @@ const WorkspaceLogs = async () => {
                   </TableCell>
                   <TableCell className="hidden md:table-cell">
                     {log.createdAt &&
-                      formatDistanceToNow(log.createdAt * 1000, {
+                      formatDistanceToNow(log.createdAt, {
                         addSuffix: true,
                       })}
                   </TableCell>

@@ -237,7 +237,7 @@ const WorkspaceList = ({
                       )}
                     >
                       {item.createdAt &&
-                        formatDistanceToNow(item.createdAt * 1000, {
+                        formatDistanceToNow(item.createdAt, {
                           addSuffix: true,
                         })}
                     </div>

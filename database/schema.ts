@@ -38,11 +38,11 @@ export const workspaceTypes = ["personal", "enterprise", "standard"] as const;
 export const workspaceStatus = ["active", "inactive", "archived"] as const;
 
 export const createdAtSchema = integer("created_at").default(
-  sql`(cast(unixepoch() as int))`,
+  Date.now()
 );
 
 const updatedAtSchema = integer("updated_at").default(
-  sql`(cast(unixepoch() as int))`,
+ Date.now()
 );
 
 export const templateStatus = ["draft", "active", "archived"] as const;

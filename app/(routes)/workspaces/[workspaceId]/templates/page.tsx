@@ -187,12 +187,9 @@ export default async function Page({
                                 </TableCell>
                                 <TableCell className="hidden md:table-cell">
                                   {template.createdAt &&
-                                    formatDistanceToNow(
-                                      template.createdAt * 1000,
-                                      {
-                                        addSuffix: true,
-                                      },
-                                    )}
+                                    formatDistanceToNow(template.createdAt, {
+                                      addSuffix: true,
+                                    })}
                                 </TableCell>
                                 <TableCell className="hidden md:table-cell">
                                   <TemplatePageRouteInfo.Link

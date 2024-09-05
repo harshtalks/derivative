@@ -62,7 +62,7 @@ const InvoiceEditor = ({
           const localLastUpdated =
             data?.lastUpdated && new Date(data.lastUpdated);
           const remoteLastUpdated =
-            markup?.updatedAt && new Date(markup.updatedAt * 1000);
+            markup?.updatedAt && new Date(markup.updatedAt);
 
           if (localLastUpdated && remoteLastUpdated) {
             return localLastUpdated > remoteLastUpdated
