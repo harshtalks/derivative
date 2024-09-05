@@ -1,5 +1,6 @@
 import {
   members,
+  permissions,
   templates,
   workspaceActivities,
   workspaceMetadata,
@@ -137,18 +138,46 @@ const memberRouter = createTRPCRouter({
         });
       }
 
-      // update the member
-      const updated = await db
-        .update(members)
-        .set({
-          permissions: input.permissions,
-          role: input.role,
-          updatedAt: Date.now(),
-        })
-        .where(eq(members.id, input.id))
-        .returning();
+      // checking if the user is being removed as the admin?
 
-      return updated;
+      const member = await db.query.members.findFirst({
+        where: (members, { eq }) => eq(members.id, input.id),
+      });
+
+      if (member) {
+        if (
+          member.role === "admin" &&
+          (input.role !== "admin" || permissions.includes("member_controls"))
+        ) {
+          const admins = await db.query.members.findMany({
+            where: (members, { and, eq }) =>
+              and(
+                eq(members.workspaceId, input.workspaceId),
+                eq(members.role, "admin"),
+              ),
+          });
+
+          if (admins.length === 1) {
+            throw new TRPCError({
+              code: "FORBIDDEN",
+              message: "You cannot remove the last admin of the workspace",
+            });
+          }
+        }
+
+        // update the member
+        const updated = await db
+          .update(members)
+          .set({
+            permissions: input.permissions,
+            role: input.role,
+            updatedAt: Date.now(),
+          })
+          .where(eq(members.id, input.id))
+          .returning();
+
+        return updated;
+      }
     }),
   get: twoFactorAuthenticatedProcedure
     .input(inputAs<{ id: Branded.WorkspaceId }>())
