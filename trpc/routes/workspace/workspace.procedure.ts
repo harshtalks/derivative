@@ -185,6 +185,24 @@ const workspaceRouter = createTRPCRouter({
         });
       }
 
+      const needToGenerateLink =
+        response.inviteCount >= response.inviteLimit ||
+        response.inviteExpiry < Date.now();
+
+      if (needToGenerateLink) {
+        const timespan = new TimeSpan(WEEKS_TO_EXPIRE, "w");
+
+        const token = await createInviteLink(timespan, { workspaceId });
+        await db
+          .update(workspaceMetadata)
+          .set({
+            inviteCode: token,
+            inviteExpiry: timespan.milliseconds(),
+            inviteCount: 0,
+          })
+          .where(eq(workspaceMetadata.id, response.id));
+      }
+
       return response;
     }),
   generateLink: twoFactorAuthenticatedProcedure

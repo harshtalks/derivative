@@ -59,6 +59,7 @@ const InviteMembers = () => {
               { search: { invite: data.inviteCode } },
             )}
             readOnly
+            className="text-muted-foreground text-xs shadow-none"
           />
           <Button
             color=""

@@ -17,6 +17,7 @@ import InviteMembers from "./invite";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import UsersList from "./users-list";
 import MembersList from "./members-list";
+import { INVITE_COUNT, WEEKS_TO_EXPIRE } from "@/auth/invite";
 
 const AddMembers = () => {
   return (
@@ -32,8 +33,13 @@ const AddMembers = () => {
       <CredenzaContent>
         <CredenzaHeader>
           <CardTitle>Invite Members</CardTitle>
-          <CardDescription>
-            Anyone with the link can join this workspace. Account Required.
+          <CardDescription className="text-xs leading-relaxed">
+            Anyone with the link can join this workspace. Account Required. Note
+            that by default every member will be joined with{" "}
+            <strong>developer</strong> role. In future, we aim to support unique
+            invite links for different roles. Each invite link is valid for{" "}
+            <strong>{WEEKS_TO_EXPIRE} weeks</strong> with limit of{" "}
+            <strong>{INVITE_COUNT} invites</strong> per link.
           </CardDescription>
         </CredenzaHeader>
         <CredenzaBody>

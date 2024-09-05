@@ -164,7 +164,7 @@ export const workspaceMetadata = sqliteTable("workspaceMetadata", {
     .notNull()
     .references(() => workspaces.id, { onDelete: "cascade" }),
   inviteCode: text("invite_code"),
-  inviteExpiry: integer("invite_expiry"),
+  inviteExpiry: integer("invite_expiry").notNull(),
   inviteLimit: integer("invite_limit").notNull(),
   inviteCount: integer("invite_count").notNull(),
 });
