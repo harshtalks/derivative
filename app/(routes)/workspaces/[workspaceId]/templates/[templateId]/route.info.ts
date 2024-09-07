@@ -1,5 +1,5 @@
 import createRoute from "@/route.config";
-import { object, string, infer as infer_ } from "zod";
+import { object, string, infer as infer_, enum as enum_ } from "zod";
 
 export const templatePageParamsSchema = object({
   workspaceId: string(),
@@ -11,6 +11,9 @@ const TemplatePageRouteInfo = createRoute({
   fn: ({ workspaceId, templateId }) =>
     `/workspaces/${workspaceId}/templates/${templateId}`,
   paramsSchema: templatePageParamsSchema,
+  searchParamsSchema: object({
+    active: enum_(["inbox", "schema", "integration"]).default("inbox"),
+  }),
 });
 
 export default TemplatePageRouteInfo;

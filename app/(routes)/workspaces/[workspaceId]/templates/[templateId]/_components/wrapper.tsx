@@ -17,6 +17,8 @@ import {
   ShoppingCart,
   Trash2,
   Users2,
+  Code,
+  Workflow,
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -41,6 +43,7 @@ import { formatDistanceToNow } from "date-fns";
 import { Badge } from "@/components/ui/badge";
 import TemplatePageEditorRouteInfo from "../editor/route.info";
 import { Button } from "@/components/ui/button";
+import TemplateSchemaEditor from "../../new-template/_components/template-schema-editor";
 
 interface MailProps {
   accounts: {
@@ -70,12 +73,14 @@ export function TemplatePage({
     workspaceId: Branded.WorkspaceId(workspaceId),
   });
 
+  const { active } = TemplatePageRouteInfo.useSearchParams();
+
   return match(query)
     .with({ status: "success" }, ({ data }) => {
       return (
         <TooltipProvider delayDuration={0}>
-          <div className="h-full flex max-h-[800px] overflow-hidden border-b items-stretch">
-            <div className={cn("min-w-[300px]")}>
+          <div className="flex h-[calc(100svh-100px)] overflow-hidden border-b items-stretch">
+            <div className={cn("min-w-[350px] max-w-[350px]")}>
               <div
                 className={cn(
                   "flex h-[52px] items-center gap-2 justify-center",
@@ -175,79 +180,157 @@ export function TemplatePage({
                 isCollapsed={isCollapsed}
                 links={[
                   {
-                    title: "Meetings",
-                    label: "972",
-                    icon: Users2,
-                    variant: "ghost",
+                    title: "Inbox",
+                    icon: Inbox,
+                    variant: active === "inbox" ? "default" : "ghost",
+                    link: TemplatePageRouteInfo(
+                      { templateId, workspaceId },
+                      { search: { active: "inbox" } },
+                    ),
                   },
                   {
-                    title: "Updates",
-                    label: "342",
-                    icon: AlertCircle,
-                    variant: "ghost",
+                    title: "Code",
+                    icon: Code,
+                    variant: active === "schema" ? "default" : "ghost",
+                    link: TemplatePageRouteInfo(
+                      { templateId, workspaceId },
+                      { search: { active: "schema" } },
+                    ),
                   },
                   {
-                    title: "Forums",
-                    label: "128",
-                    icon: MessagesSquare,
-                    variant: "ghost",
-                  },
-                  {
-                    title: "Shopping",
-                    label: "8",
-                    icon: ShoppingCart,
-                    variant: "ghost",
-                  },
-                  {
-                    title: "Promotions",
-                    label: "21",
-                    icon: Archive,
-                    variant: "ghost",
+                    title: "Integration",
+                    icon: Workflow,
+                    variant: active === "integration" ? "default" : "ghost",
+                    link: TemplatePageRouteInfo(
+                      { templateId, workspaceId },
+                      { search: { active: "integration" } },
+                    ),
                   },
                 ]}
               />
             </div>
-            <div className="border-r border-l max-w-[500px]">
-              <Tabs defaultValue="all">
-                <div className="flex items-center px-4 py-2">
-                  <h1 className="text-xl font-bold">Inbox</h1>
-                  <TabsList className="ml-auto">
-                    <TabsTrigger
-                      value="all"
-                      className="text-zinc-600 dark:text-zinc-200"
-                    >
-                      All mail
-                    </TabsTrigger>
-                    <TabsTrigger
-                      value="unread"
-                      className="text-zinc-600 dark:text-zinc-200"
-                    >
-                      Unread
-                    </TabsTrigger>
-                  </TabsList>
+            {match(active)
+              .with("inbox", () => (
+                <div className="flex">
+                  <div className="border-r border-l max-w-[500px]">
+                    <Tabs defaultValue="all">
+                      <div className="flex items-center px-4 py-2">
+                        <h1 className="text-xl font-bold">Inbox</h1>
+                        <TabsList className="ml-auto">
+                          <TabsTrigger
+                            value="all"
+                            className="text-zinc-600 dark:text-zinc-200"
+                          >
+                            All mail
+                          </TabsTrigger>
+                          <TabsTrigger
+                            value="unread"
+                            className="text-zinc-600 dark:text-zinc-200"
+                          >
+                            Unread
+                          </TabsTrigger>
+                        </TabsList>
+                      </div>
+                      <Separator />
+                      <div className="bg-background/95 p-4 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+                        <form>
+                          <div className="relative">
+                            <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                            <Input placeholder="Search" className="pl-8" />
+                          </div>
+                        </form>
+                      </div>
+                      <TabsContent value="all" className="m-0">
+                        <MailList items={mails} />
+                      </TabsContent>
+                      <TabsContent value="unread" className="m-0">
+                        <MailList items={mails.filter((item) => !item.read)} />
+                      </TabsContent>
+                    </Tabs>
+                  </div>
+                  <div>
+                    <MailDisplay
+                      mail={
+                        mails.find((item) => item.id === mail.selected) || null
+                      }
+                    />
+                  </div>
                 </div>
-                <Separator />
-                <div className="bg-background/95 p-4 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-                  <form>
-                    <div className="relative">
-                      <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                      <Input placeholder="Search" className="pl-8" />
-                    </div>
-                  </form>
-                </div>
-                <TabsContent value="all" className="m-0">
-                  <MailList items={mails} />
-                </TabsContent>
-                <TabsContent value="unread" className="m-0">
-                  <MailList items={mails.filter((item) => !item.read)} />
-                </TabsContent>
-              </Tabs>
-            </div>
-            <div>
-              <MailDisplay
-                mail={mails.find((item) => item.id === mail.selected) || null}
-              />
-            </div>
+              ))
+              .with("schema", () => {
+                return (
+                  <div className="border-r border-l w-full">
+                    <Tabs defaultValue="object">
+                      <div className="flex items-center px-4 py-2">
+                        <h1 className="text-xl font-bold">Schema</h1>
+                        <TabsList className="ml-auto">
+                          <TabsTrigger
+                            value="schema"
+                            className="text-zinc-600 dark:text-zinc-200"
+                          >
+                            JSON Schema
+                          </TabsTrigger>
+                          <TabsTrigger
+                            value="object"
+                            className="text-zinc-600 dark:text-zinc-200"
+                          >
+                            Sample Object
+                          </TabsTrigger>
+                        </TabsList>
+                      </div>
+                      <Separator />
+                      <TabsContent value="object" className="m-0">
+                        <div className="px-4 py-2">
+                          <pre className="p-2 w-fit !font-mono bg-zinc-100 dark:bg-zinc-700 text-sm rounded-md">
+                            {data.json}
+                          </pre>
+                        </div>
+                      </TabsContent>
+                      <TabsContent value="schema" className="m-0">
+                        <div className="px-4 py-2 w-3/5">
+                          <TemplateSchemaEditor
+                            height={700}
+                            value={data.jsonSchema}
+                          />
+                        </div>
+                      </TabsContent>
+                    </Tabs>
+                  </div>
+                );
+              })
+              .with("integration", () => {
+                return (
+                  <div className="border-r border-l w-full">
+                    <Tabs defaultValue="integration">
+                      <div className="flex items-center px-4 py-2">
+                        <h1 className="text-xl font-bold">Schema</h1>
+                        <TabsList className="ml-auto">
+                          <TabsTrigger
+                            value="integration"
+                            className="text-zinc-600 dark:text-zinc-200"
+                          >
+                            Integration
+                          </TabsTrigger>
+                          <TabsTrigger
+                            value="help"
+                            className="text-zinc-600 dark:text-zinc-200"
+                          >
+                            Help
+                          </TabsTrigger>
+                        </TabsList>
+                      </div>
+                      <Separator />
+                      <TabsContent value="integration" className="m-0">
+                        <div className="px-4 py-2"></div>
+                      </TabsContent>
+                      <TabsContent value="help" className="m-0">
+                        <div className="px-4 py-2 w-3/5"></div>
+                      </TabsContent>
+                    </Tabs>
+                  </div>
+                );
+              })
+              .exhaustive()}
           </div>
         </TooltipProvider>
       );
