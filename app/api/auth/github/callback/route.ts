@@ -44,18 +44,18 @@ export const GET = withError<ErrorWrapperResponse<string>>(
           headers: {
             Location: "/sign-in",
           },
-        }
+        },
       );
     }
 
     const token = await github.validateAuthorizationCode(code);
 
     const githubUserEffect = githubHandlers.getGithubUserEffect(
-      token.accessToken
+      token.accessToken,
     );
 
     const githubUserEmailsEffect = githubHandlers.getGithubUserEmailsEffect(
-      token.accessToken
+      token.accessToken,
     );
 
     const [githubUserResponse, githubUserEmailsResponse] = await Effect.all([
@@ -79,7 +79,7 @@ export const GET = withError<ErrorWrapperResponse<string>>(
       cookies().set(
         sessionCookie.name,
         sessionCookie.value,
-        sessionCookie.attributes
+        sessionCookie.attributes,
       );
 
       return NextResponse.json(
@@ -94,7 +94,7 @@ export const GET = withError<ErrorWrapperResponse<string>>(
               ? webAuthUrl
               : destination,
           },
-        }
+        },
       );
     }
 
@@ -120,7 +120,7 @@ export const GET = withError<ErrorWrapperResponse<string>>(
     cookies().set(
       sessionCookie.name,
       sessionCookie.value,
-      sessionCookie.attributes
+      sessionCookie.attributes,
     );
 
     return NextResponse.json(
@@ -133,7 +133,7 @@ export const GET = withError<ErrorWrapperResponse<string>>(
         headers: {
           Location: webAuthUrl,
         },
-      }
+      },
     );
   },
   {
@@ -155,9 +155,9 @@ export const GET = withError<ErrorWrapperResponse<string>>(
             headers: {
               Location: SignInPage({}),
             },
-          }
+          },
         );
       }
     },
-  }
+  },
 );

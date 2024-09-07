@@ -5,7 +5,6 @@ import PlateEditor from "@/components/plate-editor";
 import Container from "@/app/_components/container";
 import Header from "@/app/_components/header";
 import { TooltipProvider } from "@/components/plate-ui/tooltip";
-import TemplateTabs from "../_components/tabs";
 import { RouteProps } from "@/types/next.type";
 import ParserLayout from "@/components/parser-layout";
 import { setCurrentWorkspace } from "@/app/(routes)/workspaces/route.info";
