@@ -37,13 +37,9 @@ export const workspaceTypes = ["personal", "enterprise", "standard"] as const;
 
 export const workspaceStatus = ["active", "inactive", "archived"] as const;
 
-export const createdAtSchema = integer("created_at").default(
-  Date.now()
-);
+export const createdAtSchema = integer("created_at").default(Date.now());
 
-const updatedAtSchema = integer("updated_at").default(
- Date.now()
-);
+const updatedAtSchema = integer("updated_at").default(Date.now());
 
 export const templateStatus = ["draft", "active", "archived"] as const;
 
@@ -220,6 +216,18 @@ export const templates = sqliteTable(
   },
 );
 
+export const templateIntegration = sqliteTable("templateIntegration", {
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => `integration_${crypto.randomUUID()}`),
+  templateId: text("template_id")
+    .notNull()
+    .references(() => templates.id, { onDelete: "cascade" }),
+  createdAt: createdAtSchema,
+  updatedAt: updatedAtSchema,
+  integrationKey: text("integration_key").notNull(),
+});
+
 export const templateMarkups = sqliteTable("templateMarkup", {
   id: text("id")
     .primaryKey()
@@ -317,7 +325,18 @@ export const templateRelations = relations(templates, ({ many, one }) => ({
     fields: [templates.createdBy],
     references: [members.id],
   }),
+  templateIntegration: one(templateIntegration),
 }));
+
+export const templateIntegrationRelations = relations(
+  templateIntegration,
+  ({ one }) => ({
+    template: one(templates, {
+      fields: [templateIntegration.templateId],
+      references: [templates.id],
+    }),
+  }),
+);
 
 export const templateMetadataRelations = relations(
   templateMarkups,

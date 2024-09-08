@@ -23,6 +23,19 @@ import { match } from "ts-pattern";
 import { deepKeys } from "deeks";
 import { Loader2 } from "lucide-react";
 
+export const getSchemaKeys = (str: string) => {
+  try {
+    const schema = JSON.parse(str);
+    return deepKeys(schema).map((l, i) => ({
+      label: l,
+      text: `{{${l}}}`,
+      key: i.toString(),
+    }));
+  } catch {
+    return [];
+  }
+};
+
 const InvoiceEditor = ({
   template,
   markup,
@@ -39,18 +52,7 @@ const InvoiceEditor = ({
 
   const containerRef = useRef(null);
 
-  const schemaKeys = () => {
-    try {
-      const schema = JSON.parse(template.json);
-      return deepKeys(schema).map((l, i) => ({
-        label: l,
-        text: `{{${l}}}`,
-        key: i.toString(),
-      }));
-    } catch {
-      return [];
-    }
-  };
+  const schemaKeys = () => getSchemaKeys(template.json);
 
   return match(query)
     .with({ status: "success" }, ({ data }) => {

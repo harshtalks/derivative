@@ -1,5 +1,5 @@
 import createRoute from "@/route.config";
-import { object, string, infer as infer_, enum as enum_ } from "zod";
+import { object, string, infer as infer_, enum as enum_, boolean } from "zod";
 
 export const templatePageParamsSchema = object({
   workspaceId: string(),
@@ -12,7 +12,15 @@ const TemplatePageRouteInfo = createRoute({
     `/workspaces/${workspaceId}/templates/${templateId}`,
   paramsSchema: templatePageParamsSchema,
   searchParamsSchema: object({
-    active: enum_(["inbox", "schema", "integration"]).default("inbox"),
+    active: enum_([
+      "inbox",
+      "schema",
+      "integration",
+      "template-markup",
+    ]).default("inbox"),
+    sampled: enum_(["true", "false"])
+      .default("false")
+      .transform((el) => el === "true"),
   }),
 });
 
