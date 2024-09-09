@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { cn } from "@udecode/cn";
 import { PlateContent } from "@udecode/plate-common";
 import { cva } from "class-variance-authority";
@@ -8,6 +8,7 @@ import type { VariantProps } from "class-variance-authority";
 import { ptSerif, lora, openSans } from "@/fonts";
 import { useSelector } from "@xstate/store/react";
 import { fontStore } from "@/stores/font-store";
+import { toast } from "sonner";
 
 const fonts = [ptSerif, lora, openSans];
 
@@ -73,35 +74,40 @@ const Editor = React.forwardRef<HTMLDivElement, EditorProps>(
     const font =
       fonts.find((el) => el.variable === currentFontVariable) || ptSerif;
 
+    const containerRef = React.useRef<HTMLDivElement>(null);
+
     return (
       <div
         ref={ref}
         className={cn(
-          "relative border mx-auto my-6 shadow-2xl rounded-md",
+          "relative border mx-auto my-6 shadow-2xl rounded-md overflow-clip",
           font.className,
         )}
+        data-editorWrapper
         style={{
           maxWidth: "21cm",
           minHeight: "29.7cm",
           maxHeight: "29.7cm",
         }}
       >
-        <PlateContent
-          className={cn(
-            editorVariants({
-              disabled,
-              focused,
-              focusRing,
-              size,
-              variant,
-            }),
-            className,
-          )}
-          disableDefaultStyles
-          readOnly={disabled ?? readOnly}
-          aria-disabled={disabled}
-          {...props}
-        />
+        <div className="h-full w-full">
+          <PlateContent
+            className={cn(
+              editorVariants({
+                disabled,
+                focused,
+                focusRing,
+                size,
+                variant,
+              }),
+              className,
+              "overflow-clip",
+            )}
+            disableDefaultStyles
+            readOnly={disabled ?? readOnly}
+            aria-disabled={disabled}
+          />
+        </div>
       </div>
     );
   },

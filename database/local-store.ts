@@ -2,7 +2,7 @@
 import Branded from "@/types/branded.type";
 import { openDB, DBSchema } from "idb";
 
-interface InvoiceMarkup extends DBSchema {
+export interface InvoiceMarkup extends DBSchema {
   "invoice-markup": {
     value: {
       templateId: string;
