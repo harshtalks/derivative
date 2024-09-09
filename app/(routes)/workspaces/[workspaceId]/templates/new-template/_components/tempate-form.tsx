@@ -50,24 +50,29 @@ import { useRouter } from "next/navigation";
 import templatesPageRoute from "../../route.info";
 import { validate } from "json-schema";
 import Ajv from "ajv";
+import JSchema from "@/schema-processing";
 
 const templateSchema = z.object({
   name: z.string().min(1),
   description: z.string().min(1),
   schema: z.object({
     type: z.literal("text"),
-    schema: z
+    json: z
       .string()
       .min(1)
-      .refine((schema) => {
-        try {
-          const parsed = JSON.parse(schema);
-          return true;
-        } catch {
-          return false;
-        }
-      }),
-    json: z.string().min(1),
+      .refine(
+        (schema) => {
+          try {
+            const parsed = JSON.parse(schema);
+            return true;
+          } catch {
+            return false;
+          }
+        },
+        {
+          message: "Invalid JSON",
+        },
+      ),
   }),
   category: z.string().min(1),
   subCategory: z.string().min(1),
@@ -110,10 +115,19 @@ export function TemplateForm() {
         <form
           onSubmit={form.handleSubmit((data) => {
             try {
-              const ajv = new Ajv();
-              const schema = JSON.parse(data.schema.schema);
               const json = JSON.parse(data.schema.json);
+              const schema = new JSchema(json)
+                .assertValidObject()
+                .applyConstraints({
+                  noTopLevelArray: true,
+                })
+                .createSchema({
+                  title: data.name,
+                  description: data.description,
+                })
+                .getSchema();
 
+              const ajv = new Ajv();
               const validate = ajv.compile(schema);
               const valid = validate(json);
 
@@ -122,27 +136,27 @@ export function TemplateForm() {
                   "Oops. looks like the json is invalid against the given schema.",
                 );
               }
+
+              toast.promise(
+                mutation.mutateAsync({
+                  workspaceId: Branded.WorkspaceId(workspaceId),
+                  category: data.category,
+                  subcategory: data.subCategory,
+                  jsonSchema: JSON.stringify(schema),
+                  status: data.status,
+                  name: data.name,
+                  description: data.description,
+                  json: data.schema.json,
+                }),
+                {
+                  success: () => "Successfully created the template",
+                  error: (err) => err.message,
+                },
+              );
             } catch (err) {
               toast.error(err instanceof Error ? err.message : "Invalid JSON");
               return;
             }
-
-            toast.promise(
-              mutation.mutateAsync({
-                workspaceId: Branded.WorkspaceId(workspaceId),
-                category: data.category,
-                subcategory: data.subCategory,
-                jsonSchema: data.schema.schema,
-                status: data.status,
-                name: data.name,
-                description: data.description,
-                json: data.schema.json,
-              }),
-              {
-                success: () => "Successfully created the template",
-                error: (err) => err.message,
-              },
-            );
           })}
         >
           <div className="mx-auto grid container max-w-6xl py-12 flex-1 auto-rows-max gap-4">
@@ -237,29 +251,13 @@ export function TemplateForm() {
                   <CardHeader>
                     <CardTitle>Template Schema</CardTitle>
                     <CardDescription>
-                      Generate Schema for your template here, you may be able to
-                      edit this later depending on your plan.
+                      Add your json object here containing all the necessary
+                      information for the invoice generation. Schema will be
+                      inferred from the given json object. This is an AI powered
+                      editor that will help you to create JSON on the fly.
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    <FormField
-                      control={form.control}
-                      name="schema.schema"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Add some schema</FormLabel>
-                          <TemplateSchemaEditor
-                            value={field.value}
-                            onChange={field.onChange}
-                          />
-                          <FormDescription>
-                            You can add schema for your template here. This will
-                            be used to generate the invoice.
-                          </FormDescription>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
                     <FormField
                       control={form.control}
                       name="schema.json"
@@ -284,7 +282,8 @@ export function TemplateForm() {
                       We need both schema and json object to generate the
                       invoice in future. this will allow us to generate the
                       invoice based on the schema and json object. You can
-                      create as complex schema as you want. Use{" "}
+                      create as complex schema as you want. For more
+                      information, visit{" "}
                       <Navigate
                         base="JSON_SCHEMA_TOOL"
                         path="/json-to-json-schema"
@@ -293,7 +292,8 @@ export function TemplateForm() {
                       >
                         json to json-schema helper
                       </Navigate>{" "}
-                      for help.
+                      to see how your json object will be used to generate a
+                      seriliazable schema.
                     </p>
                   </CardFooter>
                 </Card>
