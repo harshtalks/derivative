@@ -1,10 +1,10 @@
-import { Separator } from "@/components/plate-ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import TemplateSchemaEditor from "../../../new-template/_components/template-schema-editor";
+import { Separator } from "@/components/ui/separator";
 
 const Schema = ({ json, jsonSchema }: { jsonSchema: string; json: string }) => {
   return (
-    <div className="border-r border-l w-full">
+    <div className="border-r overflow-auto border-l w-full">
       <Tabs defaultValue="object">
         <div className="flex items-center px-4 py-2">
           <h1 className="text-xl font-bold">Schema</h1>
@@ -32,8 +32,10 @@ const Schema = ({ json, jsonSchema }: { jsonSchema: string; json: string }) => {
           </div>
         </TabsContent>
         <TabsContent value="schema" className="m-0">
-          <div className="px-4 py-2 w-3/5">
-            <TemplateSchemaEditor height={700} value={jsonSchema} />
+          <div className="px-4 py-2">
+            <pre className="p-2 w-fit !font-mono bg-zinc-100 dark:bg-zinc-700 text-sm rounded-md">
+              {JSON.stringify(JSON.parse(jsonSchema), null, 2)}
+            </pre>
           </div>
         </TabsContent>
       </Tabs>

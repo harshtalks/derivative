@@ -1,16 +1,14 @@
 import React from "react";
 import AuthInterceptor from "@/auth/authIntercepter";
 import TemplatePageEditorRouteInfo from "./route.info";
-import PlateEditor from "@/components/plate-editor";
 import Container from "@/app/_components/container";
-import Header from "@/app/_components/header";
-import { TooltipProvider } from "@/components/plate-ui/tooltip";
 import { RouteProps } from "@/types/next.type";
 import ParserLayout from "@/components/parser-layout";
 import { setCurrentWorkspace } from "@/app/(routes)/workspaces/route.info";
 import Branded from "@/types/branded.type";
 import { checkAccessForWorkspace } from "@/auth/access-check";
 import EditorSidebar from "./_components/editor-sidebar";
+import Editor from "@/editor/components/editor";
 
 const page = async (props: RouteProps) => {
   return (
@@ -25,29 +23,22 @@ const page = async (props: RouteProps) => {
           .check();
 
         return (
-          <TooltipProvider
-            disableHoverableContent
-            delayDuration={500}
-            skipDelayDuration={0}
-          >
-            <Container>
-              <section className="grid items-center gap-6 pb-8">
-                <div className="flex items-center justify-between">
-                  <div className="flex max-w-[980px] flex-col items-start gap-2">
-                    <h1 className="text-3xl font-extrabold leading-tight tracking-tighter md:text-4xl">
-                      Template Editor
-                    </h1>
-                    <p className="max-w-[700px] text-muted-foreground">
-                      Edit your template, fill your schema values and save.
-                    </p>
-                  </div>
-                  <EditorSidebar />
+          <Container>
+            <section className="grid items-center gap-6 pb-8">
+              <div className="flex items-center justify-between">
+                <div className="flex max-w-[980px] flex-col items-start gap-2">
+                  <h1 className="text-3xl font-extrabold leading-tight tracking-tighter md:text-4xl">
+                    Template Editor
+                  </h1>
+                  <p className="max-w-[700px] text-muted-foreground">
+                    Edit your template, fill your schema values and save.
+                  </p>
                 </div>
-
-                <PlateEditor />
-              </section>
-            </Container>
-          </TooltipProvider>
+                <EditorSidebar />
+              </div>
+              <Editor />
+            </section>
+          </Container>
         );
       }}
     </ParserLayout>

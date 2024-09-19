@@ -1,5 +1,5 @@
-import { Separator } from "@/components/plate-ui/separator";
 import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const Integration = () => {
