@@ -8,11 +8,11 @@ import {
   Image as ImageIcon,
   ItalicIcon,
   ListIcon,
+  ListOrderedIcon,
   Table,
   Underline,
 } from "lucide-react";
 import { BubbleMenuBtn } from "./bubble-menu";
-import { Editor } from "@tiptap/react";
 import {
   Select,
   SelectContent,
@@ -24,21 +24,23 @@ import {
 } from "@/components/ui/select";
 import { buttonVariants } from "@/components/ui/button";
 import ImageLoader from "./image-loader";
+import { useInvoiceEditorContext } from "../editor-context";
 
-const TopEditorOptions = ({ editor }: { editor: Editor | null }) => {
+const TopEditorOptions = () => {
+  const editor = useInvoiceEditorContext();
   return (
-    <div className="p-2 border border-gray-50 w-full rounded-md">
+    <div className="p-2 fixed left-1/2  bg-white -translate-x-1/2 w-fit bottom-[40px] shadow-2xl rounded-md">
       <div className="flex items-center gap-2">
         <BubbleMenuBtn
-          onClick={() => editor?.chain().focus().toggleBold().run()}
-          active={editor?.isActive("bold")}
+          onClick={() => editor.chain().focus().toggleBold().run()}
+          active={editor.isActive("bold")}
         >
           <BoldIcon className="shrink-0 size-4" />
         </BubbleMenuBtn>
 
         <BubbleMenuBtn
-          onClick={() => editor?.chain().focus().toggleItalic().run()}
-          active={editor?.isActive("italic")}
+          onClick={() => editor.chain().focus().toggleItalic().run()}
+          active={editor.isActive("italic")}
         >
           <ItalicIcon className="shrink-0 size-4" />
         </BubbleMenuBtn>
@@ -46,28 +48,35 @@ const TopEditorOptions = ({ editor }: { editor: Editor | null }) => {
           onClick={() =>
             editor && editor.chain().focus().toggleUnderline().run()
           }
-          active={editor?.isActive("underline")}
+          active={editor.isActive("underline")}
         >
           <Underline className="shrink-0 size-4" />
         </BubbleMenuBtn>
         <BubbleMenuBtn
-          onClick={() => editor?.chain().focus().toggleHighlight().run()}
-          active={editor?.isActive("highlight")}
+          onClick={() => editor.chain().focus().toggleHighlight().run()}
+          active={editor.isActive("highlight")}
         >
           <Highlighter className="shrink-0 size-4" />
         </BubbleMenuBtn>
         <BubbleMenuBtn
-          onClick={() => editor?.chain().focus().toggleBulletList().run()}
-          active={editor?.isActive("bulletList")}
+          onClick={() => editor.chain().focus().toggleBulletList().run()}
+          active={editor.isActive("bulletList")}
         >
           <ListIcon className="shrink-0 size-4 " />
+        </BubbleMenuBtn>
+
+        <BubbleMenuBtn
+          onClick={() => editor.chain().focus().toggleOrderedList().run()}
+          active={editor.isActive("orderedList")}
+        >
+          <ListOrderedIcon className="shrink-0 size-4 " />
         </BubbleMenuBtn>
 
         <ImageLoader />
 
         <BubbleMenuBtn
           onClick={() => {
-            editor?.commands.createParagraphNear();
+            editor.commands.createParagraphNear();
 
             editor
               ?.chain()
@@ -82,7 +91,7 @@ const TopEditorOptions = ({ editor }: { editor: Editor | null }) => {
         <Select
           defaultValue="left"
           onValueChange={(value) => {
-            editor?.chain().focus().setTextAlign(value).run();
+            editor.chain().focus().setTextAlign(value).run();
           }}
         >
           <SelectTrigger

@@ -17,11 +17,12 @@ import ListItem from "@tiptap/extension-list-item";
 import Heading from "@tiptap/extension-heading";
 import Image from "@tiptap/extension-image";
 import Dropcursor from "@tiptap/extension-dropcursor";
-import ImageResize from "tiptap-extension-resize-image";
 import Table from "@tiptap/extension-table";
 import TableCell from "@tiptap/extension-table-cell";
 import TableHeader from "@tiptap/extension-table-header";
 import TableRow from "@tiptap/extension-table-row";
+import SlashCommand from "./slash/command";
+import OrderedList from "@tiptap/extension-ordered-list";
 
 const useInvoiceEditor = () => {
   const editor = useEditor({
@@ -33,15 +34,20 @@ const useInvoiceEditor = () => {
       Bold,
       UnderlineNode,
       Placeholder.configure({
-        placeholder: "Start typing...",
-        showOnlyCurrent: false,
+        placeholder: ({ node }) => {
+          if (node.type.name === "heading") {
+            return `Heading ${node.attrs.level}`;
+          }
+          return "Press '/' for commands";
+        },
+        includeChildren: true,
       }),
       Highlight,
       Typography,
       History,
       TextAlign.configure({
         defaultAlignment: "left",
-        types: ["heading", "paragraph", "tableCell"],
+        types: ["heading", "paragraph", "tableCell", "image"],
       }),
       BulletList.configure({
         HTMLAttributes: {
@@ -50,16 +56,24 @@ const useInvoiceEditor = () => {
         itemTypeName: "listItem",
       }),
       ListItem,
+      OrderedList,
       Heading,
-      Image.configure({
-        allowBase64: true,
-      }),
       Dropcursor,
-      ImageResize.configure({
-        allowBase64: true,
-        HTMLAttributes: {
-          class: "image-node",
+      Image.extend({
+        name: "image",
+        addAttributes() {
+          return {
+            ...this.parent?.(),
+            width: {
+              default: null,
+            },
+            height: {
+              default: null,
+            },
+          };
         },
+      }).configure({
+        allowBase64: true,
       }),
       Table.configure({
         resizable: true,
@@ -71,6 +85,7 @@ const useInvoiceEditor = () => {
       TableRow.extend({
         allowGapCursor: true,
       }),
+      SlashCommand,
     ],
     content: `
             <p>The Text extension is required, at least if you want to have text in your text editor and that’s very likely.</p>

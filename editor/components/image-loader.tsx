@@ -44,7 +44,7 @@ const ImageLoader = () => {
           <ImageIcon className="shrink-0 size-4" />
         </BubbleMenuBtn>
       </CredenzaTrigger>
-      <CredenzaContent>
+      <CredenzaContent className="z-[100]">
         <CredenzaHeader>
           <CredenzaTitle>Add Image</CredenzaTitle>
           <CredenzaDescription>
