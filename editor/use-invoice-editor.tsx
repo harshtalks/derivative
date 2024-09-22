@@ -121,7 +121,8 @@ const useInvoiceEditor = () => {
       `,
     editorProps: {
       attributes: {
-        class: "prose prose-sm focus:outline-none",
+        class:
+          "prose prose-sm leading-tight marker:text-gray-900 focus:outline-none",
       },
     },
   });

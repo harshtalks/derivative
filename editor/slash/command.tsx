@@ -21,6 +21,9 @@ import {
   Text,
   ListOrdered,
   Image as ImageIcon,
+  Heading4,
+  Heading5,
+  Heading6,
 } from "lucide-react";
 import imageStore from "../image-store";
 
@@ -134,12 +137,7 @@ export const slashSuggestions: SuggestionItem[] = [
     searchTerms: ["title", "big", "large"],
     icon: <Heading1 size={18} />,
     command: ({ editor, range }) => {
-      editor
-        .chain()
-        .focus()
-        .deleteRange(range)
-        .setNode("heading", { level: 1 })
-        .run();
+      editor.chain().focus().toggleHeading({ level: 1 }).run();
     },
   },
   {
@@ -152,7 +150,7 @@ export const slashSuggestions: SuggestionItem[] = [
         .chain()
         .focus()
         .deleteRange(range)
-        .setNode("heading", { level: 2 })
+        .toggleHeading({ level: 2 })
         .run();
     },
   },
@@ -166,7 +164,49 @@ export const slashSuggestions: SuggestionItem[] = [
         .chain()
         .focus()
         .deleteRange(range)
-        .setNode("heading", { level: 3 })
+        .toggleHeading({ level: 3 })
+        .run();
+    },
+  },
+  {
+    title: "Heading 4",
+    description: "Small section heading.",
+    searchTerms: ["subtitle", "smaller"],
+    icon: <Heading4 size={18} />,
+    command: ({ editor, range }) => {
+      editor
+        .chain()
+        .focus()
+        .deleteRange(range)
+        .toggleHeading({ level: 4 })
+        .run();
+    },
+  },
+  {
+    title: "Heading 5",
+    description: "Small section heading.",
+    searchTerms: ["subtitle", "small"],
+    icon: <Heading5 size={18} />,
+    command: ({ editor, range }) => {
+      editor
+        .chain()
+        .focus()
+        .deleteRange(range)
+        .toggleHeading({ level: 5 })
+        .run();
+    },
+  },
+  {
+    title: "Heading 6",
+    description: "Small section heading.",
+    searchTerms: ["subtitle", "small"],
+    icon: <Heading6 size={18} />,
+    command: ({ editor, range }) => {
+      editor
+        .chain()
+        .focus()
+        .deleteRange(range)
+        .toggleHeading({ level: 6 })
         .run();
     },
   },
