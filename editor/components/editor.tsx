@@ -13,6 +13,7 @@ import { handleCommandNavigation, slashSuggestions } from "../slash/command";
 import SlashCommandRoot from "../slash/components";
 import { ImageResizer } from "../image-resize";
 import { useEffect, useState } from "react";
+import ImageMenu from "./image-menu";
 
 const Editor = () => {
   const { editor } = useInvoiceEditor();
@@ -31,11 +32,11 @@ const Editor = () => {
   return (
     <InvoiceEditorContextProvider editor={editor}>
       <SlashCommandRoot>
-        <BubbleMenuWrapper />
         <div className="p-2 flex flex-col pb-24 gap-4 items-center justify-center overflow-y-auto w-full">
           <TopEditorOptions />
           <div>
             <BubbleMenuWrapper />
+            <ImageMenu />
             <SlashCommand>
               <SlashCommandEmpty>No results found</SlashCommandEmpty>
               <SlashCommandList>

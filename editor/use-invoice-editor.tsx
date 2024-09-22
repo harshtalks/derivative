@@ -72,6 +72,16 @@ const useInvoiceEditor = () => {
             height: {
               default: null,
             },
+            margin: {
+              default: null,
+            },
+            style: {
+              // alignment - left, right, and center
+              default: "margin: 0 auto;",
+            },
+            "data-alignment": {
+              default: "center",
+            },
           };
         },
       }).configure({

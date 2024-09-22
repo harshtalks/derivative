@@ -137,7 +137,7 @@ export const slashSuggestions: SuggestionItem[] = [
     searchTerms: ["title", "big", "large"],
     icon: <Heading1 size={18} />,
     command: ({ editor, range }) => {
-      editor.chain().focus().toggleHeading({ level: 1 }).run();
+      editor.chain().focus().setHeading({ level: 1 }).run();
     },
   },
   {
@@ -146,12 +146,7 @@ export const slashSuggestions: SuggestionItem[] = [
     searchTerms: ["subtitle", "medium"],
     icon: <Heading2 size={18} />,
     command: ({ editor, range }) => {
-      editor
-        .chain()
-        .focus()
-        .deleteRange(range)
-        .toggleHeading({ level: 2 })
-        .run();
+      editor.chain().focus().deleteRange(range).setHeading({ level: 2 }).run();
     },
   },
   {
@@ -160,12 +155,7 @@ export const slashSuggestions: SuggestionItem[] = [
     searchTerms: ["subtitle", "small"],
     icon: <Heading3 size={18} />,
     command: ({ editor, range }) => {
-      editor
-        .chain()
-        .focus()
-        .deleteRange(range)
-        .toggleHeading({ level: 3 })
-        .run();
+      editor.chain().focus().deleteRange(range).setHeading({ level: 3 }).run();
     },
   },
   {
@@ -174,12 +164,7 @@ export const slashSuggestions: SuggestionItem[] = [
     searchTerms: ["subtitle", "smaller"],
     icon: <Heading4 size={18} />,
     command: ({ editor, range }) => {
-      editor
-        .chain()
-        .focus()
-        .deleteRange(range)
-        .toggleHeading({ level: 4 })
-        .run();
+      editor.chain().focus().deleteRange(range).setHeading({ level: 4 }).run();
     },
   },
   {
@@ -188,12 +173,7 @@ export const slashSuggestions: SuggestionItem[] = [
     searchTerms: ["subtitle", "small"],
     icon: <Heading5 size={18} />,
     command: ({ editor, range }) => {
-      editor
-        .chain()
-        .focus()
-        .deleteRange(range)
-        .toggleHeading({ level: 5 })
-        .run();
+      editor.chain().focus().deleteRange(range).setHeading({ level: 5 }).run();
     },
   },
   {
@@ -202,12 +182,7 @@ export const slashSuggestions: SuggestionItem[] = [
     searchTerms: ["subtitle", "small"],
     icon: <Heading6 size={18} />,
     command: ({ editor, range }) => {
-      editor
-        .chain()
-        .focus()
-        .deleteRange(range)
-        .toggleHeading({ level: 6 })
-        .run();
+      editor.chain().focus().deleteRange(range).setHeading({ level: 6 }).run();
     },
   },
   {
