@@ -127,6 +127,13 @@ const config = {
       fontFamily: {
         sans: ["var(--font-sans)", ...fontFamily.sans],
       },
+      typography: {
+        DEFAULT: {
+          css: {
+            maxWidth: "100ch", // add required value here
+          },
+        },
+      },
     },
   },
   plugins: [require("tailwindcss-animate"), require("@tailwindcss/typography")],

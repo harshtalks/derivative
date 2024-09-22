@@ -137,7 +137,7 @@ export const slashSuggestions: SuggestionItem[] = [
     searchTerms: ["title", "big", "large"],
     icon: <Heading1 size={18} />,
     command: ({ editor, range }) => {
-      editor.chain().focus().setHeading({ level: 1 }).run();
+      editor.chain().focus().deleteRange(range).setHeading({ level: 1 }).run();
     },
   },
   {

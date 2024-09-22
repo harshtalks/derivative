@@ -5,7 +5,7 @@ import { useInvoiceEditorContext } from "../editor-context";
 import { BubbleMenuBtn } from "./bubble-menu";
 import { AlignCenter, AlignLeft, AlignRight } from "lucide-react";
 
-const variants = {
+export const variants = {
   left: `margin-right:0 auto`,
   center: `margin: 0 auto;`,
   right: `margin-left: auto;`,

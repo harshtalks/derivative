@@ -81,13 +81,7 @@ const TopEditorOptions = () => {
 
         <BubbleMenuBtn
           onClick={() => {
-            editor.commands.createParagraphNear();
-
-            editor
-              ?.chain()
-              .focus()
-              .insertTable({ rows: 3, cols: 3, withHeaderRow: true })
-              .run();
+            editor?.chain().focus().insertTable({ rows: 3, cols: 3 }).run();
           }}
         >
           <Table className="shrink-0 size-4" />

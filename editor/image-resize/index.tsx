@@ -1,6 +1,7 @@
 import type { FC } from "react";
 import Moveable from "react-moveable";
 import { useInvoiceEditorContext } from "../editor-context";
+import { variants } from "../components/image-menu";
 
 export const ImageResizer: FC = () => {
   const editor = useInvoiceEditorContext();
@@ -17,20 +18,23 @@ export const ImageResizer: FC = () => {
         src: string;
         alt?: string;
         title?: string;
-        style: typeof imageInfo.style;
+        style: string;
         height: number;
         width: number;
-        "data-alignment": ReturnType<typeof imageInfo.getAttribute>;
+        "data-alignment": string | null;
       }) => boolean;
 
       setImage({
         src: imageInfo.src,
         width: Number(imageInfo.style.width.replace("px", "")),
         height: Number(imageInfo.style.height.replace("px", "")),
-        style: imageInfo.style,
         alt: imageInfo.alt,
         title: imageInfo.title,
         "data-alignment": imageInfo.getAttribute("data-alignment"),
+        style:
+          variants[
+            imageInfo.getAttribute("data-alignment") as keyof typeof variants
+          ],
       });
       editor.commands.setNodeSelection(selection.from);
     }
