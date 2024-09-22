@@ -42,7 +42,7 @@ export const SlashCommandOut = (props: SlashCommandOutProps) => {
           if (commandRef) {
             commandRef.dispatchEvent(
               new KeyboardEvent("keydown", {
-                key: e.key,
+                key: event.key,
                 cancelable: true,
                 bubbles: true,
               }),
@@ -87,7 +87,7 @@ const SlashCommand = ({ children }: { children: ReactNode }) => {
               e.stopPropagation();
             }}
             id={SLASH_CMD_DOM_ID}
-            className="z-50 h-auto max-h-[330px] overflow-y-auto rounded-md border border-muted bg-background px-1 py-2 shadow-md transition-all"
+            className="z-50 h-auto max-h-[330px] overflow-y-auto rounded-md border border-muted bg-background p-4  shadow-[rgba(100,_100,_111,_0.2)_0px_7px_29px_0px] transition-all"
           >
             <Command.Input
               value={query}
