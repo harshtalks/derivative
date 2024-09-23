@@ -9,8 +9,11 @@ import {
   AlignLeft,
   AlignRight,
   BoldIcon,
+  Delete,
+  DeleteIcon,
   Highlighter,
   ItalicIcon,
+  Trash2,
   Underline,
 } from "lucide-react";
 import useInvoiceEditor from "../use-invoice-editor";
@@ -123,6 +126,14 @@ export const BubbleMenuWrapper = () => {
           })}
         >
           <AlignRight className="shrink-0 size-4" />
+        </BubbleMenuBtn>
+
+        <BubbleMenuBtn
+          onClick={() => {
+            editor.chain().focus().deleteSelection().run();
+          }}
+        >
+          <Trash2 className="shrink-0 size-4" />
         </BubbleMenuBtn>
       </div>
     </BubbleMenu>

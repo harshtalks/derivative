@@ -21,8 +21,9 @@ import Table from "@tiptap/extension-table";
 import TableCell from "@tiptap/extension-table-cell";
 import TableHeader from "@tiptap/extension-table-header";
 import TableRow from "@tiptap/extension-table-row";
-import SlashCommand from "./slash/command";
+import SlashCommand, { handleCommandNavigation } from "./slash/command";
 import OrderedList from "@tiptap/extension-ordered-list";
+import LinkExtension from "@tiptap/extension-link";
 
 const useInvoiceEditor = () => {
   const editor = useEditor({
@@ -98,6 +99,7 @@ const useInvoiceEditor = () => {
         allowGapCursor: true,
       }),
       SlashCommand,
+      LinkExtension,
     ],
     content: `
         <h2>
@@ -133,6 +135,11 @@ const useInvoiceEditor = () => {
       attributes: {
         class:
           "prose prose-sm leading-tight marker:text-gray-900 w-full focus:outline-none",
+      },
+      handleDOMEvents: {
+        keydown: (_, event) => {
+          return handleCommandNavigation(event);
+        },
       },
     },
   });

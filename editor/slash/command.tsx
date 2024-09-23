@@ -217,9 +217,11 @@ export const slashSuggestions: SuggestionItem[] = [
   },
 ];
 
+// important for keyboard navigation to work. it wont work without this.
+
 export const handleCommandNavigation = (event: KeyboardEvent) => {
   if (navigationKeys.includes(event.key)) {
-    const slashCommand = document.querySelector(SLASH_CMD_DOM_ID);
+    const slashCommand = document.getElementById(SLASH_CMD_DOM_ID);
     if (slashCommand) {
       return true;
     }

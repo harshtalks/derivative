@@ -31,7 +31,7 @@ export const SlashCommandOut = (props: SlashCommandOutProps) => {
   }, [props.range]);
 
   useEffect(() => {
-    const abortControll = new AbortController();
+    const abortController = new AbortController();
 
     document.addEventListener(
       "keydown",
@@ -53,12 +53,12 @@ export const SlashCommandOut = (props: SlashCommandOutProps) => {
         }
       },
       {
-        signal: abortControll.signal,
+        signal: abortController.signal,
       },
     );
 
     return () => {
-      abortControll.abort();
+      abortController.abort();
     };
   }, []);
 

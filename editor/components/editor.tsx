@@ -30,8 +30,8 @@ const Editor = () => {
   }
 
   return (
-    <InvoiceEditorContextProvider editor={editor}>
-      <SlashCommandRoot>
+    <SlashCommandRoot>
+      <InvoiceEditorContextProvider editor={editor}>
         <div className="p-2 flex flex-col pb-24 gap-4 items-center justify-center overflow-y-auto w-full">
           <TopEditorOptions />
           <div>
@@ -69,14 +69,14 @@ const Editor = () => {
                 maxHeight: "29.7cm",
                 minWidth: "21cm",
               }}
-              className="border p-12 rounded-md shadow-2xl"
+              className="border p-12 bg-white rounded-md shadow-2xl"
               editor={editor}
             />
             <ImageResizer />
           </div>
         </div>
-      </SlashCommandRoot>
-    </InvoiceEditorContextProvider>
+      </InvoiceEditorContextProvider>
+    </SlashCommandRoot>
   );
 };
 

@@ -2,7 +2,7 @@ import { ReactNode, useRef } from "react";
 import tunnel from "tunnel-rat";
 import { slashCommandTunnelContext } from "./command";
 
-export const SLASH_CMD_DOM_ID = "slash-cmd";
+export const SLASH_CMD_DOM_ID = "editor__slash__command__dom__id";
 export const navigationKeys = ["ArrowUp", "ArrowDown", "Enter"];
 
 const SlashCommandRoot = ({ children }: { children: ReactNode }) => {
