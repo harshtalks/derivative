@@ -1,10 +1,10 @@
 import { ReactNode, createContext, useEffect } from "react";
-import tunnel from "tunnel-rat";
 import { Range as TRange } from "@tiptap/react";
 import { slashStore } from "../slash-store";
 import { SLASH_CMD_DOM_ID, navigationKeys } from ".";
 import { useSelector } from "@xstate/store/react";
 import { Command } from "cmdk";
+import tunnel from "@/stores/tunnel";
 
 export const slashCommandTunnelContext = createContext(
   {} as ReturnType<typeof tunnel>,
@@ -64,7 +64,7 @@ export const SlashCommandOut = (props: SlashCommandOutProps) => {
 
   return (
     <slashCommandTunnelContext.Consumer>
-      {(tunnel) => <tunnel.Out />}
+      {(tunnel) => <tunnel.Outlet />}
     </slashCommandTunnelContext.Consumer>
   );
 };
@@ -81,7 +81,7 @@ const SlashCommand = ({ children }: { children: ReactNode }) => {
   return (
     <slashCommandTunnelContext.Consumer>
       {(tunnel) => (
-        <tunnel.In>
+        <tunnel.Inlet>
           <Command
             onKeyDown={(e) => {
               e.stopPropagation();
@@ -96,7 +96,7 @@ const SlashCommand = ({ children }: { children: ReactNode }) => {
             />
             {children}
           </Command>
-        </tunnel.In>
+        </tunnel.Inlet>
       )}
     </slashCommandTunnelContext.Consumer>
   );
