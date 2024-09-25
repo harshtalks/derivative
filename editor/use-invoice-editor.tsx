@@ -21,9 +21,11 @@ import Table from "@tiptap/extension-table";
 import TableCell from "@tiptap/extension-table-cell";
 import TableHeader from "@tiptap/extension-table-header";
 import TableRow from "@tiptap/extension-table-row";
-import SlashCommand, { handleCommandNavigation } from "./slash/command";
 import OrderedList from "@tiptap/extension-ordered-list";
 import LinkExtension from "@tiptap/extension-link";
+import { ImageExtension } from "@harshtalks/image-tiptap";
+import { Slash, enableKeyboardNavigation } from "@harshtalks/slash-tiptap";
+import { slashSuggestions } from "./suggestions";
 
 const useInvoiceEditor = () => {
   const editor = useEditor({
@@ -62,30 +64,7 @@ const useInvoiceEditor = () => {
         levels: [1, 2, 3, 4, 5, 6],
       }),
       Dropcursor,
-      Image.extend({
-        name: "image",
-        addAttributes() {
-          return {
-            ...this.parent?.(),
-            width: {
-              default: null,
-            },
-            height: {
-              default: null,
-            },
-            margin: {
-              default: null,
-            },
-            style: {
-              // alignment - left, right, and center
-              default: "margin: 0 auto;",
-            },
-            "data-alignment": {
-              default: "center",
-            },
-          };
-        },
-      }).configure({
+      ImageExtension.configure({
         allowBase64: true,
       }),
       Table.configure({
@@ -98,7 +77,11 @@ const useInvoiceEditor = () => {
       TableRow.extend({
         allowGapCursor: true,
       }),
-      SlashCommand,
+      Slash.configure({
+        suggestion: {
+          items: () => slashSuggestions,
+        },
+      }),
       LinkExtension,
     ],
     content: `
@@ -138,7 +121,7 @@ const useInvoiceEditor = () => {
       },
       handleDOMEvents: {
         keydown: (_, event) => {
-          return handleCommandNavigation(event);
+          return enableKeyboardNavigation(event);
         },
       },
     },

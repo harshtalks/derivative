@@ -1,18 +1,5 @@
-import {
-  Editor,
-  Extension,
-  ReactRenderer,
-  Range as TRange,
-} from "@tiptap/react";
-import Suggestion, { type SuggestionOptions } from "@tiptap/suggestion";
 import { ReactNode, RefObject } from "react";
-import tippy, {
-  type GetReferenceClientRect,
-  type Instance,
-  type Props,
-} from "tippy.js";
-import { SlashCommandOut } from "./components/command";
-import { SLASH_CMD_DOM_ID, navigationKeys } from "./components";
+
 import {
   Heading1,
   Heading2,
@@ -25,98 +12,13 @@ import {
   Heading5,
   Heading6,
 } from "lucide-react";
-import imageStore from "../image-store";
+import { createSuggestionsItems } from "@harshtalks/slash-tiptap";
+import imageStore from "./image-store";
 
-const Command = Extension.create({
-  name: "slash-command",
-  addOptions() {
-    return {
-      suggestion: {
-        char: "/",
-        command: ({ editor, range, props }) => {
-          props.command({ editor, range });
-        },
-      } as SuggestionOptions,
-    };
-  },
-  addProseMirrorPlugins() {
-    return [
-      Suggestion({
-        editor: this.editor,
-        ...this.options.suggestion,
-      }),
-    ];
-  },
-});
-
-const renderItems = (elementRef?: RefObject<Element> | null) => {
-  let component: ReactRenderer | null = null;
-  let popup: Instance<Props>[] | null = null;
-
-  return {
-    onStart: (props: { editor: Editor; clientRect: DOMRect }) => {
-      component = new ReactRenderer(SlashCommandOut, {
-        props,
-        editor: props.editor,
-      });
-
-      const { selection } = props.editor.state;
-
-      const parentNode = selection.$from.node(selection.$from.depth);
-      const blockType = parentNode.type.name;
-
-      if (blockType === "codeBlock") {
-        return false;
-      }
-
-      // @ts-ignore
-      popup = tippy("body", {
-        getReferenceClientRect: props.clientRect,
-        appendTo: () => (elementRef ? elementRef.current : document.body),
-        content: component.element,
-        showOnCreate: true,
-        interactive: true,
-        trigger: "manual",
-        placement: "bottom-start",
-      });
-    },
-    onUpdate: (props: {
-      editor: Editor;
-      clientRect: GetReferenceClientRect;
-    }) => {
-      component?.updateProps(props);
-
-      popup?.[0]?.setProps({
-        getReferenceClientRect: props.clientRect,
-      });
-    },
-
-    onKeyDown: (props: { event: KeyboardEvent }) => {
-      if (props.event.key === "Escape") {
-        popup?.[0]?.hide();
-
-        return true;
-      }
-
-      // @ts-ignore
-      return component?.ref?.onKeyDown(props);
-    },
-    onExit: () => {
-      popup?.[0]?.destroy();
-      component?.destroy();
-    },
-  };
-};
-
-export interface SuggestionItem {
-  title: string;
+export const slashSuggestions = createSuggestionsItems<{
   description: string;
   icon: ReactNode;
-  searchTerms?: string[];
-  command: (props: { editor: Editor; range: TRange }) => void;
-}
-
-export const slashSuggestions: SuggestionItem[] = [
+}>([
   {
     title: "Text",
     description: "Just start typing with plain text.",
@@ -215,24 +117,4 @@ export const slashSuggestions: SuggestionItem[] = [
       });
     },
   },
-];
-
-// important for keyboard navigation to work. it wont work without this.
-
-export const handleCommandNavigation = (event: KeyboardEvent) => {
-  if (navigationKeys.includes(event.key)) {
-    const slashCommand = document.getElementById(SLASH_CMD_DOM_ID);
-    if (slashCommand) {
-      return true;
-    }
-  }
-};
-
-const SlashCommand = Command.configure({
-  suggestion: {
-    render: renderItems,
-    suggestions: () => slashSuggestions,
-  },
-});
-
-export default SlashCommand;
+]);
