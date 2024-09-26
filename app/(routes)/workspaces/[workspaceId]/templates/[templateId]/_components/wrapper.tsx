@@ -297,5 +297,6 @@ export function TemplatePage({
         <p>{error.message}</p>
       </div>
     )),
+    Match.exhaustive,
   );
 }
