@@ -26,6 +26,7 @@ import LinkExtension from "@tiptap/extension-link";
 import { ImageExtension } from "@harshtalks/image-tiptap";
 import { Slash, enableKeyboardNavigation } from "@harshtalks/slash-tiptap";
 import { slashSuggestions } from "./suggestions";
+import getSchemaVariableExtension from "./dynamic-variables/schema-variable";
 
 const useInvoiceEditor = () => {
   const editor = useEditor({
@@ -83,6 +84,73 @@ const useInvoiceEditor = () => {
         },
       }),
       LinkExtension,
+      getSchemaVariableExtension({
+        items: [
+          {
+            value: "name",
+          },
+          {
+            value: "email",
+          },
+          {
+            value: "phone",
+          },
+          {
+            value: "address",
+          },
+          {
+            value: "city",
+          },
+          {
+            value: "state",
+          },
+          {
+            value: "zip",
+          },
+          {
+            value: "country",
+          },
+          {
+            value: "invoiceNumber",
+          },
+          {
+            value: "invoiceDate",
+          },
+          {
+            value: "dueDate",
+          },
+          {
+            value: "notes",
+          },
+          {
+            value: "total",
+          },
+          {
+            value: "tax",
+          },
+          {
+            value: "discount",
+          },
+          {
+            value: "items",
+          },
+          {
+            value: "item",
+          },
+          {
+            value: "description",
+          },
+          {
+            value: "quantity",
+          },
+          {
+            value: "price",
+          },
+          {
+            value: "amount",
+          },
+        ],
+      }),
     ],
     content: `
         <h2>

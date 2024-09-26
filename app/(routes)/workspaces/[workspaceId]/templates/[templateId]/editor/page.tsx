@@ -9,6 +9,7 @@ import Branded from "@/types/branded.type";
 import { checkAccessForWorkspace } from "@/auth/access-check";
 import EditorSidebar from "./_components/editor-sidebar";
 import Editor from "@/editor/components/editor";
+import serverApiTrpc from "@/trpc/server";
 
 const page = async (props: RouteProps) => {
   return (

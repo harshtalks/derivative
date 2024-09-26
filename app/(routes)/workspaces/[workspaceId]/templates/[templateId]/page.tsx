@@ -17,7 +17,8 @@ const page = async (props: RouteProps) => {
   return (
     <ParserLayout routeInfo={TemplatePageRouteInfo} {...props}>
       {async ({ params }) => {
-        setCurrentWorkspace(params.workspaceId);
+        setCurrentWorkspace(Branded.WorkspaceId(params.workspaceId));
+
         await new AuthInterceptor(
           TemplatePageRouteInfo({
             workspaceId: Branded.WorkspaceId(params.workspaceId),

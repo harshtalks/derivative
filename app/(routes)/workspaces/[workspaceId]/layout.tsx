@@ -42,8 +42,6 @@ const Layout = ({
   children: ReactNode;
   params: { workspaceId: string };
 }) => {
-  // setting the current worksapce
-  setCurrentWorkspace(Branded.WorkspaceId(params.workspaceId));
   return (
     <TooltipProvider>
       <div className="flex min-h-screen w-full flex-col bg-muted/40">

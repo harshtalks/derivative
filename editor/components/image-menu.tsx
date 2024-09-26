@@ -4,8 +4,12 @@ import { cn } from "@/lib/utils";
 import { ImageAligner } from "@harshtalks/image-tiptap";
 import { BubbleMenu, Editor } from "@tiptap/react";
 import { AlignCenter, AlignLeft, AlignRight } from "lucide-react";
+import useInvoiceEditor from "../use-invoice-editor";
+import { useSelector } from "@xstate/store/react";
+import imageStore from "../image-store";
+import { useEffect } from "react";
 
-const ImageMenu = ({ editor }: { editor: Editor }) => {
+const ImageMenu = () => {
   const btnClass = buttonVariants({
     variant: "ghost",
     className: cn(
@@ -13,6 +17,15 @@ const ImageMenu = ({ editor }: { editor: Editor }) => {
       "data-[isactive=true]:bg-zinc-100 data-[isactive=true]:border-zinc-200",
     ),
   });
+
+  const { editor } = useInvoiceEditor();
+  const { url } = useSelector(imageStore, (state) => state.context);
+
+  useEffect(() => {
+    if (editor && url) {
+      editor.chain().focus().setImage({ src: url }).run();
+    }
+  }, [editor, url]);
 
   return (
     <ImageAligner.Root editor={editor}>

@@ -12,6 +12,7 @@ import Branded from "@/types/branded.type";
 import { iife } from "@/lib/utils";
 import AddMemberToWorkspace from "./add-member-dialog";
 import { Match } from "effect";
+import { Input } from "@/components/ui/input";
 
 const UsersList = () => {
   const { userSearchTerm } = useSelector(store, (state) => state.context);
@@ -31,6 +32,15 @@ const UsersList = () => {
 
   return (
     <>
+      <Input
+        type="text"
+        placeholder="Search users"
+        value={userSearchTerm}
+        onChange={(e) =>
+          store.send({ type: "setUserSearchTerm", value: e.target.value })
+        }
+        className="mb-4"
+      />
       <ScrollArea className="h-[300px]">
         {Match.value(query).pipe(
           Match.when({ status: "success" }, ({ data }) => {
