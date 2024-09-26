@@ -3,12 +3,12 @@ import { Input } from "@/components/ui/input";
 import clientApiTrpc from "@/trpc/client";
 import DashboardRoute from "../route.info";
 import Branded from "@/types/branded.type";
-import { match } from "ts-pattern";
 import { AlertOctagon, Check, Copy, Loader } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { toast } from "sonner";
 import WorkspaceInvitationRoute from "../../invitation/route.info";
 import { useEffect, useReducer } from "react";
+import { Match } from "effect";
 
 const InviteMembers = () => {
   const { workspaceId } = DashboardRoute.useParams();
@@ -31,13 +31,86 @@ const InviteMembers = () => {
 
   const [copied, setCopied] = useReducer((prev) => !prev, false);
 
-  return match(query)
-    .with({ status: "pending" }, () => (
+  return Match.value(query).pipe(
+    Match.when({ status: "success" }, ({ data }) => {
+      return Match.value(data).pipe(
+        Match.when({ inviteCode: (code) => !!code }, (data) => (
+          <div className="flex items-stretch gap-2">
+            <Input
+              value={WorkspaceInvitationRoute(
+                { workspaceId: Branded.WorkspaceId(workspaceId) },
+                { search: { invite: data.inviteCode } },
+              )}
+              readOnly
+              className="text-muted-foreground text-xs shadow-none"
+            />
+            <Button
+              color=""
+              onClick={() => {
+                if (!data.inviteCode) {
+                  return;
+                }
+                navigator.clipboard.writeText(
+                  WorkspaceInvitationRoute(
+                    { workspaceId: Branded.WorkspaceId(workspaceId) },
+                    { search: { invite: data.inviteCode } },
+                  ),
+                );
+
+                toast.success("Link copied to clipboard");
+                setCopied();
+
+                setTimeout(() => {
+                  setCopied();
+                }, 2000);
+              }}
+              size="sm"
+              className="shrink-0 text-xs"
+            >
+              {copied ? (
+                <span className="inline-flex items-center">
+                  <Check className="shrink-0 size-4 mr-1" />
+                  Link Copied
+                </span>
+              ) : (
+                <span className="inline-flex items-center">
+                  <Copy className="shrink-0 size-4 mr-1" />
+                  Copy Link
+                </span>
+              )}
+            </Button>
+          </div>
+        )),
+        Match.orElse((data) => (
+          <div className="flex flex-col gap-2">
+            <p className="text-muted-foreground text-sm">
+              No invite code generated yet
+            </p>
+            <Button
+              onClick={() =>
+                mutation.mutate({
+                  workspaceId: Branded.WorkspaceId(workspaceId),
+                })
+              }
+              disabled={mutation.isPending}
+              size="sm"
+              className="shrink-0 w-fit text-xs"
+            >
+              {mutation.isPending && (
+                <Loader className="shrink-0 size-4 animate-spin" />
+              )}
+              {mutation.isPending ? "Generating..." : "Generate Invite Link"}
+            </Button>
+          </div>
+        )),
+      );
+    }),
+    Match.when({ status: "pending" }, () => (
       <div className="flex items-stretch justify-center gap-2">
         <Loader className="shrink-0 size-4 animate-spin" />
       </div>
-    ))
-    .with({ status: "error" }, ({ error }) => {
+    )),
+    Match.when({ status: "error" }, ({ error }) => {
       return (
         <div className="flex items-stretch gap-2">
           <Alert className="w-fit mx-auto mb-1">
@@ -49,76 +122,9 @@ const InviteMembers = () => {
           </Alert>
         </div>
       );
-    })
-    .with({ status: "success" }, ({ data }) => {
-      return data.inviteCode ? (
-        <div className="flex items-stretch gap-2">
-          <Input
-            value={WorkspaceInvitationRoute(
-              { workspaceId: Branded.WorkspaceId(workspaceId) },
-              { search: { invite: data.inviteCode } },
-            )}
-            readOnly
-            className="text-muted-foreground text-xs shadow-none"
-          />
-          <Button
-            color=""
-            onClick={() => {
-              if (!data.inviteCode) {
-                return;
-              }
-              navigator.clipboard.writeText(
-                WorkspaceInvitationRoute(
-                  { workspaceId: Branded.WorkspaceId(workspaceId) },
-                  { search: { invite: data.inviteCode } },
-                ),
-              );
-
-              toast.success("Link copied to clipboard");
-              setCopied();
-
-              setTimeout(() => {
-                setCopied();
-              }, 2000);
-            }}
-            size="sm"
-            className="shrink-0 text-xs"
-          >
-            {copied ? (
-              <span className="inline-flex items-center">
-                <Check className="shrink-0 size-4 mr-1" />
-                Link Copied
-              </span>
-            ) : (
-              <span className="inline-flex items-center">
-                <Copy className="shrink-0 size-4 mr-1" />
-                Copy Link
-              </span>
-            )}
-          </Button>
-        </div>
-      ) : (
-        <div className="flex flex-col gap-2">
-          <p className="text-muted-foreground text-sm">
-            No invite code generated yet
-          </p>
-          <Button
-            onClick={() =>
-              mutation.mutate({ workspaceId: Branded.WorkspaceId(workspaceId) })
-            }
-            disabled={mutation.isPending}
-            size="sm"
-            className="shrink-0 w-fit text-xs"
-          >
-            {mutation.isPending && (
-              <Loader className="shrink-0 size-4 animate-spin" />
-            )}
-            {mutation.isPending ? "Generating..." : "Generate Invite Link"}
-          </Button>
-        </div>
-      );
-    })
-    .exhaustive();
+    }),
+    Match.exhaustive,
+  );
 };
 
 export default InviteMembers;

@@ -1,6 +1,6 @@
 import { validateRequestCached } from "@/auth/validate-request";
 import React from "react";
-import { TemplatePage } from "./_components/wrapper";
+import { TemplatePage } from "./_components/TemplatePage";
 import { cookies } from "next/headers";
 import { accounts, mails } from "./_components/data";
 import withAuth from "@/auth/wrappers/withAuth";

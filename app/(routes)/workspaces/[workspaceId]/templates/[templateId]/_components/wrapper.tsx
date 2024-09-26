@@ -35,19 +35,17 @@ import { MailList } from "./list";
 import { AccountSwitcher } from "./account";
 import { useMail } from "./use-mail";
 import { ThemeToggle } from "@/app/_components/theme-toggle";
-import { UserNav } from "@/app/_components/user";
 import clientApiTrpc from "@/trpc/client";
 import TemplatePageRouteInfo from "../route.info";
 import Branded from "@/types/branded.type";
-import { match } from "ts-pattern";
 import { formatDistanceToNow } from "date-fns";
 import { Badge } from "@/components/ui/badge";
 import TemplatePageEditorRouteInfo from "../editor/route.info";
 import { Button } from "@/components/ui/button";
-import TemplateSchemaEditor from "../../new-template/_components/template-schema-editor";
 import Integration from "./wrapper-components/integration";
 import Schema from "./wrapper-components/schema";
 import TemplateMarkup from "./wrapper-components/template-markup";
+import { Match } from "effect";
 
 interface MailProps {
   accounts: {
@@ -79,8 +77,8 @@ export function TemplatePage({
 
   const { active } = TemplatePageRouteInfo.useSearchParams();
 
-  return match(query)
-    .with({ status: "success" }, ({ data }) => {
+  return Match.value(query).pipe(
+    Match.when({ status: "success" }, ({ data }) => {
       return (
         <TooltipProvider delayDuration={0}>
           <div className="flex h-[calc(100svh-100px)] overflow-hidden border-b items-stretch">
@@ -222,8 +220,8 @@ export function TemplatePage({
                 ]}
               />
             </div>
-            {match(active)
-              .with("inbox", () => (
+            {Match.value(active).pipe(
+              Match.when("inbox", () => (
                 <div className="flex">
                   <div className="border-r border-l max-w-[500px]">
                     <Tabs defaultValue="all">
@@ -269,42 +267,35 @@ export function TemplatePage({
                     />
                   </div>
                 </div>
-              ))
-              .with("schema", () => {
-                return <Schema json={data.json} jsonSchema={data.jsonSchema} />;
-              })
-              .with("integration", () => {
-                return <Integration />;
-              })
-              .with("template-markup", () => {
-                return (
-                  <TemplateMarkup
-                    markup={data.template_markup?.markup}
-                    jsonStr={data.json}
-                  />
-                );
-              })
-              .exhaustive()}
+              )),
+              Match.when("schema", () => (
+                <Schema json={data.json} jsonSchema={data.jsonSchema} />
+              )),
+              Match.when("integration", () => <Integration />),
+              Match.when("template-markup", () => (
+                <TemplateMarkup
+                  markup={data.template_markup?.markup}
+                  jsonStr={data.json}
+                />
+              )),
+              Match.exhaustive,
+            )}
           </div>
         </TooltipProvider>
       );
-    })
-    .with({ status: "pending" }, () => {
-      return (
-        <div className="w-full py-32 flex flex-col items-center justify-center">
-          <Loader className="animate-spin shrink-0 size-4" />
-          <p className="text-center text-muted-foreground text-xs pt-4">
-            Fetching details...
-          </p>
-        </div>
-      );
-    })
-    .with({ status: "error" }, ({ error }) => {
-      return (
-        <div className="w-full py-32 flex items-center justify-center">
-          <p>{error.message}</p>
-        </div>
-      );
-    })
-    .exhaustive();
+    }),
+    Match.when({ status: "pending" }, () => (
+      <div className="w-full py-32 flex flex-col items-center justify-center">
+        <Loader className="animate-spin shrink-0 size-4" />
+        <p className="text-center text-muted-foreground text-xs pt-4">
+          Fetching details...
+        </p>
+      </div>
+    )),
+    Match.when({ status: "error" }, ({ error }) => (
+      <div className="w-full py-32 flex items-center justify-center">
+        <p>{error.message}</p>
+      </div>
+    )),
+  );
 }

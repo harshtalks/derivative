@@ -2,11 +2,9 @@ import clientApiTrpc from "@/trpc/client";
 import DashboardRoute from "../route.info";
 import Branded from "@/types/branded.type";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { match } from "ts-pattern";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import store from "@/stores/manage-workspace-users";
 import { useSelector } from "@xstate/store/react";
-import useDebounce from "@/hooks/use-debounce";
 import { Input } from "@/components/ui/input";
 import { Edit3, Loader, MoreVertical } from "lucide-react";
 import { iife } from "@/lib/utils";
@@ -14,13 +12,13 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import EditWorkspaceMember from "./edit-member-dialog";
 import { useSessionProvider } from "@/providers/session.provider";
+import { Match } from "effect";
 
 const MembersList = () => {
   const { workspaceId } = DashboardRoute.useParams();
@@ -56,8 +54,8 @@ const MembersList = () => {
         className="mb-4"
       />
       <ScrollArea className="h-[300px]">
-        {match(query)
-          .with({ status: "success" }, ({ data }) => (
+        {Match.value(query).pipe(
+          Match.when({ status: "success" }, ({ data }) => (
             <div>
               {iife(() => {
                 const filteredMembers = data.filter(
@@ -158,14 +156,17 @@ const MembersList = () => {
                 );
               })}
             </div>
-          ))
-          .with({ status: "pending" }, () => (
+          )),
+          Match.when({ status: "error" }, ({ error }) => (
+            <div>{error.message}</div>
+          )),
+          Match.when({ status: "pending" }, ({ error }) => (
             <div className="py-12 flex items-center justify-center">
               <Loader className="shrink-0 size-4 animate-spin" />
             </div>
-          ))
-          .with({ status: "error" }, ({ error }) => <div>{error.message}</div>)
-          .exhaustive()}
+          )),
+          Match.exhaustive,
+        )}
       </ScrollArea>
     </>
   );
