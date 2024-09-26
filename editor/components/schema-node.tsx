@@ -1,84 +1,28 @@
 "use client";
 
+import { Effect } from "effect";
 import SchemaNode from "../dynamic-variables/components";
 import { useInvoiceEditorContext } from "../editor-context";
+import { effective } from "@/lib/effect.stuff";
+import { succeed } from "effect/STM";
+import { createSchemaVariables } from "../dynamic-variables/schema-variable";
+import { deepKeys } from "deeks";
 
-const items = [
-  {
-    value: "name",
-  },
-  {
-    value: "email",
-  },
-  {
-    value: "phone",
-  },
-  {
-    value: "address",
-  },
-  {
-    value: "city",
-  },
-  {
-    value: "state",
-  },
-  {
-    value: "zip",
-  },
-  {
-    value: "country",
-  },
-  {
-    value: "invoiceNumber",
-  },
-  {
-    value: "invoiceDate",
-  },
-  {
-    value: "dueDate",
-  },
-  {
-    value: "notes",
-  },
-  {
-    value: "total",
-  },
-  {
-    value: "tax",
-  },
-  {
-    value: "discount",
-  },
-  {
-    value: "items",
-  },
-  {
-    value: "item",
-  },
-  {
-    value: "description",
-  },
-  {
-    value: "quantity",
-  },
-  {
-    value: "price",
-  },
-  {
-    value: "amount",
-  },
-];
+const getSchemaItems = (str: string) => {
+  return createSchemaVariables(deepKeys(JSON.parse(str)));
+};
 
-const SchemaVariables = () => {
+const SchemaVariables = ({ json }: { json: string }) => {
   const editor = useInvoiceEditorContext();
+  const schemaItems = getSchemaItems(json);
 
   return (
     <SchemaNode.root editor={editor}>
       <SchemaNode.List>
         <SchemaNode.Empty>No variables available</SchemaNode.Empty>
-        {items.map((el) => (
+        {schemaItems.map((el) => (
           <SchemaNode.item
-            onCommand={(v) => {}}
+            onCommand={el.command}
             key={el.value}
             value={el.value}
           >

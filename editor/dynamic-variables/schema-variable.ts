@@ -13,39 +13,6 @@ import {
 import { KeyboardEvent } from "react";
 import { PluginKey } from "@tiptap/pm/state";
 
-export const createSchemaVariables = (items: string[]): SchemaVariable[] => {
-  return items.map((item) => ({
-    value: item,
-    command: ({ editor, range }) => {},
-  }));
-};
-
-const getSchemaVariableExtension = ({ items }: { items: SchemaVariable[] }) =>
-  Extension.create<SchemaVariableSuggestionOptions>({
-    name: "schemaVariable",
-    addOptions: () => {
-      return {
-        suggestion: {
-          char: "{{",
-          command: ({ editor, range, props }) => {
-            props.command({ editor, range });
-          },
-          render: renderItems,
-          items: () => items,
-          pluginKey: new PluginKey("schemaVariable"),
-        },
-      };
-    },
-    addProseMirrorPlugins() {
-      return [
-        Suggestion({
-          editor: this.editor,
-          ...this.options.suggestion,
-        }),
-      ];
-    },
-  });
-
 const renderItems: SuggestionOptions["render"] = (
   elementRef?: React.RefObject<Element> | null,
 ) => {
@@ -108,6 +75,42 @@ const renderItems: SuggestionOptions["render"] = (
   };
 };
 
+export const createSchemaVariables = (items: string[]): SchemaVariable[] => {
+  return items.map((item) => ({
+    value: item,
+    command: ({ editor, range }) => {
+      // empty space closes the suggestion
+      const content = `{{${item}}}` + " ";
+      editor.chain().focus().deleteRange(range).insertContent(content).run();
+    },
+  }));
+};
+
+const SchemaVariableExtension =
+  Extension.create<SchemaVariableSuggestionOptions>({
+    name: "schemaVariable",
+    addOptions: () => {
+      return {
+        suggestion: {
+          char: "{{",
+          command: ({ editor, range, props }) => {
+            props.command({ editor, range });
+          },
+          pluginKey: new PluginKey("schemaVariable"),
+          render: renderItems,
+        },
+      };
+    },
+    addProseMirrorPlugins() {
+      return [
+        Suggestion({
+          editor: this.editor,
+          ...this.options.suggestion,
+        }),
+      ];
+    },
+  });
+
 export const enableKeyNavigationForSchemaVariablesInEditor = (
   e: KeyboardEvent,
 ) => {
@@ -119,4 +122,4 @@ export const enableKeyNavigationForSchemaVariablesInEditor = (
   }
 };
 
-export default getSchemaVariableExtension;
+export default SchemaVariableExtension;
