@@ -10,7 +10,6 @@ import {
   SchemaOut,
   navigationKeys,
 } from "./components";
-import { KeyboardEvent } from "react";
 import { PluginKey } from "@tiptap/pm/state";
 
 const renderItems: SuggestionOptions["render"] = (

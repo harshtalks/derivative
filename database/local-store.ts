@@ -1,5 +1,6 @@
 // Local DB to preserve template data
 import Branded from "@/types/branded.type";
+import { Effect } from "effect";
 import { openDB, DBSchema } from "idb";
 
 export interface InvoiceMarkup extends DBSchema {
@@ -7,7 +8,6 @@ export interface InvoiceMarkup extends DBSchema {
     value: {
       templateId: string;
       markup: string;
-      fontFamily: string;
       lastUpdated: number;
     };
     key: string;
@@ -26,7 +26,7 @@ export const localStore = async () =>
     },
   });
 
-export const getDraft = async (templateId: Branded.TemplateId) => {
+export const getLocalDraft = async (templateId: Branded.TemplateId) => {
   try {
     const db = await localStore();
     const output = await db.getFromIndex("invoice-markup", "by-id", templateId);
@@ -40,14 +40,12 @@ export const getDraft = async (templateId: Branded.TemplateId) => {
   }
 };
 
-export const updateDraft = async (
+export const updateLocalDraft = async (
   templateId: Branded.TemplateId,
   markup: string,
-  fontFamily: string,
 ) => {
   try {
     const result = (await localStore()).put("invoice-markup", {
-      fontFamily: fontFamily,
       markup: markup,
       templateId: templateId,
       lastUpdated: Date.now(),
@@ -58,3 +56,14 @@ export const updateDraft = async (
     return null;
   }
 };
+
+export const getLocalMarkup = (templateId: Branded.TemplateId) =>
+  Effect.promise(() => getLocalDraft(templateId)).pipe(
+    Effect.map((value) =>
+      value
+        ? Effect.succeed(value)
+        : Effect.fail(new Error("No local draft found")),
+    ),
+    Effect.flatMap((v) => v),
+    Effect.runPromise,
+  );

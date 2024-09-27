@@ -25,7 +25,7 @@ const Error = ({ error, className }: { error: string; className?: string }) => {
         className,
       )}
     >
-      <div className="text-red-500 text-sm">Loading...</div>
+      <div className="text-red-500 text-sm">{error}</div>
     </div>
   );
 };
