@@ -15,7 +15,6 @@ import Playground from "./playground";
 
 const Editor = () => {
   const { editor } = useInvoiceEditor();
-  const { url } = useSelector(imageStore, (state) => state.context);
   const { templateId, workspaceId } = TemplatePageEditorRouteInfo.useParams();
   const templateQuery = clientApiTrpc.template.get.useQuery({
     templateId: Branded.TemplateId(templateId),

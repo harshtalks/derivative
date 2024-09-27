@@ -19,8 +19,10 @@ import Branded from "@/types/branded.type";
 import { getLocalMarkup } from "@/database/local-store";
 import TemplatePageEditorRouteInfo from "@/app/(routes)/workspaces/[workspaceId]/templates/[templateId]/editor/route.info";
 import { useTypedParams } from "tempeh";
-import { Match } from "effect";
+import { Effect, Match } from "effect";
 import Query from "@/components/query";
+import { useEffect } from "react";
+import Content from "./content";
 
 export const playgroundQueryOptions = ({
   templateId,
@@ -37,11 +39,8 @@ const Playground = ({
 }: {
   data: Awaited<ReturnType<typeof serverApiTrpc.template.get>>;
 }) => {
+  const { templateId } = useTypedParams(TemplatePageEditorRouteInfo);
   const editor = useInvoiceEditorContext();
-  const { templateId, workspaceId } = useTypedParams(
-    TemplatePageEditorRouteInfo,
-  );
-
   const query = useQuery(
     playgroundQueryOptions({
       templateId: Branded.TemplateId(templateId),
@@ -93,32 +92,25 @@ const Playground = ({
           </SlashCmd.Cmd>
         </SlashCmd.Root>
         {Match.value(query).pipe(
-          Match.when({ status: "success" }, ({ data }) => (
-            <EditorContent
-              style={{
-                maxWidth: "21cm",
-                minHeight: "29.7cm",
-                maxHeight: "29.7cm",
-                minWidth: "21cm",
-              }}
-              className="border p-12 bg-white rounded-md shadow-2xl"
-              value="<p>hi {{invoice.invoiceNumber}} </p>"
-              content="<p>hi {{invoice.invoiceNumber}} </p>"
-              editor={editor}
-            />
-          )),
+          Match.when({ status: "success" }, ({ data: localData }) => {
+            return Effect.void.pipe(
+              Effect.andThen(() => {
+                const latestUpdated =
+                  (data.template_markup?.updatedAt || 0) > localData.lastUpdated
+                    ? data.template_markup?.markup
+                    : localData.markup;
+
+                return latestUpdated;
+              }),
+              Effect.andThen((markup) => {
+                return <Content value={markup || ""} />;
+              }),
+              Effect.runSync,
+            );
+          }),
           Match.when({ status: "pending" }, () => <Query.Loading />),
-          Match.when({ status: "error" }, ({ error }) => (
-            <EditorContent
-              style={{
-                maxWidth: "21cm",
-                minHeight: "29.7cm",
-                maxHeight: "29.7cm",
-                minWidth: "21cm",
-              }}
-              className="border p-12 bg-white rounded-md shadow-2xl"
-              editor={editor}
-            />
+          Match.when({ status: "error" }, () => (
+            <Content value={data.template_markup?.markup || ""} />
           )),
           Match.exhaustive,
         )}

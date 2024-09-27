@@ -4,10 +4,10 @@ import { cn } from "@/lib/utils";
 import { ImageAligner } from "@harshtalks/image-tiptap";
 import { BubbleMenu, Editor } from "@tiptap/react";
 import { AlignCenter, AlignLeft, AlignRight } from "lucide-react";
-import useInvoiceEditor from "../use-invoice-editor";
 import { useSelector } from "@xstate/store/react";
 import imageStore from "../image-store";
 import { useEffect } from "react";
+import { useInvoiceEditorContext } from "../editor-context";
 
 const ImageMenu = () => {
   const btnClass = buttonVariants({
@@ -18,7 +18,7 @@ const ImageMenu = () => {
     ),
   });
 
-  const { editor } = useInvoiceEditor();
+  const editor = useInvoiceEditorContext();
   const { url } = useSelector(imageStore, (state) => state.context);
 
   useEffect(() => {
