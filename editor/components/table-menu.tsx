@@ -14,13 +14,10 @@ const TableMenu = () => {
       shouldShow={({ editor }) => {
         const { state } = editor;
         const { selection } = state;
-        if (!editor.isActive("table")) {
-          return true;
-        }
         let depth = selection.$anchor.depth;
         while (depth > 0) {
           const node = selection.$anchor.node(depth);
-          if (node.type.name === "table") {
+          if (["table", "tableCell", "tableRow"].includes(node.type.name)) {
             return true;
           }
           depth--;
