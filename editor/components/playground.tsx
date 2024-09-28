@@ -23,6 +23,7 @@ import { Effect, Match } from "effect";
 import Query from "@/components/query";
 import { useEffect } from "react";
 import Content from "./content";
+import TableMenu from "./table-menu";
 
 export const playgroundQueryOptions = ({
   templateId,
@@ -62,6 +63,7 @@ const Playground = ({
       <TopEditorOptions />
       <div>
         <BubbleMenuWrapper />
+        <TableMenu />
         <SchemaVariables json={data.json} />
         <ImageMenu />
         <SlashCmd.Root editor={editor}>

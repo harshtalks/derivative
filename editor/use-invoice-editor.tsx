@@ -34,6 +34,7 @@ import { updateLocalDraft } from "@/database/local-store";
 import { useTypedParams } from "tempeh";
 import TemplatePageRouteInfo from "@/app/(routes)/workspaces/[workspaceId]/templates/[templateId]/route.info";
 import Branded from "@/types/branded.type";
+import HorizontalRule from "@tiptap/extension-horizontal-rule";
 
 const useInvoiceEditor = () => {
   const { templateId } = useTypedParams(TemplatePageRouteInfo);
@@ -93,6 +94,7 @@ const useInvoiceEditor = () => {
       }),
       LinkExtension,
       SchemaVariables,
+      HorizontalRule,
     ],
 
     editorProps: {
