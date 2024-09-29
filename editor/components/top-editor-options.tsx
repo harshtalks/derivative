@@ -34,7 +34,7 @@ import { Level } from "@tiptap/extension-heading";
 const TopEditorOptions = () => {
   const editor = useInvoiceEditorContext();
   return (
-    <div className="p-2 fixed left-1/2  bg-white -translate-x-1/2 w-fit bottom-[40px] shadow-2xl rounded-md">
+    <div className="p-2 fixed left-1/2 bg-white z-20 -translate-x-1/2 w-fit bottom-[40px] shadow-2xl rounded-md">
       <div className="flex items-center gap-2">
         <BubbleMenuBtn
           onClick={() => editor.chain().focus().toggleBold().run()}
