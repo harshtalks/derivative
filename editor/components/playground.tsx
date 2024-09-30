@@ -16,7 +16,7 @@ import { Button } from "@/components/ui/button";
 import { Loader, LucideFolderSync } from "lucide-react";
 import { queryOptions, useQuery, useQueryClient } from "@tanstack/react-query";
 import Branded from "@/types/branded.type";
-import { getLocalMarkup } from "@/database/local-store";
+import { getLocalMarkup, saveLocalMarkup } from "@/database/local-store";
 import TemplatePageEditorRouteInfo from "@/app/(routes)/workspaces/[workspaceId]/templates/[templateId]/editor/route.info";
 import { useTypedParams } from "tempeh";
 import { Effect, Match } from "effect";
@@ -73,7 +73,48 @@ const Playground = ({
   return (
     <div className="p-2 flex flex-col pb-24 gap-4 items-center justify-center overflow-y-auto w-full">
       <div className="flex gap-4 pb-8 items-center justify-end w-full">
-        <Button size="sm">Reset</Button>
+        {Match.value(data).pipe(
+          Match.when(
+            { template_markup: (template_markup) => !!template_markup },
+            ({ template_markup: { markup } }) => (
+              <Button
+                size="sm"
+                onClick={async () => {
+                  await saveLocalMarkup({
+                    templateId: Branded.TemplateId(templateId),
+                    markup: markup,
+                  });
+                  queryClient.resetQueries({
+                    queryKey: playgroundQueryOptions({
+                      templateId: Branded.TemplateId(templateId),
+                    }).queryKey,
+                  });
+                }}
+                variant="secondary"
+              >
+                Reset to server markup
+              </Button>
+            ),
+          ),
+          Match.orElse(() => null),
+        )}
+        <Button
+          size="sm"
+          onClick={async () => {
+            await saveLocalMarkup({
+              templateId: Branded.TemplateId(templateId),
+              markup: "",
+            });
+            queryClient.resetQueries({
+              queryKey: playgroundQueryOptions({
+                templateId: Branded.TemplateId(templateId),
+              }).queryKey,
+            });
+          }}
+          variant="destructive"
+        >
+          Reset
+        </Button>
         <Button
           size="sm"
           onClick={async () => {

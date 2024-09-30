@@ -30,11 +30,11 @@ import SchemaVariables, {
   enableKeyNavigationForSchemaVariablesInEditor,
 } from "./dynamic-variables/schema-variable";
 import { generateHTML } from "@tiptap/html";
-import { updateLocalDraft } from "@/database/local-store";
 import { useTypedParams } from "tempeh";
 import TemplatePageRouteInfo from "@/app/(routes)/workspaces/[workspaceId]/templates/[templateId]/route.info";
 import Branded from "@/types/branded.type";
 import HorizontalRule from "@tiptap/extension-horizontal-rule";
+import { saveLocalMarkup } from "@/database/local-store";
 
 const useInvoiceEditor = () => {
   const { templateId } = useTypedParams(TemplatePageRouteInfo);
@@ -114,7 +114,10 @@ const useInvoiceEditor = () => {
     onUpdate: async ({ editor }) => {
       const { state } = editor;
       const html = editor.getHTML();
-      await updateLocalDraft(Branded.TemplateId(templateId), html);
+      await saveLocalMarkup({
+        templateId: Branded.TemplateId(templateId),
+        markup: html,
+      });
     },
   });
 
