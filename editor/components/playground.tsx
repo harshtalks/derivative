@@ -13,8 +13,8 @@ import SchemaVariables from "./schema-node";
 import TopEditorOptions from "./top-editor-options";
 import useInvoiceEditor from "../use-invoice-editor";
 import { Button } from "@/components/ui/button";
-import { LucideFolderSync } from "lucide-react";
-import { queryOptions, useQuery } from "@tanstack/react-query";
+import { Loader, LucideFolderSync } from "lucide-react";
+import { queryOptions, useQuery, useQueryClient } from "@tanstack/react-query";
 import Branded from "@/types/branded.type";
 import { getLocalMarkup } from "@/database/local-store";
 import TemplatePageEditorRouteInfo from "@/app/(routes)/workspaces/[workspaceId]/templates/[templateId]/editor/route.info";
@@ -24,6 +24,11 @@ import Query from "@/components/query";
 import { useEffect } from "react";
 import Content from "./content";
 import TableMenu from "./table-menu";
+import clientApiTrpc from "@/trpc/client";
+import { toast } from "sonner";
+import { useSelector } from "@xstate/store/react";
+import { fontStore } from "@/stores/font-store";
+import { cn } from "@/lib/utils";
 
 export const playgroundQueryOptions = ({
   templateId,
@@ -40,7 +45,9 @@ const Playground = ({
 }: {
   data: Awaited<ReturnType<typeof serverApiTrpc.template.get>>;
 }) => {
-  const { templateId } = useTypedParams(TemplatePageEditorRouteInfo);
+  const { templateId, workspaceId } = useTypedParams(
+    TemplatePageEditorRouteInfo,
+  );
   const editor = useInvoiceEditorContext();
   const query = useQuery(
     playgroundQueryOptions({
@@ -48,17 +55,60 @@ const Playground = ({
     }),
   );
 
+  const queryClient = useQueryClient();
+
+  // Mutation
+  const mutation = clientApiTrpc.markup.add.useMutation({
+    onSettled: () => {
+      queryClient.resetQueries({
+        queryKey: playgroundQueryOptions({
+          templateId: Branded.TemplateId(templateId),
+        }).queryKey,
+      });
+    },
+  });
+
+  const font = useSelector(fontStore, (state) => state.context.editorFont);
+
   return (
     <div className="p-2 flex flex-col pb-24 gap-4 items-center justify-center overflow-y-auto w-full">
       <div className="flex gap-4 pb-8 items-center justify-end w-full">
-        <div className="inline-flex items-center gap-1">
-          <LucideFolderSync className="shrink-0 size-4" />
-          <p className="text-sm text-muted-foreground">
-            Editor is not synced with server
-          </p>
-        </div>
         <Button size="sm">Reset</Button>
-        <Button size="sm">Save Markup</Button>
+        <Button
+          size="sm"
+          onClick={async () => {
+            const markup = editor.getHTML();
+            toast.promise(
+              data.template_markup
+                ? mutation.mutateAsync({
+                    id: data.template_markup.id,
+                    fontFamily: data.template_markup.fontFamily,
+                    templateId: templateId,
+                    markup: markup,
+                    workspaceId: workspaceId,
+                    updatedAt: Date.now(),
+                  })
+                : mutation.mutateAsync({
+                    fontFamily: font,
+                    templateId: templateId,
+                    markup: markup,
+                    workspaceId: workspaceId,
+                  }),
+              {
+                success: "Markup saved successfully",
+                error: "Failed to save markup",
+                loading: "Saving markup...",
+              },
+            );
+          }}
+          disabled={mutation.isPending}
+          className="inline-flex items-center"
+        >
+          {mutation.isPending && (
+            <Loader className="size-4 shrink-0 animate-spin mr-2" />
+          )}
+          Save Markup
+        </Button>
       </div>
       <TopEditorOptions />
       <div>
