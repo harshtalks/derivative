@@ -17,7 +17,7 @@ const Hero = async () => {
     <div
       className={clsx(
         "absolute inset-0 h-full w-full items-center dark:[background:radial-gradient(125%_125%_at_50%_10%,#000_40%,#63e_100%)]",
-        "bg-white [background:radial-gradient(125%_125%_at_50%_10%,#fff_40%,#63e_100%)]"
+        "bg-white [background:radial-gradient(125%_125%_at_50%_10%,#fff_40%,#63e_100%)]",
       )}
     >
       <RetroGrid />
@@ -27,7 +27,6 @@ const Hero = async () => {
       />
       <Container>
         <div className="relative pt-32 sm:pt-44 ml-auto">
-          <Meteors />
           <div className="lg:w-2/3 text-center mx-auto">
             <AnimatedGradientText className="mb-4">
               Announcing Invoicing APIs {"->"}

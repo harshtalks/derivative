@@ -11,6 +11,7 @@ import {
   navigationKeys,
 } from "./components";
 import { PluginKey } from "@tiptap/pm/state";
+import { ReactNode } from "react";
 
 const renderItems: SuggestionOptions["render"] = (
   elementRef?: React.RefObject<Element> | null,
@@ -74,9 +75,13 @@ const renderItems: SuggestionOptions["render"] = (
   };
 };
 
-export const createSchemaVariables = (items: string[]): SchemaVariable[] => {
+export const createSchemaVariables = (
+  items: string[],
+  getRenderedValue: (item: string) => ReactNode,
+): SchemaVariable[] => {
   return items.map((item) => ({
     value: item,
+    label: getRenderedValue(item),
     command: ({ editor, range }) => {
       // empty space closes the suggestion
       const content = `{{${item}}}` + " ";

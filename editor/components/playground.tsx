@@ -1,6 +1,6 @@
 import serverApiTrpc from "@/trpc/server";
 import { SlashCmd, SlashCmdProvider } from "@harshtalks/slash-tiptap";
-import { EditorContent } from "@tiptap/react";
+import { Editor, EditorContent } from "@tiptap/react";
 import {
   InvoiceEditorContextProvider,
   useInvoiceEditorContext,
@@ -21,7 +21,7 @@ import TemplatePageEditorRouteInfo from "@/app/(routes)/workspaces/[workspaceId]
 import { useTypedParams } from "tempeh";
 import { Effect, Match } from "effect";
 import Query from "@/components/query";
-import { useEffect } from "react";
+import { useEffect, useReducer, useState } from "react";
 import Content from "./content";
 import TableMenu from "./table-menu";
 import clientApiTrpc from "@/trpc/client";
@@ -29,6 +29,12 @@ import { toast } from "sonner";
 import { useSelector } from "@xstate/store/react";
 import { fontStore } from "@/stores/font-store";
 import { cn } from "@/lib/utils";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import Handlebars from "handlebars";
+import Schema from "../schema";
+import { deepKeys } from "deeks";
+const template = Handlebars.compile("Name: {{name}}");
 
 export const playgroundQueryOptions = ({
   templateId,
@@ -38,6 +44,7 @@ export const playgroundQueryOptions = ({
   queryOptions({
     queryKey: ["template.get", templateId],
     queryFn: async () => getLocalMarkup(templateId),
+    refetchOnWindowFocus: false,
   });
 
 const Playground = ({
@@ -55,16 +62,23 @@ const Playground = ({
     }),
   );
 
+  const [reviewMode, toggleReviewMode] = useState(false);
+
+  const trpcUtils = clientApiTrpc.useUtils();
+
   const queryClient = useQueryClient();
 
   // Mutation
   const mutation = clientApiTrpc.markup.add.useMutation({
     onSettled: () => {
-      queryClient.resetQueries({
+      queryClient.invalidateQueries({
         queryKey: playgroundQueryOptions({
           templateId: Branded.TemplateId(templateId),
         }).queryKey,
       });
+    },
+    onSuccess: () => {
+      trpcUtils.template.get.invalidate();
     },
   });
 
@@ -73,6 +87,24 @@ const Playground = ({
   return (
     <div className="p-2 flex flex-col pb-24 gap-4 items-center justify-center overflow-y-auto w-full">
       <div className="flex gap-4 pb-8 items-center justify-end w-full">
+        <Label
+          onClick={() => {
+            console.log(
+              new Schema(editor, {
+                json: JSON.parse(data.json),
+                keys: deepKeys(JSON.parse(data.json), {
+                  expandArrayObjects: true,
+                  ignoreEmptyArraysWhenExpanding: true,
+                  ignoreEmptyArrays: true,
+                }),
+              }).content,
+            );
+          }}
+          className="inline-flex items-center gap-2 justify-self-start"
+        >
+          Review{" "}
+          <Switch checked={reviewMode} onCheckedChange={toggleReviewMode} />{" "}
+        </Label>
         {Match.value(data).pipe(
           Match.when(
             { template_markup: (template_markup) => !!template_markup },
@@ -103,7 +135,7 @@ const Playground = ({
           onClick={async () => {
             await saveLocalMarkup({
               templateId: Branded.TemplateId(templateId),
-              markup: "",
+              markup: data.template_markup?.markup ?? "",
             });
             queryClient.resetQueries({
               queryKey: playgroundQueryOptions({
@@ -113,7 +145,7 @@ const Playground = ({
           }}
           variant="destructive"
         >
-          Reset
+          Reset Local Markup
         </Button>
         <Button
           size="sm"
@@ -193,17 +225,27 @@ const Playground = ({
                     ? data.template_markup?.markup
                     : localData.markup;
 
-                return latestUpdated;
+                return latestUpdated || "";
               }),
               Effect.andThen((markup) => {
-                return <Content value={markup || ""} />;
+                return (
+                  <Content
+                    value={markup}
+                    readOnly={reviewMode}
+                    json={data.json}
+                  />
+                );
               }),
               Effect.runSync,
             );
           }),
           Match.when({ status: "pending" }, () => <Query.Loading />),
           Match.when({ status: "error" }, () => (
-            <Content value={data.template_markup?.markup || ""} />
+            <Content
+              value={data.template_markup?.markup || ""}
+              readOnly={reviewMode}
+              json={data.json}
+            />
           )),
           Match.exhaustive,
         )}

@@ -32,7 +32,9 @@ const page = async (props: RouteProps) => {
                     Template Editor
                   </h1>
                   <p className="max-w-[700px] text-muted-foreground">
-                    Edit your template, fill your schema values and save.
+                    Edit your template, fill your schema values and save. Local
+                    First Editor with Realtime Collaboration feature coming
+                    soon.
                   </p>
                 </div>
                 <EditorSidebar />

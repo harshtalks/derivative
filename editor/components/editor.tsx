@@ -16,10 +16,15 @@ import Playground from "./playground";
 const Editor = () => {
   const { editor } = useInvoiceEditor();
   const { templateId, workspaceId } = TemplatePageEditorRouteInfo.useParams();
-  const templateQuery = clientApiTrpc.template.get.useQuery({
-    templateId: Branded.TemplateId(templateId),
-    workspaceId: Branded.WorkspaceId(workspaceId),
-  });
+  const templateQuery = clientApiTrpc.template.get.useQuery(
+    {
+      templateId: Branded.TemplateId(templateId),
+      workspaceId: Branded.WorkspaceId(workspaceId),
+    },
+    {
+      refetchOnWindowFocus: false,
+    },
+  );
 
   if (!editor) {
     return null;
