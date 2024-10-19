@@ -34,8 +34,6 @@ const Content = ({
     }
   }, [readOnly]);
 
-  useEffect(() => {}, [readOnly]);
-
   return (
     <>
       <AnimatePresence>
@@ -64,10 +62,10 @@ const Content = ({
 
       <EditorContent
         style={{
-          maxWidth: "21cm",
+          // min width and max width being set, minimum A4 size.
           minHeight: "29.7cm",
-          maxHeight: "29.7cm",
           minWidth: "21cm",
+          maxWidth: "21cm",
         }}
         data-read-only={readOnly}
         className="border data-[read-only=true]:border-black p-12 bg-white rounded-md transition-all duration-200 shadow-2xl"

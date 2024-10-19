@@ -26,7 +26,7 @@ const isArrayKey = (obj: NestedObject, key: string): boolean => {
 const getSchemaItems = (str: string) => {
   const json = JSON.parse(str);
   return createSchemaVariables(
-    deepKeys(json, { expandArrayObjects: true }),
+    deepKeys(json, { expandArrayObjects: false, ignoreEmptyArrays: true }),
     (item) =>
       isArrayKey(json, item) ? (
         <div>

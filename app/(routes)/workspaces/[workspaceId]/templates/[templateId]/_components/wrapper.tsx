@@ -66,7 +66,7 @@ export function TemplatePage({
   defaultCollapsed = false,
   navCollapsedSize,
 }: MailProps) {
-  const [isCollapsed, setIsCollapsed] = React.useState(defaultCollapsed);
+  const [isCollapsed] = React.useState(defaultCollapsed);
   const [mail] = useMail();
   const { templateId, workspaceId } = TemplatePageRouteInfo.useParams();
 
@@ -284,7 +284,7 @@ export function TemplatePage({
         </TooltipProvider>
       );
     }),
-    Match.when({ status: "pending" }, () => (
+    Match.when({ status: "pending", isLoading: true }, () => (
       <div className="w-full py-32 flex flex-col items-center justify-center">
         <Loader className="animate-spin shrink-0 size-4" />
         <p className="text-center text-muted-foreground text-xs pt-4">
