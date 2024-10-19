@@ -36,6 +36,20 @@
       "when": 1725469828223,
       "tag": "0004_clean_lyja",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "6",
+      "when": 1729328708832,
+      "tag": "0005_fantastic_captain_stacy",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1729328723373,
+      "tag": "0006_talented_hellcat",
+      "breakpoints": true
     }
   ]
 }

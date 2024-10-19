@@ -202,19 +202,19 @@ export function TemplatePage({
                   <div className="border-r border-l max-w-[500px]">
                     <Tabs defaultValue="all">
                       <div className="flex items-center px-4 py-2">
-                        <h1 className="text-xl font-bold">Inbox</h1>
+                        <h1 className="text-xl font-bold">Invoices</h1>
                         <TabsList className="ml-auto">
                           <TabsTrigger
                             value="all"
                             className="text-zinc-600 dark:text-zinc-200"
                           >
-                            All mail
+                            All
                           </TabsTrigger>
                           <TabsTrigger
                             value="unread"
                             className="text-zinc-600 dark:text-zinc-200"
                           >
-                            Unread
+                            Delivered
                           </TabsTrigger>
                         </TabsList>
                       </div>

@@ -43,6 +43,8 @@ const updatedAtSchema = integer("updated_at").default(Date.now());
 
 export const templateStatus = ["draft", "active", "archived"] as const;
 
+export const invoiceRemarkVisibility = ["public", "private"] as const;
+
 export const users = sqliteTable("users", {
   id: text("id")
     .primaryKey()
@@ -252,6 +254,43 @@ export const invoices = sqliteTable("invoices", {
     .references(() => templates.id, { onDelete: "cascade" }),
 });
 
+export const invoiceRemarks = sqliteTable("invoiceRemarks", {
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => `remark_${crypto.randomUUID()}`),
+  invoiceId: text("invoice_id")
+    .notNull()
+    .references(() => invoices.id, { onDelete: "cascade" }),
+  // member id is the member who added the remark, but optional as it can be added by the user as well
+  memberId: text("member_id").references(() => members.id, {
+    onDelete: "no action",
+  }),
+  remark: text("remark").notNull(),
+  type: text("type", { enum: ["internal", "external"] }).notNull(),
+  visibility: text("visibility", { enum: invoiceRemarkVisibility }).notNull(),
+  priority: integer("priority").default(0),
+  createdAt: createdAtSchema,
+  updatedAt: updatedAtSchema,
+});
+
+export const invoiceMetadata = sqliteTable("invoiceMetadata", {
+  id: text("id")
+    .primaryKey()
+    .$defaultFn(() => `inv_metadata_${crypto.randomUUID()}`),
+  invoiceId: text("invoice_id")
+    .notNull()
+    .references(() => invoices.id, { onDelete: "cascade" }),
+  sentTo: text("sent_to").notNull(),
+  lastUpdated: integer("last_updated").notNull(),
+  cc: text("cc", { mode: "json" }).$type<string[]>(),
+  bcc: text("bcc", { mode: "json" }).$type<string[]>(),
+  subject: text("subject").notNull(),
+  body: text("body").notNull(),
+  openedAt: integer("opened_at"),
+  createdAt: createdAtSchema,
+  updatedAt: updatedAtSchema,
+});
+
 /**
  * Relations
  */
@@ -306,7 +345,7 @@ export const workspaceMetadataRelations = relations(
 );
 
 // member relations
-export const memberRelations = relations(members, ({ one }) => ({
+export const memberRelations = relations(members, ({ one, many }) => ({
   user: one(users, {
     fields: [members.userId],
     references: [users.id],
@@ -315,6 +354,7 @@ export const memberRelations = relations(members, ({ one }) => ({
     fields: [members.workspaceId],
     references: [workspaces.id],
   }),
+  invoice_remarks: many(invoiceRemarks),
 }));
 
 // template relations
@@ -348,10 +388,33 @@ export const templateMetadataRelations = relations(
   }),
 );
 
-export const invoiceRelations = relations(invoices, ({ one }) => ({
+export const invoiceRelations = relations(invoices, ({ one, many }) => ({
   template: one(templates, {
     fields: [invoices.templateId],
     references: [templates.id],
+  }),
+  remarks: many(invoiceRemarks),
+  metadata: one(invoiceMetadata),
+}));
+
+export const invoiceMetadataRelations = relations(
+  invoiceMetadata,
+  ({ one }) => ({
+    invoice: one(invoices, {
+      fields: [invoiceMetadata.invoiceId],
+      references: [invoices.id],
+    }),
+  }),
+);
+
+export const invoiceRemarkRelations = relations(invoiceRemarks, ({ one }) => ({
+  invoice: one(invoices, {
+    fields: [invoiceRemarks.invoiceId],
+    references: [invoices.id],
+  }),
+  member: one(members, {
+    fields: [invoiceRemarks.memberId],
+    references: [members.id],
   }),
 }));
 
