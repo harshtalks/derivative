@@ -17,11 +17,13 @@ import { User2, UserIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import SignInPage from "../(routes)/sign-in/route.info";
 import SettingsRouteInfo from "../(routes)/settings/route.info";
+import AddNewWorkspaceRoute from "../(routes)/workspaces/add-new-workspace/route.info";
 
 export function UserNav() {
   const { data: user } = client.user.get.useQuery();
   const settingsPageRouter = SettingsRouteInfo.useRouter(useRouter);
   const signInPageRouter = SignInPage.useRouter(useRouter);
+  const addnewWorkspaceRouter = AddNewWorkspaceRoute.useRouter(useRouter);
 
   const { mutate } = client.user.logout.useMutation({
     onSettled: () => {
@@ -63,14 +65,7 @@ export function UserNav() {
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuGroup>
-            <DropdownMenuItem>
-              Profile
-              <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              Billing
-              <DropdownMenuShortcut>⌘B</DropdownMenuShortcut>
-            </DropdownMenuItem>
+            <DropdownMenuItem>Profile</DropdownMenuItem>
             <DropdownMenuItem
               onClick={() =>
                 settingsPageRouter.push({
@@ -79,9 +74,16 @@ export function UserNav() {
               }
             >
               Settings
-              <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
             </DropdownMenuItem>
-            <DropdownMenuItem>New Team</DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => {
+                addnewWorkspaceRouter.push({
+                  params: {},
+                });
+              }}
+            >
+              New Workspace
+            </DropdownMenuItem>
           </DropdownMenuGroup>
           <DropdownMenuSeparator />
           <DropdownMenuItem
@@ -90,7 +92,6 @@ export function UserNav() {
             }}
           >
             Log out
-            <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
           </DropdownMenuItem>
         </DropdownMenuContent>
       ) : (
