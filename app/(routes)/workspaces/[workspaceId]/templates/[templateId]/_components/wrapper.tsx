@@ -1,51 +1,39 @@
 "use client";
 
-import * as React from "react";
 import {
-  AlertCircle,
-  Archive,
-  ArchiveX,
   Clock,
-  Edit3,
-  File,
-  Inbox,
-  Info,
-  Loader,
-  MessagesSquare,
-  Search,
-  Send,
-  ShoppingCart,
-  Trash2,
-  Users2,
   Code,
-  Workflow,
+  Edit3,
+  Inbox,
+  Loader,
+  Search,
   Sheet,
+  Workflow,
 } from "lucide-react";
+import * as React from "react";
 
-import { cn } from "@/lib/utils";
 import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
 
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { MailDisplay } from "./display";
-import { Nav } from "./nav";
-import { type Mail } from "./data";
-import { MailList } from "./list";
-import { AccountSwitcher } from "./account";
-import { useMail } from "./use-mail";
-import { ThemeToggle } from "@/app/_components/theme-toggle";
 import clientApiTrpc from "@/trpc/client";
-import TemplatePageRouteInfo from "../route.info";
 import Branded from "@/types/branded.type";
 import { formatDistanceToNow } from "date-fns";
-import { Badge } from "@/components/ui/badge";
+import { Match } from "effect";
 import TemplatePageEditorRouteInfo from "../editor/route.info";
-import { Button } from "@/components/ui/button";
+import TemplatePageRouteInfo from "../route.info";
+import { type Mail } from "./data";
+import { MailDisplay } from "./display";
+import { MailList } from "./list";
+import { Nav } from "./nav";
+import { useMail } from "./use-mail";
 import Integration from "./wrapper-components/integration";
 import Schema from "./wrapper-components/schema";
 import TemplateMarkup from "./wrapper-components/template-markup";
-import { Match } from "effect";
 
 interface MailProps {
   accounts: {
@@ -83,18 +71,6 @@ export function TemplatePage({
         <TooltipProvider delayDuration={0}>
           <div className="flex h-[calc(100svh-100px)] overflow-hidden border-b items-stretch">
             <div className={cn("min-w-[350px] max-w-[350px]")}>
-              <div
-                className={cn(
-                  "flex h-[52px] items-center gap-2 justify-center",
-                  isCollapsed ? "h-[52px]" : "px-2",
-                )}
-              >
-                <ThemeToggle />
-                <AccountSwitcher
-                  isCollapsed={isCollapsed}
-                  accounts={accounts}
-                />
-              </div>
               <Separator />
               <div className="p-4">
                 {/* DETAILS FOR TEMPLATE */}
