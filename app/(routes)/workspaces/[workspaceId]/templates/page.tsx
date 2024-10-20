@@ -32,7 +32,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import AuthInterceptor from "@/auth/authIntercepter";
 import { checkAccessForWorkspace } from "@/auth/access-check";
-import templatesPageRoute from "./route.info";
+import TemplatesPageRoute from "./route.info";
 import { brandedCurrentWorkspace, setCurrentWorkspace } from "../../route.info";
 import Branded from "@/types/branded.type";
 import serverApiTrpc from "@/trpc/server";
@@ -50,7 +50,7 @@ export default async function Page({
 }) {
   return (
     <ParserLayout
-      routeInfo={templatesPageRoute}
+      routeInfo={TemplatesPageRoute}
       params={params}
       searchParams={searchParams}
     >
@@ -58,7 +58,7 @@ export default async function Page({
         setCurrentWorkspace(Branded.WorkspaceId(params.workspaceId));
 
         await new AuthInterceptor(
-          templatesPageRoute({
+          TemplatesPageRoute({
             workspaceId: brandedCurrentWorkspace(),
           }),
         )
@@ -72,6 +72,7 @@ export default async function Page({
           await serverApiTrpc.template.all({
             workspaceId: brandedCurrentWorkspace(),
             page: searchParams.page,
+            status: searchParams.status,
           });
 
         return (
@@ -80,12 +81,51 @@ export default async function Page({
               <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
                 <Tabs defaultValue="all">
                   <div className="flex items-center">
-                    <TabsList>
-                      <TabsTrigger value="all">All</TabsTrigger>
-                      <TabsTrigger value="active">Active</TabsTrigger>
-                      <TabsTrigger value="draft">Draft</TabsTrigger>
-                      <TabsTrigger value="archived" className="hidden sm:flex">
-                        Archived
+                    <TabsList defaultValue={searchParams.status ?? "all"}>
+                      <TabsTrigger value="all" asChild>
+                        <TemplatesPageRoute.Link
+                          params={params}
+                          searchParams={{ page: searchParams.page }}
+                        >
+                          All
+                        </TemplatesPageRoute.Link>
+                      </TabsTrigger>
+                      <TabsTrigger value="active" asChild>
+                        <TemplatesPageRoute.Link
+                          params={params}
+                          searchParams={{
+                            page: searchParams.page,
+                            status: "active",
+                          }}
+                        >
+                          Active
+                        </TemplatesPageRoute.Link>
+                      </TabsTrigger>
+                      <TabsTrigger value="draft" asChild>
+                        <TemplatesPageRoute.Link
+                          params={params}
+                          searchParams={{
+                            page: searchParams.page,
+                            status: "draft",
+                          }}
+                        >
+                          Draft
+                        </TemplatesPageRoute.Link>
+                      </TabsTrigger>
+                      <TabsTrigger
+                        value="archived"
+                        className="hidden sm:flex"
+                        asChild
+                      >
+                        <TemplatesPageRoute.Link
+                          params={params}
+                          searchParams={{
+                            page: searchParams.page,
+                            status: "archived",
+                          }}
+                        >
+                          Archived
+                        </TemplatesPageRoute.Link>
                       </TabsTrigger>
                     </TabsList>
                     <div className="ml-auto flex items-center gap-2">
@@ -134,7 +174,7 @@ export default async function Page({
                       </NewTemplateRouteInfo.Link>
                     </div>
                   </div>
-                  <TabsContent value="all">
+                  <div className="py-4">
                     <Card x-chunk="dashboard-06-chunk-0">
                       <CardHeader>
                         <CardTitle>Templates</CardTitle>
@@ -149,10 +189,10 @@ export default async function Page({
                               <TableHead>Name</TableHead>
                               <TableHead>Status</TableHead>
                               <TableHead className="hidden md:table-cell">
-                                Price
+                                Category
                               </TableHead>
                               <TableHead className="hidden md:table-cell">
-                                Total Sales
+                                Subcategory
                               </TableHead>
                               <TableHead className="hidden md:table-cell">
                                 Created at
@@ -180,10 +220,20 @@ export default async function Page({
                                   </Badge>
                                 </TableCell>
                                 <TableCell className="hidden md:table-cell">
-                                  $499.99
+                                  <Badge
+                                    variant="secondary"
+                                    className="capitalize"
+                                  >
+                                    {template.category}
+                                  </Badge>
                                 </TableCell>
                                 <TableCell className="hidden md:table-cell">
-                                  25
+                                  <Badge
+                                    variant="secondary"
+                                    className="capitalize"
+                                  >
+                                    {template.subcategory}
+                                  </Badge>
                                 </TableCell>
                                 <TableCell className="hidden md:table-cell">
                                   {template.createdAt &&
@@ -198,7 +248,13 @@ export default async function Page({
                                       workspaceId: brandedCurrentWorkspace(),
                                     }}
                                   >
-                                    <Button size="sm">View</Button>
+                                    <Button
+                                      aria-haspopup="true"
+                                      variant="secondary"
+                                      className="text-xs"
+                                    >
+                                      View Template
+                                    </Button>
                                   </TemplatePageRouteInfo.Link>
                                 </TableCell>
                                 <TableCell>
@@ -241,7 +297,7 @@ export default async function Page({
                         </div>
                       </CardFooter>
                     </Card>
-                  </TabsContent>
+                  </div>
                 </Tabs>
               </main>
             </div>

@@ -55,7 +55,7 @@ const templateRouter = createTRPCRouter({
     }),
   all: twoFactorAuthenticatedProcedure
     .input(templateListSchema)
-    .query(async ({ ctx, input: { workspaceId, page } }) => {
+    .query(async ({ ctx, input: { workspaceId, page, status } }) => {
       const { db, user } = ctx;
 
       // check if user can add members
@@ -87,7 +87,11 @@ const templateRouter = createTRPCRouter({
       const offset = TEMPLATES_PER_PAGE * (page - 1);
 
       const dbTemplates = await db.query.templates.findMany({
-        where: (templates, { eq }) => eq(templates.workspaceId, workspaceId),
+        where: (templates, { eq, and }) =>
+          and(
+            eq(templates.workspaceId, workspaceId),
+            status ? eq(templates.status, status) : undefined,
+          ),
         limit: TEMPLATES_PER_PAGE,
         offset: offset,
       });
