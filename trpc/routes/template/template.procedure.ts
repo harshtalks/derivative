@@ -12,7 +12,7 @@ import {
   provideDB,
   runWithServices,
 } from "@/services";
-import { canAddTemplatesEffect, isMemberEffect } from "@/services/access-layer";
+import { canAddTemplatesEffect } from "@/services/access-layer";
 
 const TEMPLATES_PER_PAGE = 10;
 
@@ -188,6 +188,44 @@ const templateRouter = createTRPCRouter({
         .returning();
 
       return deleted;
+    }),
+  update: twoFactorAuthenticatedProcedure
+    .input(
+      insertTemplateSchema
+        .required({
+          id: true,
+        })
+        .omit({
+          createdBy: true,
+        }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { db, user, session } = ctx;
+
+      const dbLayer = provideDB(db);
+      const authLayer = provideAuth({ user, session });
+      const mainLayer = makeMainLiveWithServices(dbLayer, authLayer);
+      const doesUserHaveAccess = await runWithServices(
+        canAddTemplatesEffect(Branded.WorkspaceId(input.workspaceId)),
+        mainLayer,
+      );
+
+      if (!doesUserHaveAccess) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "You do not have permission to perform this action",
+        });
+      }
+
+      const updated = await db
+        .update(templates)
+        .set({
+          ...input,
+        })
+        .where(eq(templates.id, input.id))
+        .returning();
+
+      return updated;
     }),
 });
 

@@ -8,6 +8,10 @@ const NewTemplateRouteInfo = createRoute({
     workspaceId: string(),
   }),
   fn: ({ workspaceId }) => `/workspaces/${workspaceId}/templates/new-template`,
+  searchParamsSchema: object({
+    // we would want to pass the templateId if we are editing a template
+    templateId: string().optional(),
+  }),
 });
 
 export default NewTemplateRouteInfo;

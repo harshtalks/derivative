@@ -40,6 +40,7 @@ import { formatDistanceToNow } from "date-fns";
 import NewTemplateRouteInfo from "./new-template/route.info";
 import ParserLayout from "@/components/parser-layout";
 import TemplatePageRouteInfo from "./[templateId]/route.info";
+import TemplateActionList from "./_components/template-list-action";
 
 export default async function Page({
   params,
@@ -258,29 +259,9 @@ export default async function Page({
                                   </TemplatePageRouteInfo.Link>
                                 </TableCell>
                                 <TableCell>
-                                  <DropdownMenu>
-                                    <DropdownMenuTrigger asChild>
-                                      <Button
-                                        aria-haspopup="true"
-                                        size="icon"
-                                        variant="ghost"
-                                      >
-                                        <MoreHorizontal className="h-4 w-4" />
-                                        <span className="sr-only">
-                                          Toggle menu
-                                        </span>
-                                      </Button>
-                                    </DropdownMenuTrigger>
-                                    <DropdownMenuContent align="end">
-                                      <DropdownMenuLabel>
-                                        Actions
-                                      </DropdownMenuLabel>
-                                      <DropdownMenuItem>Edit</DropdownMenuItem>
-                                      <DropdownMenuItem>
-                                        Delete
-                                      </DropdownMenuItem>
-                                    </DropdownMenuContent>
-                                  </DropdownMenu>
+                                  <TemplateActionList
+                                    templateId={Branded.TemplateId(template.id)}
+                                  />
                                 </TableCell>
                               </TableRow>
                             ))}

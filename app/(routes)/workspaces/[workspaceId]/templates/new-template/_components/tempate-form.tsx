@@ -79,25 +79,54 @@ const templateSchema = z.object({
   status: z.enum(templateStatus),
 });
 
-export function TemplateForm() {
-  const { push: moveToTemplatesPage } = templatesPageRoute.useRouter(useRouter);
+const btnLabel = (isLoading: boolean, existing: boolean) => {
+  return isLoading
+    ? existing
+      ? "Updating the template..."
+      : "Creating the template..."
+    : existing
+      ? "Update Template"
+      : "Create Template";
+};
 
-  const form = useForm<z.infer<typeof templateSchema>>({
+type TemplateFormSchema = z.infer<typeof templateSchema>;
+
+export function TemplateForm({
+  existingTemplate,
+}: {
+  existingTemplate?: TemplateFormSchema;
+}) {
+  const { push: moveToTemplatesPage } = templatesPageRoute.useRouter(useRouter);
+  const { templateId: existingTemplateId } =
+    NewTemplateRouteInfo.useSearchParams();
+  const { workspaceId } = NewTemplateRouteInfo.useParams();
+
+  const form = useForm<TemplateFormSchema>({
     resolver: zodResolver(templateSchema),
-    defaultValues: {
-      category: "Expense Invoices" satisfies Invoice.Keys,
-      schema: {
-        schema: DEFAULT_SCHEMA,
-        type: "text",
-        json: DEFAULT_SCHEMA_JSON,
-      },
-    },
+    defaultValues: existingTemplate
+      ? existingTemplate
+      : {
+          category: "Expense Invoices" satisfies Invoice.Keys,
+          schema: {
+            type: "text",
+            json: DEFAULT_SCHEMA_JSON,
+          },
+        },
   });
 
   const updatedKey = form.watch("category");
-  const { workspaceId } = NewTemplateRouteInfo.useParams();
 
   const mutation = clientApiTrpc.template.addNew.useMutation({
+    onSuccess: () => {
+      moveToTemplatesPage({
+        params: {
+          workspaceId: Branded.WorkspaceId(workspaceId),
+        },
+      });
+    },
+  });
+
+  const updateMutation = clientApiTrpc.template.update.useMutation({
     onSuccess: () => {
       moveToTemplatesPage({
         params: {
@@ -137,22 +166,45 @@ export function TemplateForm() {
                 );
               }
 
-              toast.promise(
-                mutation.mutateAsync({
-                  workspaceId: Branded.WorkspaceId(workspaceId),
-                  category: data.category,
-                  subcategory: data.subCategory,
-                  jsonSchema: JSON.stringify(schema),
-                  status: data.status,
-                  name: data.name,
-                  description: data.description,
-                  json: data.schema.json,
-                }),
-                {
-                  success: () => "Successfully created the template",
-                  error: (err) => err.message,
-                },
-              );
+              if (existingTemplate && existingTemplateId) {
+                toast.promise(
+                  updateMutation.mutateAsync({
+                    id: Branded.TemplateId(existingTemplateId),
+                    category: data.category,
+                    subcategory: data.subCategory,
+                    jsonSchema: JSON.stringify(schema),
+                    status: data.status,
+                    name: data.name,
+                    description: data.description,
+                    json: data.schema.json,
+                    workspaceId: Branded.WorkspaceId(workspaceId),
+                    updatedAt: Date.now(),
+                  }),
+                  {
+                    success: () => "Successfully created the template",
+                    error: (err) => err.message,
+                    loading: "Updating the template...",
+                  },
+                );
+              } else {
+                toast.promise(
+                  mutation.mutateAsync({
+                    workspaceId: Branded.WorkspaceId(workspaceId),
+                    category: data.category,
+                    subcategory: data.subCategory,
+                    jsonSchema: JSON.stringify(schema),
+                    status: data.status,
+                    name: data.name,
+                    description: data.description,
+                    json: data.schema.json,
+                  }),
+                  {
+                    success: () => "Successfully created the template",
+                    error: (err) => err.message,
+                    loading: "Creating the template...",
+                  },
+                );
+              }
             } catch (err) {
               toast.error(err instanceof Error ? err.message : "Invalid JSON");
               return;
@@ -190,7 +242,10 @@ export function TemplateForm() {
                   {mutation.isPending ? (
                     <Loader className="shrink-0 animate-spin size-4" />
                   ) : null}
-                  {mutation.isPending ? "Saving template" : "Save template"}
+                  {btnLabel(
+                    mutation.isPending || updateMutation.isPending,
+                    Boolean(existingTemplateId) && Boolean(existingTemplate),
+                  )}
                 </Button>
               </div>
             </div>
@@ -459,7 +514,10 @@ export function TemplateForm() {
                 {mutation.isPending ? (
                   <Loader className="shrink-0 animate-spin size-4" />
                 ) : null}
-                {mutation.isPending ? "Saving template" : "Save template"}
+                {btnLabel(
+                  mutation.isPending || updateMutation.isPending,
+                  Boolean(existingTemplateId) && Boolean(existingTemplate),
+                )}
               </Button>
             </div>
           </div>

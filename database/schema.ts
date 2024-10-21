@@ -202,7 +202,7 @@ export const templates = sqliteTable(
       .references(() => members.id, { onDelete: "no action" }),
     jsonSchema: text("jsonSchema", { mode: "text" }).notNull(),
     json: text("json", { mode: "text" }).notNull(),
-    description: text("description"),
+    description: text("description").notNull(),
     category: text("category").notNull(),
     subcategory: text("subcategory").notNull(),
     status: text("status", { enum: templateStatus }).notNull(),
