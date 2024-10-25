@@ -1,5 +1,4 @@
 import createRoute from "@/route.config";
-import { createEndPoint } from "tempeh";
 import { array, object, string, boolean, infer as infer_ } from "zod";
 import { effective } from "@/lib/effect.stuff";
 import {
@@ -46,7 +45,7 @@ export type GithubUser = infer_<typeof githubUserSchema>;
 
 const getGithubUserEmailsEffect = (token: string) =>
   effective<GithubUserEmails>()(
-    HttpClientRequest.get(githubUserEmailsRoute({})).pipe(
+    HttpClientRequest.get(githubUserEmailsRoute.navigate({})).pipe(
       HttpClientRequest.setHeader("Authorization", `Bearer ${token}`),
       HttpClient.fetchOk,
       HttpClientResponse.json,
@@ -63,7 +62,7 @@ const getGithubUserEmailsEffect = (token: string) =>
 
 const getGithubUserEffect = (token: string) =>
   effective<GithubUser>()(
-    HttpClientRequest.get(githubUserRoute({})).pipe(
+    HttpClientRequest.get(githubUserRoute.navigate({})).pipe(
       HttpClientRequest.setHeader("Authorization", `Bearer ${token}`),
       HttpClient.fetchOk,
       HttpClientResponse.json,

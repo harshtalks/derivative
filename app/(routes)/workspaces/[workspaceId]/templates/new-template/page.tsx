@@ -19,7 +19,7 @@ const Page = async (routeProps: RouteProps) => {
         setCurrentWorkspace(params.workspaceId);
         // auth check
         await new AuthInterceptor(
-          NewTemplateRouteInfo({
+          NewTemplateRouteInfo.navigate({
             workspaceId: brandedCurrentWorkspace(),
           }),
         )

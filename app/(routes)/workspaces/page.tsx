@@ -6,13 +6,12 @@ import { Button } from "@/components/ui/button";
 import api from "@/trpc/server";
 import { ExclamationTriangleIcon } from "@radix-ui/react-icons";
 import AddNewWorkspaceRoute from "./add-new-workspace/route.info";
-import withAuth from "@/auth/wrappers/withAuth";
 import WorkspaceRouteInfo from "./route.info";
 import AuthInterceptor from "@/auth/authIntercepter";
 import Workspaces from "./_components/workspaces";
 
 export default async function Page() {
-  await new AuthInterceptor(WorkspaceRouteInfo({}))
+  await new AuthInterceptor(WorkspaceRouteInfo.navigate({}))
     .withTwoFactor()
     .withRedirect()
     .check();

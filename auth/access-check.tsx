@@ -22,7 +22,7 @@ export const checkAccessForWorkspace = cache(async () => {
   const result = await isMember(workspaceId);
 
   if (!result) {
-    redirect(WorkspaceRouteInfo({}));
+    redirect(WorkspaceRouteInfo.navigate({}));
   }
 });
 

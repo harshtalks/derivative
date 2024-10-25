@@ -3,7 +3,6 @@ import React from "react";
 import { TemplatePage } from "./_components/wrapper";
 import { cookies } from "next/headers";
 import { accounts, mails } from "./_components/data";
-import withAuth from "@/auth/wrappers/withAuth";
 import AuthInterceptor from "@/auth/authIntercepter";
 import Branded from "@/types/branded.type";
 import { checkAccessForWorkspace } from "@/auth/access-check";
@@ -20,7 +19,7 @@ const page = async (props: RouteProps) => {
         setCurrentWorkspace(Branded.WorkspaceId(params.workspaceId));
 
         await new AuthInterceptor(
-          TemplatePageRouteInfo({
+          TemplatePageRouteInfo.navigate({
             workspaceId: Branded.WorkspaceId(params.workspaceId),
             templateId: Branded.TemplateId(params.templateId),
           }),

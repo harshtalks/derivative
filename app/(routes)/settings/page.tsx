@@ -16,7 +16,7 @@ import SettingsRouteInfo from "./route.info";
 import { AccountForm } from "./components/profile-form";
 
 export default async function Dashboard() {
-  await new AuthInterceptor(SettingsRouteInfo({}))
+  await new AuthInterceptor(SettingsRouteInfo.navigate({}))
     .withTwoFactor()
     .withRedirect()
     .check();

@@ -19,10 +19,10 @@ export const GET = withError<ErrorWrapperResponse<string>>(
     const redirectUrl = cookies().get("github_oauth_redirect")?.value ?? null;
 
     const webAuthUrl = redirectUrl
-      ? WebAuthRoute({}, { search: { redirectUrl } })
-      : WebAuthRoute({});
+      ? WebAuthRoute.navigate({}, { searchParams: { redirectUrl } })
+      : WebAuthRoute.navigate({});
 
-    const destination = redirectUrl ?? WorkspaceRouteInfo({});
+    const destination = redirectUrl ?? WorkspaceRouteInfo.navigate({});
 
     const { device, ua } = userAgent(request);
 

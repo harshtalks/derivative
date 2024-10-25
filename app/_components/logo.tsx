@@ -1,3 +1,4 @@
+"use client";
 import React from "react";
 import HomePageRoute from "../route.info";
 import Image from "next/image";

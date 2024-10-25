@@ -74,7 +74,7 @@ export function AddWorkspace() {
       // reset the form
       form.reset();
       // redirect to the workspace
-      await revalidate({ path: WorkspaceRouteInfo({}) });
+      await revalidate({ path: WorkspaceRouteInfo.navigate({}) });
       push({ params: {} });
     },
   });

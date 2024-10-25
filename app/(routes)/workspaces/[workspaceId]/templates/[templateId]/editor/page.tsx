@@ -17,7 +17,9 @@ const page = async (props: RouteProps) => {
       {async ({ params }) => {
         setCurrentWorkspace(Branded.WorkspaceId(params.workspaceId));
 
-        await new AuthInterceptor(TemplatePageEditorRouteInfo({ ...params }))
+        await new AuthInterceptor(
+          TemplatePageEditorRouteInfo.navigate({ ...params }),
+        )
           .withRedirect()
           .withTwoFactor()
           .withAfterAuth(checkAccessForWorkspace)

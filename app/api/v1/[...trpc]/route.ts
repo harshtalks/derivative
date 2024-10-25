@@ -12,7 +12,7 @@ const createContext = (req: Request) => {
 
 const handler = (request: Request) => {
   return fetchRequestHandler({
-    endpoint: V1Route({}),
+    endpoint: V1Route.navigate({}),
     req: request,
     router: appRouter,
     createContext: () => createContext(request),

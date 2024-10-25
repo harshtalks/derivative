@@ -8,7 +8,7 @@ import { brandedCurrentWorkspace } from "../../route.info";
 
 export default async function SettingsWorkspacePage() {
   await new AuthInterceptor(
-    WorkspaceSettingsRouteInfo({
+    WorkspaceSettingsRouteInfo.navigate({
       workspaceId: brandedCurrentWorkspace(),
     }),
   )

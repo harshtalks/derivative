@@ -67,7 +67,7 @@ export async function DashboardLayout() {
       return output;
     },
     catch: (error) => {
-      redirect(WorkspaceRouteInfo({}));
+      redirect(WorkspaceRouteInfo.navigate({}));
     },
   }).pipe(Effect.runPromise);
 
@@ -250,7 +250,7 @@ export async function DashboardLayout() {
                   <div className="flex items-center justify-between">
                     <dt className="text-muted-foreground">Joined</dt>
                     <dd>
-                      {formatDistanceToNow(creator.createdAt , {
+                      {formatDistanceToNow(creator.createdAt, {
                         addSuffix: true,
                       })}
                     </dd>

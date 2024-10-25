@@ -4,7 +4,7 @@ import WebAuthRoute from "./route.info";
 import AuthInterceptor from "@/auth/authIntercepter";
 
 const page = async () => {
-  await new AuthInterceptor(WebAuthRoute({})).withTwoFactor().check();
+  await new AuthInterceptor(WebAuthRoute.navigate({})).withTwoFactor().check();
 
   return <Hero />;
 };

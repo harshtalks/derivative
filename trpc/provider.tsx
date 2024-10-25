@@ -16,7 +16,10 @@ const QueryProvider = ({ children }: { children: ReactNode }) => {
     client.createClient({
       links: [
         httpBatchLink({
-          url: new URL(V1Route({}), env.NEXT_PUBLIC_BASE_URL).toString(),
+          url: new URL(
+            V1Route.navigate({}),
+            env.NEXT_PUBLIC_BASE_URL,
+          ).toString(),
           transformer: superjson,
         }),
       ],

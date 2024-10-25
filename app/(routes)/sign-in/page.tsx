@@ -15,7 +15,7 @@ const Page = async ({
     [key: string]: string | undefined | string[];
   };
 }) => {
-  await new AuthInterceptor(SignInPage({})).check();
+  await new AuthInterceptor(SignInPage.navigate({})).check();
 
   return (
     <section>

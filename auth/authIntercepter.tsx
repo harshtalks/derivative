@@ -22,8 +22,8 @@ export default class AuthInterceptor {
   private afterAuth?: () => PromiseLike<void>;
 
   constructor(pathname: string) {
-    this.signInPage = SignInPage({});
-    this.webAuthPage = WebAuthRoute({});
+    this.signInPage = SignInPage.navigate({});
+    this.webAuthPage = WebAuthRoute.navigate({});
     let protocol = headers().get("x-forwarded-proto");
     let host = headers().get("host");
     this.base = new URL(`${protocol}://${host}`).toString();
@@ -102,16 +102,17 @@ export default class AuthInterceptor {
         //  if the two factor auth is not successful
         if (!tfSession.success) {
           // redirect to the auth
-          this.pathname !== WebAuthRoute({}) && redirect(this.webAuthPage);
+          this.pathname !== WebAuthRoute.navigate({}) &&
+            redirect(this.webAuthPage);
           return;
         } else {
           // run the after auth function to do some stuff
           this.afterAuth && (await this.afterAuth());
           // success check
-          if (this.pathname === WebAuthRoute({})) {
+          if (this.pathname === WebAuthRoute.navigate({})) {
             redirect(
               this.redirectUrl ??
-                new URL(WorkspaceRouteInfo({}), this.base).toString(),
+                new URL(WorkspaceRouteInfo.navigate({}), this.base).toString(),
             );
           } else {
             return;
@@ -121,10 +122,10 @@ export default class AuthInterceptor {
         // run the after auth function to do some stuff
         this.afterAuth && (await this.afterAuth());
         // redirect to the redirect url
-        this.pathname === WebAuthRoute({}) &&
+        this.pathname === WebAuthRoute.navigate({}) &&
           redirect(
             this.redirectUrl ??
-              new URL(WorkspaceRouteInfo({}), this.base).toString(),
+              new URL(WorkspaceRouteInfo.navigate({}), this.base).toString(),
           );
 
         return;
@@ -133,10 +134,10 @@ export default class AuthInterceptor {
       // run the after auth function to do some stuff
       this.afterAuth && (await this.afterAuth());
       // redirect to the redirect url
-      if (this.pathname === SignInPage({})) {
+      if (this.pathname === SignInPage.navigate({})) {
         redirect(
           this.redirectUrl ??
-            new URL(WorkspaceRouteInfo({}), this.base).toString(),
+            new URL(WorkspaceRouteInfo.navigate({}), this.base).toString(),
         );
       }
       return;

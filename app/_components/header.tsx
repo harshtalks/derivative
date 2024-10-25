@@ -3,9 +3,6 @@ import { ThemeToggle } from "./theme-toggle";
 import Logo from "./logo";
 import Container from "./container";
 import Frame from "./frame";
-import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import { UserNav } from "./user";
 
 const links = [
   {
@@ -89,8 +86,6 @@ const Header = ({ withoutCenterStuff }: { withoutCenterStuff?: boolean }) => {
 
               <div className="w-full my-6 border-t dark:border-[--ui-dark-border-color] pt-6 lg:mt-0 flex gap-2 lg:my-0 lg:border-none lg:pt-0">
                 {/* <Button className="rounded-full">Get Started</Button> */}
-                <ThemeToggle />
-                <UserNav />
               </div>
             </div>
           </div>

@@ -59,7 +59,7 @@ export default async function Page({
         setCurrentWorkspace(Branded.WorkspaceId(params.workspaceId));
 
         await new AuthInterceptor(
-          TemplatesPageRoute({
+          TemplatesPageRoute.navigate({
             workspaceId: brandedCurrentWorkspace(),
           }),
         )
