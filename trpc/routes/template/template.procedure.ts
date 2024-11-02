@@ -16,7 +16,7 @@ import {
   runWithServices,
 } from "@/services";
 import { canAddTemplatesEffect } from "@/services/access-layer";
-import { object, string } from "zod";
+import { boolean, object, string } from "zod";
 import { generateRandomAccessToken } from "@/auth/access-token";
 
 const TEMPLATES_PER_PAGE = 10;
@@ -234,7 +234,12 @@ const templateRouter = createTRPCRouter({
     }),
   createIntegrationKey: twoFactorAuthenticatedProcedure
     .input(
-      insertIntegrationSchema.merge(object({ workspaceId: string().min(1) })),
+      insertIntegrationSchema.merge(
+        object({
+          workspaceId: string().min(1),
+          regenerating: boolean().default(false),
+        }),
+      ),
     )
     .mutation(async ({ ctx, input }) => {
       const { db, user, session } = ctx;
@@ -254,15 +259,23 @@ const templateRouter = createTRPCRouter({
         });
       }
 
-      const newIntegration = await db
-        .insert(templateIntegration)
-        .values({
-          integrationKey: generateRandomAccessToken(),
-          templateId: input.templateId,
-        })
-        .returning();
-
-      return newIntegration;
+      if (input.regenerating) {
+        return await db
+          .update(templateIntegration)
+          .set({
+            integrationKey: generateRandomAccessToken(),
+          })
+          .where(eq(templateIntegration.templateId, input.templateId))
+          .returning();
+      } else {
+        return await db
+          .insert(templateIntegration)
+          .values({
+            integrationKey: generateRandomAccessToken(),
+            templateId: input.templateId,
+          })
+          .returning();
+      }
     }),
   accessToken: twoFactorAuthenticatedProcedure
     .input(

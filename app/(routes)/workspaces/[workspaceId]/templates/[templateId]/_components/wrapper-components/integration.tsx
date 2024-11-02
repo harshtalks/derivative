@@ -9,6 +9,13 @@ import TemplatePageRouteInfo from "../../route.info";
 import Branded from "@/types/branded.type";
 import { Loader } from "lucide-react";
 import { toast } from "sonner";
+import { CopyIcon, ReloadIcon } from "@radix-ui/react-icons";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 const Integration = () => {
   const { templateId, workspaceId } = TemplatePageRouteInfo.useParams();
@@ -20,7 +27,7 @@ const Integration = () => {
   });
   const mutation = clientApiTrpc.template.createIntegrationKey.useMutation({
     onSuccess: () => {
-      utils.template.accessToken.reset();
+      utils.template.accessToken.invalidate();
     },
   });
 
@@ -84,12 +91,65 @@ const Integration = () => {
                 Match.orElse(() => (
                   <div className="px-4 py-2">
                     <div className="py-32 flex items-center gap-4 justify-center flex-col">
-                      <h4 className="text-4xl font-bold">API Key</h4>
+                      <h4 className="text-4xl font-bold">API Access Token</h4>
                       <p className="text-sm text-muted-foreground">
                         You can use this API key to call this template&apos;s
                         API from your application.
                       </p>
-                      <Button variant="ringHover">Generate API Key</Button>
+                      <div className="bg-muted p-4 rounded-lg">
+                        <p className="text-muted-foreground font-mono">
+                          {data[0].integrationKey}
+                        </p>
+                      </div>
+                      <TooltipProvider>
+                        <div>
+                          <Tooltip>
+                            <TooltipContent>Copy API key</TooltipContent>
+                            <TooltipTrigger asChild>
+                              <Button
+                                onClick={() => {
+                                  navigator.clipboard.writeText(
+                                    data[0].integrationKey,
+                                  );
+                                  toast.success("API key copied to clipboard");
+                                }}
+                                variant="ghost"
+                              >
+                                <CopyIcon />
+                              </Button>
+                            </TooltipTrigger>
+                          </Tooltip>
+                          <Tooltip>
+                            <TooltipContent>
+                              Regenerate API Access Token (will invalidate the
+                              old one)
+                            </TooltipContent>
+                            <TooltipTrigger asChild>
+                              <Button
+                                onClick={() =>
+                                  toast.promise(
+                                    mutation.mutateAsync({
+                                      templateId,
+                                      workspaceId,
+                                      regenerating: true,
+                                    }),
+                                    {
+                                      loading: "Generating API key...",
+                                      success:
+                                        "API key generated successfully. Previous key is invalidated.",
+                                      error: (err) =>
+                                        "Failed to generate API key",
+                                    },
+                                  )
+                                }
+                                variant="ghost"
+                              >
+                                <ReloadIcon />
+                              </Button>
+                            </TooltipTrigger>
+                          </Tooltip>
+                        </div>
+                      </TooltipProvider>
                     </div>
                   </div>
                 )),

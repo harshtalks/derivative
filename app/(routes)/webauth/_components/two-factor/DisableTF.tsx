@@ -11,17 +11,17 @@ import { useTempehRouter } from "@/route.config";
 
 export const DisableTF = () => {
   const { push } = WorkspaceRouteInfo.useRouter(useRouter);
-  const { push: tempehPush } = useTempehRouter(useRouter);
   const { redirectUrl } = WebAuthRoute.useSearchParams();
+  const nextRouter = useRouter();
 
   const { mutate, isPending } = client.user.twoFactor.useMutation({
     onSuccess: (data) => {
       toast.success(
-        "Two factor authentication is disabled. You can enable it again in your settings."
+        "Two factor authentication is disabled. You can enable it again in your settings.",
       );
 
       redirectUrl
-        ? tempehPush({ path: redirectUrl })
+        ? nextRouter.push(redirectUrl)
         : push({
             params: {},
           });
