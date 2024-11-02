@@ -271,7 +271,7 @@ const templateRouter = createTRPCRouter({
         workspaceId: Branded.WorkspaceId;
       }>(),
     )
-    .mutation(async ({ ctx, input }) => {
+    .query(async ({ ctx, input }) => {
       const { db, user, session } = ctx;
 
       const dbLayer = provideDB(db);
@@ -289,10 +289,10 @@ const templateRouter = createTRPCRouter({
         });
       }
 
-      return await db.query.templateIntegration.findFirst({
-        where: (templateIntegration, { eq }) =>
-          eq(templateIntegration.templateId, input.templateId),
-      });
+      return await db
+        .select()
+        .from(templateIntegration)
+        .where(eq(templateIntegration.templateId, input.templateId));
     }),
 });
 
