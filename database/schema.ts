@@ -192,6 +192,7 @@ export const templates = sqliteTable(
   },
 );
 
+// template integration
 export const templateIntegration = sqliteTable("templateIntegration", {
   id: text("id")
     .primaryKey()
@@ -200,8 +201,9 @@ export const templateIntegration = sqliteTable("templateIntegration", {
     .notNull()
     .references(() => templates.id, { onDelete: "cascade" }),
   createdAt: createdAtSchema,
-  updatedAt: updatedAtSchema,
+  updatedAt: updatedAtSchema, // also the last time used
   integrationKey: text("integration_key").notNull(),
+  numberUsed: integer("number_used").notNull().default(0),
 });
 
 export const templateMarkups = sqliteTable("templateMarkup", {

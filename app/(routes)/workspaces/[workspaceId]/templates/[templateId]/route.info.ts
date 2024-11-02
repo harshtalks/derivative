@@ -18,9 +18,6 @@ const TemplatePageRouteInfo = createRoute({
       "integration",
       "template-markup",
     ]).default("inbox"),
-    sampled: enum_(["true", "false"])
-      .default("false")
-      .transform((el) => el === "true"),
   }),
 });
 

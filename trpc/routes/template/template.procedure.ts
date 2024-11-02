@@ -1,5 +1,8 @@
-import { templates } from "@/database/schema";
-import { insertTemplateSchema } from "@/database/schema.zod";
+import { templateIntegration, templates } from "@/database/schema";
+import {
+  insertIntegrationSchema,
+  insertTemplateSchema,
+} from "@/database/schema.zod";
 import { createTRPCRouter, twoFactorAuthenticatedProcedure } from "@/trpc/trpc";
 import { TRPCError } from "@trpc/server";
 import { deleteTemplateSchema, templateListSchema } from "./template.schema";
@@ -13,6 +16,8 @@ import {
   runWithServices,
 } from "@/services";
 import { canAddTemplatesEffect } from "@/services/access-layer";
+import { object, string } from "zod";
+import { generateRandomAccessToken } from "@/auth/access-token";
 
 const TEMPLATES_PER_PAGE = 10;
 
@@ -226,6 +231,68 @@ const templateRouter = createTRPCRouter({
         .returning();
 
       return updated;
+    }),
+  createIntegrationKey: twoFactorAuthenticatedProcedure
+    .input(
+      insertIntegrationSchema.merge(object({ workspaceId: string().min(1) })),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { db, user, session } = ctx;
+
+      const dbLayer = provideDB(db);
+      const authLayer = provideAuth({ user, session });
+      const mainLayer = makeMainLiveWithServices(dbLayer, authLayer);
+      const doesUserHaveAccess = await runWithServices(
+        canAddTemplatesEffect(Branded.WorkspaceId(input.workspaceId)),
+        mainLayer,
+      );
+
+      if (!doesUserHaveAccess) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "You do not have permission to perform this action",
+        });
+      }
+
+      const newIntegration = await db
+        .insert(templateIntegration)
+        .values({
+          integrationKey: generateRandomAccessToken(),
+          templateId: input.templateId,
+        })
+        .returning();
+
+      return newIntegration;
+    }),
+  accessToken: twoFactorAuthenticatedProcedure
+    .input(
+      inputAs<{
+        templateId: Branded.TemplateId;
+        workspaceId: Branded.WorkspaceId;
+      }>(),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { db, user, session } = ctx;
+
+      const dbLayer = provideDB(db);
+      const authLayer = provideAuth({ user, session });
+      const mainLayer = makeMainLiveWithServices(dbLayer, authLayer);
+      const doesUserHaveAccess = await runWithServices(
+        canAddTemplatesEffect(Branded.WorkspaceId(input.workspaceId)),
+        mainLayer,
+      );
+
+      if (!doesUserHaveAccess) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "You do not have permission to perform this action",
+        });
+      }
+
+      return await db.query.templateIntegration.findFirst({
+        where: (templateIntegration, { eq }) =>
+          eq(templateIntegration.templateId, input.templateId),
+      });
     }),
 });
 

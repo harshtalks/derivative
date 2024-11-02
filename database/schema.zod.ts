@@ -4,6 +4,7 @@ import {
   memberRoles,
   members,
   permissions,
+  templateIntegration,
   templateMarkups,
   templates,
   workspaces,
@@ -29,3 +30,9 @@ export const insertMemberSchema = createInsertSchema(members, {
 export const insertTemplateSchema = createInsertSchema(templates);
 
 export const insertMarkupSchema = createInsertSchema(templateMarkups);
+
+export const insertIntegrationSchema = createInsertSchema(
+  templateIntegration,
+).omit({
+  integrationKey: true,
+});

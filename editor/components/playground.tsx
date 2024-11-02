@@ -1,26 +1,20 @@
 import serverApiTrpc from "@/trpc/server";
-import { SlashCmd, SlashCmdProvider } from "@harshtalks/slash-tiptap";
-import { Editor, EditorContent } from "@tiptap/react";
-import {
-  InvoiceEditorContextProvider,
-  useInvoiceEditorContext,
-} from "../editor-context";
+import { SlashCmd } from "@harshtalks/slash-tiptap";
+import { useInvoiceEditorContext } from "../editor-context";
 import { slashSuggestions } from "../suggestions";
 import { BubbleMenuWrapper } from "./bubble-menu";
-import editor from "./editor";
 import ImageMenu from "./image-menu";
 import SchemaVariables from "./schema-node";
 import TopEditorOptions from "./top-editor-options";
-import useInvoiceEditor from "../use-invoice-editor";
 import { Button } from "@/components/ui/button";
-import { Loader, LucideFolderSync } from "lucide-react";
+import { Loader } from "lucide-react";
 import { queryOptions, useQuery, useQueryClient } from "@tanstack/react-query";
 import Branded from "@/types/branded.type";
 import { getLocalMarkup, saveLocalMarkup } from "@/database/local-store";
 import TemplatePageEditorRouteInfo from "@/app/(routes)/workspaces/[workspaceId]/templates/[templateId]/editor/route.info";
 import { Effect, Match } from "effect";
 import Query from "@/components/query";
-import { useEffect, useReducer, useState } from "react";
+import { useState } from "react";
 import Content from "./content";
 import TableMenu from "./table-menu";
 import clientApiTrpc from "@/trpc/client";
@@ -29,7 +23,6 @@ import { useSelector } from "@xstate/store/react";
 import { fontStore } from "@/stores/font-store";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import Handlebars from "handlebars";
 import Schema from "../schema";
 import { deepKeys } from "deeks";
 
