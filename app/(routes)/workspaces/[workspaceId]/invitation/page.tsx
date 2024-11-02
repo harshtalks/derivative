@@ -11,9 +11,9 @@ const Page = async ({
   searchParams: { invite?: string };
 }) => {
   await new AuthInterceptor(
-    WorkspaceInvitationRoute(
+    WorkspaceInvitationRoute.navigate(
       { workspaceId: brandedCurrentWorkspace() },
-      { search: { invite: searchParams.invite } },
+      { searchParams: { invite: searchParams.invite } },
     ),
   )
     .withRedirect()

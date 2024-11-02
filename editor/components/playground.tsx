@@ -18,7 +18,6 @@ import { queryOptions, useQuery, useQueryClient } from "@tanstack/react-query";
 import Branded from "@/types/branded.type";
 import { getLocalMarkup, saveLocalMarkup } from "@/database/local-store";
 import TemplatePageEditorRouteInfo from "@/app/(routes)/workspaces/[workspaceId]/templates/[templateId]/editor/route.info";
-import { useTypedParams } from "tempeh";
 import { Effect, Match } from "effect";
 import Query from "@/components/query";
 import { useEffect, useReducer, useState } from "react";
@@ -28,13 +27,11 @@ import clientApiTrpc from "@/trpc/client";
 import { toast } from "sonner";
 import { useSelector } from "@xstate/store/react";
 import { fontStore } from "@/stores/font-store";
-import { cn } from "@/lib/utils";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import Handlebars from "handlebars";
 import Schema from "../schema";
 import { deepKeys } from "deeks";
-const template = Handlebars.compile("Name: {{name}}");
 
 export const playgroundQueryOptions = ({
   templateId,
@@ -52,9 +49,7 @@ const Playground = ({
 }: {
   data: Awaited<ReturnType<typeof serverApiTrpc.template.get>>;
 }) => {
-  const { templateId, workspaceId } = useTypedParams(
-    TemplatePageEditorRouteInfo,
-  );
+  const { templateId, workspaceId } = TemplatePageEditorRouteInfo.useParams();
   const editor = useInvoiceEditorContext();
   const query = useQuery(
     playgroundQueryOptions({

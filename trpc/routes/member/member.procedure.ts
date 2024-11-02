@@ -2,7 +2,6 @@ import {
   members,
   permissions,
   templates,
-  workspaceActivities,
   workspaceMetadata,
   workspaces,
 } from "@/database/schema";
@@ -86,15 +85,6 @@ const memberRouter = createTRPCRouter({
           workspaceId: input.workspaceId,
         })
         .returning();
-
-      // add member log
-
-      await db.insert(workspaceActivities).values({
-        workspaceId: input.workspaceId,
-        event: "members_added",
-        payload: newMember,
-        performerId: member.id,
-      });
 
       return newMember;
     }),

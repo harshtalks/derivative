@@ -153,7 +153,7 @@ export const GET = withError<ErrorWrapperResponse<string>>(
             status: StatusCodes["BAD_REQUEST"],
             statusText: e.message,
             headers: {
-              Location: SignInPage({}),
+              Location: SignInPage.navigate({}),
             },
           },
         );

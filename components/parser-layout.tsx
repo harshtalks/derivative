@@ -1,7 +1,7 @@
 // This is a layer for parsing out the params from the URL
 
 import { ZodSchema } from "zod";
-import { RouteConfig } from "tempeh";
+import { Tempeh } from "tempeh";
 import React from "react";
 
 const ParserLayout = <
@@ -13,7 +13,7 @@ const ParserLayout = <
   searchParams,
   children,
 }: {
-  routeInfo: RouteConfig<TParams, TSearchParams>;
+  routeInfo: Tempeh.RouteConfig<TParams, TSearchParams>;
   params: unknown;
   searchParams: unknown;
   children: (props: {

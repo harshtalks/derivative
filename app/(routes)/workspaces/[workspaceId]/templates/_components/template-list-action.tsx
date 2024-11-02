@@ -21,7 +21,7 @@ const TemplateActionList = ({
 }: {
   templateId: Branded.TemplateId;
 }) => {
-  const { refresh } = templatesPageRoute.useRouter(useRouter);
+  const { refresh } = useRouter();
   const workspaceId = templatesPageRoute.useParams().workspaceId;
   const mutation = clientApiTrpc.template.delete.useMutation({
     onSuccess: () => {

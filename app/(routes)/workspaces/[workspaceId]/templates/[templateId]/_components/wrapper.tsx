@@ -161,36 +161,36 @@ export function TemplatePage({
                     title: "Inbox",
                     icon: Inbox,
                     variant: active === "inbox" ? "default" : "ghost",
-                    link: TemplatePageRouteInfo(
+                    link: TemplatePageRouteInfo.navigate(
                       { templateId, workspaceId },
-                      { search: { active: "inbox" } },
+                      { searchParams: { active: "inbox" } },
                     ),
                   },
                   {
                     title: "Code",
                     icon: Code,
                     variant: active === "schema" ? "default" : "ghost",
-                    link: TemplatePageRouteInfo(
+                    link: TemplatePageRouteInfo.navigate(
                       { templateId, workspaceId },
-                      { search: { active: "schema" } },
+                      { searchParams: { active: "schema" } },
                     ),
                   },
                   {
                     title: "Integration",
                     icon: Workflow,
                     variant: active === "integration" ? "default" : "ghost",
-                    link: TemplatePageRouteInfo(
+                    link: TemplatePageRouteInfo.navigate(
                       { templateId, workspaceId },
-                      { search: { active: "integration" } },
+                      { searchParams: { active: "integration" } },
                     ),
                   },
                   {
                     title: "Template Markup",
                     icon: Sheet,
                     variant: active === "template-markup" ? "default" : "ghost",
-                    link: TemplatePageRouteInfo(
+                    link: TemplatePageRouteInfo.navigate(
                       { templateId, workspaceId },
-                      { search: { active: "template-markup" } },
+                      { searchParams: { active: "template-markup" } },
                     ),
                   },
                 ]}
@@ -268,11 +268,10 @@ export function TemplatePage({
         </p>
       </div>
     )),
-    Match.when({ status: "error" }, ({ error }) => (
+    Match.orElse(({ error }) => (
       <div className="w-full py-32 flex items-center justify-center">
-        <p>{error.message}</p>
+        <p>{error?.message}</p>
       </div>
     )),
-    Match.exhaustive,
   );
 }

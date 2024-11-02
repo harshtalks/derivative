@@ -17,7 +17,7 @@ const page = async (routeProps: RouteProps) => {
         setCurrentWorkspace(Branded.WorkspaceId(workspaceId));
         // Validate the request
         await new AuthInterceptor(
-          DashboardRoute({
+          DashboardRoute.navigate({
             workspaceId: brandedCurrentWorkspace(),
           }),
         )

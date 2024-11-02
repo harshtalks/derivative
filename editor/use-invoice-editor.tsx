@@ -28,14 +28,13 @@ import TextAlign from "@tiptap/extension-text-align";
 import Typography from "@tiptap/extension-typography";
 import UnderlineNode from "@tiptap/extension-underline";
 import { useEditor } from "@tiptap/react";
-import { useTypedParams } from "tempeh";
 import SchemaVariables, {
   enableKeyNavigationForSchemaVariablesInEditor,
 } from "./dynamic-variables/schema-variable";
 import { slashSuggestions } from "./suggestions";
 
 const useInvoiceEditor = () => {
-  const { templateId } = useTypedParams(TemplatePageRouteInfo);
+  const { templateId } = TemplatePageRouteInfo.useParams();
   const editor = useEditor({
     extensions: [
       Document,

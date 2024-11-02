@@ -6,7 +6,7 @@ import AuthInterceptor from "@/auth/authIntercepter";
 import AddNewWorkspaceRoute from "./route.info";
 
 const NewWorkspace = async () => {
-  await new AuthInterceptor(AddNewWorkspaceRoute({}))
+  await new AuthInterceptor(AddNewWorkspaceRoute.navigate({}))
     .withRedirect()
     .withTwoFactor()
     .check();

@@ -136,7 +136,7 @@ export function TemplateForm({
     },
   });
 
-  const { back } = useTempehRouter(useRouter);
+  const { back } = useRouter();
 
   return (
     <main className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
@@ -340,13 +340,13 @@ export function TemplateForm({
                       create as complex schema as you want. For more
                       information, visit{" "}
                       <Navigate
-                        base="JSON_SCHEMA_TOOL"
+                        baseUrl="JSON_SCHEMA_TOOL"
                         path="/json-to-json-schema"
                         className="text-primary underline"
                         target="_blank"
                       >
                         json to json-schema helper
-                      </Navigate>{" "}
+                      </Navigate>
                       to see how your json object will be used to generate a
                       seriliazable schema.
                     </p>

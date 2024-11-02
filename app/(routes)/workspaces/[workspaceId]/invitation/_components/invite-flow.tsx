@@ -14,16 +14,27 @@ import WorkspaceInvitationRoute from "../route.info";
 import Branded from "@/types/branded.type";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { createStore } from "@xstate/store";
+import { useSelector } from "@xstate/store/react";
 
 interface StepState {
   step: number;
   increase: () => void;
 }
 
-const useStepStore = create<StepState>()((set) => ({
-  step: 1,
-  increase: () => set((state) => ({ step: state.step + 1 })),
-}));
+// const useStepStore = create<StepState>()((set) => ({
+//   step: 1,
+//   increase: () => set((state) => ({ step: state.step + 1 })),
+// }));
+
+const stepStore = createStore(
+  {
+    step: 1,
+  },
+  {
+    INCREASE: (ctx) => ({ step: ctx.step + 1 }),
+  },
+);
 
 const steps = [
   {
@@ -65,7 +76,12 @@ const steps = [
 ];
 
 const InviteFlow = () => {
-  const { increase, step: currentStep } = useStepStore();
+  const currentStep = useSelector(stepStore, (state) => state.context.step);
+  const increase = () =>
+    stepStore.send({
+      type: "INCREASE",
+    });
+
   const { workspaceId } = WorkspaceInvitationRoute.useParams();
   const { invite } = WorkspaceInvitationRoute.useSearchParams();
 

@@ -6,7 +6,6 @@ import {
   permissions,
   templateMarkups,
   templates,
-  workspaceActivities,
   workspaces,
 } from "./schema";
 import { string, array, enum as _enum } from "zod";
@@ -26,8 +25,6 @@ export const insertMemberSchema = createInsertSchema(members, {
   permissions: array(_enum(permissions)).min(1),
   role: _enum(memberRoles),
 });
-
-export const activityLogSchema = createInsertSchema(workspaceActivities);
 
 export const insertTemplateSchema = createInsertSchema(templates);
 

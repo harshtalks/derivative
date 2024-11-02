@@ -1,9 +1,4 @@
-import {
-  members,
-  workspaceActivities,
-  workspaceMetadata,
-  workspaces,
-} from "@/database/schema";
+import { members, workspaceMetadata, workspaces } from "@/database/schema";
 import { insertWorkspaceSchema } from "@/database/schema.zod";
 import { createTRPCRouter, twoFactorAuthenticatedProcedure } from "@/trpc/trpc";
 import {
@@ -81,15 +76,6 @@ const workspaceRouter = createTRPCRouter({
           inviteLimit: INVITE_COUNT,
           workspaceId: workspace.id,
           inviteExpiry: WEEKS_TO_EXPIRE,
-        });
-
-        // log the event -> new workspace
-        await ctx.insert(workspaceActivities).values({
-          workspaceId: workspace.id,
-          event: "created",
-          payload: workspace,
-          // performer is going to be the member not user
-          performerId: member.id,
         });
 
         return { workspace, member };

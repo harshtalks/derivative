@@ -4,7 +4,6 @@
 import { TimeSpan } from "oslo";
 import { createJWT, validateJWT } from "oslo/jwt";
 import { getKey } from "./tf";
-import WorkspaceInvitationRoute from "@/app/(routes)/workspaces/[workspaceId]/invitation/route.info";
 
 export const INVITE_COUNT = 10;
 export const WEEKS_TO_EXPIRE = 4;

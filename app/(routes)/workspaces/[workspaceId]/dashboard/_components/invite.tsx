@@ -37,9 +37,9 @@ const InviteMembers = () => {
         Match.when({ inviteCode: (code) => !!code }, (data) => (
           <div className="flex items-stretch gap-2">
             <Input
-              value={WorkspaceInvitationRoute(
+              value={WorkspaceInvitationRoute.navigate(
                 { workspaceId: Branded.WorkspaceId(workspaceId) },
-                { search: { invite: data.inviteCode } },
+                { searchParams: { invite: data.inviteCode } },
               )}
               readOnly
               className="text-muted-foreground text-xs shadow-none"
@@ -51,9 +51,9 @@ const InviteMembers = () => {
                   return;
                 }
                 navigator.clipboard.writeText(
-                  WorkspaceInvitationRoute(
+                  WorkspaceInvitationRoute.navigate(
                     { workspaceId: Branded.WorkspaceId(workspaceId) },
-                    { search: { invite: data.inviteCode } },
+                    { searchParams: { invite: data.inviteCode } },
                   ),
                 );
 

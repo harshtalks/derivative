@@ -6,7 +6,6 @@ import { object, string } from "zod";
 
 export const revalidate = createAction({
   handler: async (args) => {
-    console.log("reloading page thru action");
     revalidatePath(args?.path || "/");
 
     return {

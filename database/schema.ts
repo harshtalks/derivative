@@ -20,15 +20,6 @@ export const memberRoles = [
   "marketing",
 ] as const;
 
-export const workspaceActivitiesEvents = [
-  "created",
-  "members_added",
-  "members_removed",
-] as const;
-
-export type WorkspaceActivitiesEvents =
-  (typeof workspaceActivitiesEvents)[number];
-
 export type Permission = (typeof permissions)[number];
 
 export const permissions = ["read", "write", "member_controls"] as const;
@@ -165,23 +156,6 @@ export const workspaceMetadata = sqliteTable("workspaceMetadata", {
   inviteExpiry: integer("invite_expiry").notNull(),
   inviteLimit: integer("invite_limit").notNull(),
   inviteCount: integer("invite_count").notNull(),
-});
-
-// activities
-// making a table to store all the activities to the workspace in this.
-export const workspaceActivities = sqliteTable("workspaceActivities", {
-  id: text("id"),
-  workspaceId: text("workspace_id")
-    .notNull()
-    .references(() => workspaces.id, { onDelete: "cascade" }),
-  performerId: text("performer_id")
-    .notNull()
-    .references(() => members.id, { onDelete: "no action" }),
-  event: text("event", {
-    enum: workspaceActivitiesEvents,
-  }).notNull(),
-  payload: text("payload", { mode: "json" }).notNull(),
-  createdAt: createdAtSchema,
 });
 
 // templates
@@ -323,9 +297,6 @@ export const workspaceRelations = relations(workspaces, ({ many, one }) => ({
   members: many(members, {
     relationName: "workspace_members",
   }),
-  activities: many(workspaceActivities, {
-    relationName: "workspace_activities",
-  }),
   metadata: one(workspaceMetadata),
   creator: one(users, {
     fields: [workspaces.createdBy],
@@ -417,17 +388,3 @@ export const invoiceRemarkRelations = relations(invoiceRemarks, ({ one }) => ({
     references: [members.id],
   }),
 }));
-
-export const workspaceActivityRelations = relations(
-  workspaceActivities,
-  ({ one }) => ({
-    workspace: one(workspaces, {
-      fields: [workspaceActivities.workspaceId],
-      references: [workspaces.id],
-    }),
-    performedBy: one(members, {
-      fields: [workspaceActivities.performerId],
-      references: [members.id],
-    }),
-  }),
-);

@@ -37,7 +37,7 @@ import { brandedCurrentWorkspace } from "../../route.info";
 
 const Members = async () => {
   await new AuthInterceptor(
-    WorkspaceMembersRouteInfo({
+    WorkspaceMembersRouteInfo.navigate({
       workspaceId: brandedCurrentWorkspace(),
     }),
   )
