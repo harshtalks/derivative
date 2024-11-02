@@ -1,15 +1,15 @@
 import { EmptyRouteConfig } from "@/app/route.info";
 import createRoute from "@/route.config";
-import { createEndPoint } from "tempeh";
+import {
+  HttpClientRequest,
+  HttpClient,
+  HttpClientResponse,
+} from "@effect/platform";
+import { Effect } from "effect";
 
-const TFRegistration = createEndPoint({
-  httpMethod: "GET",
-  SafeResponse: false,
-  path: createRoute({
-    name: "two-factor-auth-reg",
-    fn: () => "/api/auth/two-factor/registration",
-    paramsSchema: EmptyRouteConfig,
-  }),
-});
+const TFRegistration = () =>
+  HttpClientRequest.get("/api/auth/two-factor/registration")
+    .pipe(HttpClient.fetchOk, HttpClientResponse.json)
+    .pipe(Effect.orDie, Effect.runPromise);
 
 export default TFRegistration;

@@ -7,7 +7,6 @@ import { NextResponse } from "next/server";
 import { generateRegistrationOptions } from "@simplewebauthn/server";
 import { env } from "@/env";
 import { PublicKeyCredentialCreationOptionsJSON } from "@simplewebauthn/types";
-import { isoBase64URL } from "@simplewebauthn/server/helpers";
 
 export const GET = withError<null | PublicKeyCredentialCreationOptionsJSON>(
   async () => {
@@ -76,5 +75,5 @@ export const GET = withError<null | PublicKeyCredentialCreationOptionsJSON>(
   {
     // Log errors
     logError: true,
-  }
+  },
 );

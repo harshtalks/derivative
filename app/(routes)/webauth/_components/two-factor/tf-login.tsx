@@ -1,6 +1,4 @@
 import TFAuthenticate from "@/app/api/auth/two-factor/authenticate/route.info";
-import enableTF from "@/app/api/auth/two-factor/enable/route.info";
-import signJWT from "@/app/api/auth/two-factor/sign/route.info";
 import { Button } from "@/components/ui/button";
 import { FetchingState } from "@/types/ui.type";
 import { startAuthentication } from "@simplewebauthn/browser";
@@ -12,6 +10,7 @@ import { useRouter } from "next/navigation";
 import WorkspaceRouteInfo from "@/app/(routes)/workspaces/route.info";
 import { useTempehRouter } from "@/route.config";
 import { ErrorWrapperResponse } from "@/types/api.type";
+import clientApiTrpc from "@/trpc/client";
 
 const TfLogin = () => {
   const [state, setState] = useState<FetchingState>("idle");
@@ -20,22 +19,20 @@ const TfLogin = () => {
   const { push: tempehPush } = useTempehRouter(useRouter);
   const { push: workspacePush } = WorkspaceRouteInfo.useRouter(useRouter);
 
+  const tfMutation = clientApiTrpc.user.twoFactor.useMutation({
+    throwOnError: true,
+  });
+
   const handler = async () => {
     try {
       setState("loading");
 
-      const tfEnableResp = await enableTF({
-        params: {},
-        body: { value: true },
+      await tfMutation.mutateAsync({
+        action: "enable",
       });
 
-      if (!tfEnableResp.success) {
-        throw new Error(tfEnableResp.message);
-      }
-
-      const response = (await TFAuthenticate({
-        params: {},
-      })) as PublicKeyCredentialRequestOptionsJSON;
+      const response =
+        (await TFAuthenticate()) as PublicKeyCredentialRequestOptionsJSON;
 
       const attResp = await startAuthentication(response);
 
@@ -47,7 +44,7 @@ const TfLogin = () => {
           headers: {
             "Content-Type": "application/json",
           },
-        }
+        },
       );
 
       if (!verification.ok) {
@@ -74,13 +71,13 @@ const TfLogin = () => {
       if (e instanceof Error) {
         if (e.name === "InvalidStateError") {
           throw new Error(
-            "You have already registered for two factor authentication"
+            "You have already registered for two factor authentication",
           );
         }
         throw new Error(e.message);
       } else {
         throw new Error(
-          "An error occurred while registering for two factor authentication"
+          "An error occurred while registering for two factor authentication",
         );
       }
     } finally {

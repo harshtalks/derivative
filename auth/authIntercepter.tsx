@@ -56,19 +56,19 @@ export default class AuthInterceptor {
   withRedirect() {
     const redirectUrl = headers().get("x-derivative-url") || undefined;
 
-    this.signInPage = SignInPage(
+    this.signInPage = SignInPage.navigate(
       {},
       {
-        search: {
+        searchParams: {
           redirectUrl: redirectUrl,
         },
       },
     );
 
-    this.webAuthPage = WebAuthRoute(
+    this.webAuthPage = WebAuthRoute.navigate(
       {},
       {
-        search: {
+        searchParams: {
           redirectUrl: redirectUrl,
         },
       },
@@ -84,7 +84,7 @@ export default class AuthInterceptor {
     // check auth
     if (!session || !user) {
       // auth failed
-      if (this.pathname === SignInPage({})) {
+      if (this.pathname === SignInPage.navigate({})) {
         // if the user is on the sign in page, we return
         return;
       } else {

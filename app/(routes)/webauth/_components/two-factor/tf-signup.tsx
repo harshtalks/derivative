@@ -9,12 +9,12 @@ import {
   startRegistration,
 } from "@simplewebauthn/browser";
 import { toast } from "sonner";
-import enableTF from "@/app/api/auth/two-factor/enable/route.info";
 import { useRouter } from "next/navigation";
 import WorkspaceRouteInfo from "@/app/(routes)/workspaces/route.info";
 import { useTempehRouter } from "@/route.config";
 import WebAuthRoute from "../../route.info";
 import { ErrorWrapperResponse } from "@/types/api.type";
+import clientApiTrpc from "@/trpc/client";
 
 const TFSignup = () => {
   const [state, setState] = useState<FetchingState>("idle");
@@ -23,21 +23,19 @@ const TFSignup = () => {
   const { push: tempehPush } = useTempehRouter(useRouter);
   const { redirectUrl } = WebAuthRoute.useSearchParams();
 
+  const tfMutation = clientApiTrpc.user.twoFactor.useMutation({
+    throwOnError: true,
+  });
+
   const handler = async () => {
     setState("loading");
     try {
-      const response = await enableTF({
-        params: {},
-        body: { value: true },
+      await tfMutation.mutateAsync({
+        action: "enable",
       });
 
-      if (!response.success) {
-        throw new Error(response.message);
-      }
-
-      const startRegResp = (await TFRegistration({
-        params: {},
-      })) as PublicKeyCredentialCreationOptionsJSON;
+      const startRegResp =
+        (await TFRegistration()) as PublicKeyCredentialCreationOptionsJSON;
 
       const attResp = await startRegistration(startRegResp);
 
@@ -49,7 +47,7 @@ const TFSignup = () => {
             registrationResponse: attResp,
             webAuthUserId: startRegResp.user.id,
           }),
-        }
+        },
       );
 
       if (!verification.ok) {
@@ -75,13 +73,13 @@ const TFSignup = () => {
       if (e instanceof Error) {
         if (e.name === "InvalidStateError") {
           throw new Error(
-            "You have already registered for two factor authentication"
+            "You have already registered for two factor authentication",
           );
         }
         throw new Error(e.message);
       } else {
         throw new Error(
-          "An error occurred while registering for two factor authentication"
+          "An error occurred while registering for two factor authentication",
         );
       }
     } finally {
@@ -96,7 +94,7 @@ const TFSignup = () => {
       // looks like the browser does not support webAuthn
       setIsSupported(false);
       toast.error(
-        "Your browser does not support webAuthn as of now, try a different browser or skip this step. you can enable it later from the settings page in dashboard."
+        "Your browser does not support webAuthn as of now, try a different browser or skip this step. you can enable it later from the settings page in dashboard.",
       );
     }
   }, []);
