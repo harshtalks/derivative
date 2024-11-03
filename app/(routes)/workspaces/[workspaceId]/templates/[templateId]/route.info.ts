@@ -17,6 +17,7 @@ const TemplatePageRouteInfo = createRoute({
       "schema",
       "integration",
       "template-markup",
+      "send",
     ]).default("inbox"),
   }),
 });

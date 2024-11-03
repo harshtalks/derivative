@@ -7,6 +7,7 @@ import {
   Inbox,
   Loader,
   Search,
+  Send,
   Sheet,
   Workflow,
 } from "lucide-react";
@@ -191,6 +192,15 @@ export function TemplatePage({
                     link: TemplatePageRouteInfo.navigate(
                       { templateId, workspaceId },
                       { searchParams: { active: "template-markup" } },
+                    ),
+                  },
+                  {
+                    title: "Send Invoice",
+                    icon: Send,
+                    variant: active === "send" ? "default" : "ghost",
+                    link: TemplatePageRouteInfo.navigate(
+                      { templateId, workspaceId },
+                      { searchParams: { active: "inbox" } },
                     ),
                   },
                 ]}
