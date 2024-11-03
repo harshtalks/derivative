@@ -11,12 +11,6 @@ class JSchema<T extends {}> {
     this.#schema = {} as JSONSchema7;
   }
 
-  assertValidObject() {
-    const stringified = JSON.stringify(this.#json);
-    JSON.parse(stringified);
-    return this;
-  }
-
   applyConstraints(constraints: { noTopLevelArray?: boolean }) {
     if (constraints.noTopLevelArray) {
       if (Array.isArray(this.#json)) {

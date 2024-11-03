@@ -1,25 +1,33 @@
-import { Separator } from "@/components/ui/separator";
 import { WorkspaceForm } from "./_components/workspace-form";
 import AuthInterceptor from "@/auth/authIntercepter";
 import WorkspaceSettingsRouteInfo from "./route.info";
-import Branded from "@/types/branded.type";
 import { checkAccessForWorkspace } from "@/auth/access-check";
-import { brandedCurrentWorkspace } from "../../route.info";
+import { brandedCurrentWorkspace, setCurrentWorkspace } from "../../route.info";
+import { RouteProps } from "@/types/next.type";
+import ParserLayout from "@/components/parser-layout";
 
-export default async function SettingsWorkspacePage() {
-  await new AuthInterceptor(
-    WorkspaceSettingsRouteInfo.navigate({
-      workspaceId: brandedCurrentWorkspace(),
-    }),
-  )
-    .withRedirect()
-    .withAfterAuth(checkAccessForWorkspace)
-    .withTwoFactor()
-    .check();
-
+export default async function SettingsWorkspacePage(routeProps: RouteProps) {
   return (
-    <div className="space-y-6">
-      <WorkspaceForm />
-    </div>
+    <ParserLayout routeInfo={WorkspaceSettingsRouteInfo} {...routeProps}>
+      {async ({ params, searchParams }) => {
+        setCurrentWorkspace(params.workspaceId);
+
+        await new AuthInterceptor(
+          WorkspaceSettingsRouteInfo.navigate({
+            workspaceId: brandedCurrentWorkspace(),
+          }),
+        )
+          .withRedirect()
+          .withAfterAuth(checkAccessForWorkspace)
+          .withTwoFactor()
+          .check();
+
+        return (
+          <div className="space-y-6">
+            <WorkspaceForm />
+          </div>
+        );
+      }}
+    </ParserLayout>
   );
 }

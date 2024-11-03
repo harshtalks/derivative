@@ -35,6 +35,7 @@ import { useMail } from "./use-mail";
 import Integration from "./wrapper-components/integration";
 import Schema from "./wrapper-components/schema";
 import TemplateMarkup from "./wrapper-components/template-markup";
+import SendInvoice from "./wrapper-components/send-invoice";
 
 interface MailProps {
   accounts: {
@@ -200,7 +201,7 @@ export function TemplatePage({
                     variant: active === "send" ? "default" : "ghost",
                     link: TemplatePageRouteInfo.navigate(
                       { templateId, workspaceId },
-                      { searchParams: { active: "inbox" } },
+                      { searchParams: { active: "send" } },
                     ),
                   },
                 ]}
@@ -264,6 +265,7 @@ export function TemplatePage({
                   jsonStr={data.json}
                 />
               )),
+              Match.when("send", () => <SendInvoice />),
               Match.exhaustive,
             )}
           </div>

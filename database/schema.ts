@@ -228,6 +228,7 @@ export const invoices = sqliteTable("invoices", {
   templateId: text("template_id")
     .notNull()
     .references(() => templates.id, { onDelete: "cascade" }),
+  json: text("json", { mode: "text" }).notNull(),
 });
 
 export const invoiceRemarks = sqliteTable("invoiceRemarks", {
