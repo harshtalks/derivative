@@ -346,7 +346,7 @@ export function TemplateForm({
                         target="_blank"
                       >
                         json to json-schema helper
-                      </Navigate>
+                      </Navigate>{" "}
                       to see how your json object will be used to generate a
                       seriliazable schema.
                     </p>
