@@ -70,7 +70,7 @@ export function TemplatePage({
       return (
         <TooltipProvider delayDuration={0}>
           <div className="flex h-[calc(100svh-100px)] overflow-hidden border-b items-stretch">
-            <div className={cn("min-w-[350px] max-w-[350px]")}>
+            <div className={cn("min-w-[300px] max-w-[300px]")}>
               <Separator />
               <div className="p-4">
                 {/* DETAILS FOR TEMPLATE */}
@@ -158,7 +158,7 @@ export function TemplatePage({
                 isCollapsed={isCollapsed}
                 links={[
                   {
-                    title: "Inbox",
+                    title: "Invoices",
                     icon: Inbox,
                     variant: active === "inbox" ? "default" : "ghost",
                     link: TemplatePageRouteInfo.navigate(
@@ -167,7 +167,7 @@ export function TemplatePage({
                     ),
                   },
                   {
-                    title: "Code",
+                    title: "Schema & Sample JSON",
                     icon: Code,
                     variant: active === "schema" ? "default" : "ghost",
                     link: TemplatePageRouteInfo.navigate(
@@ -199,7 +199,7 @@ export function TemplatePage({
             {Match.value(active).pipe(
               Match.when("inbox", () => (
                 <div className="flex">
-                  <div className="border-r border-l max-w-[500px]">
+                  <div className="border-r border-l border-t max-w-[500px]">
                     <Tabs defaultValue="all">
                       <div className="flex items-center px-4 py-2">
                         <h1 className="text-xl font-bold">Invoices</h1>
@@ -235,7 +235,7 @@ export function TemplatePage({
                       </TabsContent>
                     </Tabs>
                   </div>
-                  <div>
+                  <div className="border-t">
                     <MailDisplay
                       mail={
                         mails.find((item) => item.id === mail.selected) || null

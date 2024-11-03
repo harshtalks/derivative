@@ -20,8 +20,8 @@ const TFSignup = () => {
   const [state, setState] = useState<FetchingState>("idle");
   const [isSupported, setIsSupported] = useState(true);
   const { push } = WorkspaceRouteInfo.useRouter(useRouter);
-  const { push: tempehPush } = useTempehRouter(useRouter);
   const { redirectUrl } = WebAuthRoute.useSearchParams();
+  const nextRouter = useRouter();
 
   const tfMutation = clientApiTrpc.user.twoFactor.useMutation({
     throwOnError: true,
@@ -63,7 +63,7 @@ const TFSignup = () => {
       }
 
       redirectUrl
-        ? tempehPush({ path: redirectUrl })
+        ? nextRouter.push(redirectUrl)
         : push({
             // as it accepts empty object
             params: {},

@@ -16,8 +16,8 @@ const TfLogin = () => {
   const [state, setState] = useState<FetchingState>("idle");
   const { redirectUrl } = WebAuthRoute.useSearchParams();
 
-  const { push: tempehPush } = useTempehRouter(useRouter);
   const { push: workspacePush } = WorkspaceRouteInfo.useRouter(useRouter);
+  const nextRouter = useRouter();
 
   const tfMutation = clientApiTrpc.user.twoFactor.useMutation({
     throwOnError: true,
@@ -60,9 +60,7 @@ const TfLogin = () => {
       }
 
       redirectUrl
-        ? tempehPush({
-            path: redirectUrl,
-          })
+        ? nextRouter.push(redirectUrl)
         : workspacePush({
             params: {},
           });

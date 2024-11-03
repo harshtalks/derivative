@@ -4,7 +4,7 @@ import { Separator } from "@/components/ui/separator";
 
 const Schema = ({ json, jsonSchema }: { jsonSchema: string; json: string }) => {
   return (
-    <div className="border-r overflow-auto border-l w-full">
+    <div className="border-r border-t overflow-auto border-l w-full">
       <Tabs defaultValue="object">
         <div className="flex items-center px-4 py-2">
           <h1 className="text-xl font-bold">Schema</h1>

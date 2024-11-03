@@ -32,7 +32,7 @@ const Integration = () => {
   });
 
   return (
-    <div className="border-r border-l w-full">
+    <div className="border-r border-t border-l w-full">
       <Tabs defaultValue="integration">
         <div className="flex items-center px-4 py-2">
           <h1 className="text-xl font-bold">Schema</h1>
