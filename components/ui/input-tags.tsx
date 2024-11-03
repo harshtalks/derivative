@@ -10,12 +10,12 @@ import { type InputProps } from "./input";
 import { cn } from "@/lib/utils";
 
 type InputTagsProps = Omit<InputProps, "value" | "onChange"> & {
-  value: string[];
+  value?: string[];
   onChange: React.Dispatch<React.SetStateAction<string[]>>;
 };
 
 const InputTags = React.forwardRef<HTMLInputElement, InputTagsProps>(
-  ({ className, value, onChange, ...props }, ref) => {
+  ({ className, value = [], onChange, ...props }, ref) => {
     const [pendingDataPoint, setPendingDataPoint] = React.useState("");
 
     React.useEffect(() => {
@@ -46,16 +46,17 @@ const InputTags = React.forwardRef<HTMLInputElement, InputTagsProps>(
         )}
       >
         {value.map((item) => (
-          <Badge
-            key={item}
-            onClick={() => {
-              onChange(value.filter((i) => i !== item));
-            }}
-            className="py-1"
-            variant={"secondary"}
-          >
+          <Badge key={item} className="py-1" variant={"secondary"}>
             {item}
-            <Button variant="ghost" size="icon" className="ml-2 h-3 w-3">
+            <Button
+              type="button"
+              onClick={() => {
+                onChange(value.filter((i) => i !== item));
+              }}
+              variant="ghost"
+              size="icon"
+              className="ml-2 h-3 w-3"
+            >
               <XIcon />
             </Button>
           </Badge>

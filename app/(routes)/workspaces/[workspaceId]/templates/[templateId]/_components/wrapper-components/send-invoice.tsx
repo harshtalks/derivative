@@ -28,6 +28,7 @@ import { BellRing } from "lucide-react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import TemplateSchemaEditor from "../../../new-template/_components/template-schema-editor";
+import { InputTags } from "@/components/ui/input-tags";
 
 const formSchema = z.object({
   sendTo: z
@@ -37,15 +38,34 @@ const formSchema = z.object({
     .email({
       message: "Please enter a valid email address",
     }),
-  cc: z.array(z.string().email()).optional(),
-  bcc: z.array(z.string().email()).optional(),
+  cc: z
+    .array(
+      z.string().email({
+        message: "Please enter a valid email address",
+      }),
+      {
+        message: "Please enter a valid email address",
+      },
+    )
+    .optional(),
+  bcc: z
+    .array(
+      z.string().email({
+        message: "Please enter a valid email address",
+      }),
+      {
+        message: "Please enter a valid email address",
+      },
+    )
+    .optional(),
   subject: z.string(),
-  message: z.string(),
+  message: z.string().optional(),
   json: z
     .string({
       message: "Please enter a valid JSON, it should match the schema",
     })
     .min(1),
+  sendNotifs: z.boolean().default(false).optional(),
 });
 
 type FormSchema = z.infer<typeof formSchema>;
@@ -105,6 +125,47 @@ const SendInvoice = () => {
                         </FormItem>
                       )}
                     />
+
+                    <FormField
+                      control={form.control}
+                      name="cc"
+                      render={({ field }) => (
+                        <div className="flex flex-col space-y-1.5">
+                          <FormLabel className="text-xs">
+                            CC (Carbon Copy)
+                          </FormLabel>
+                          <FormControl>
+                            <InputTags
+                              {...field}
+                              placeholder="e.g. sales@acme.com"
+                              className="max-w-[500px]"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </div>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="bcc"
+                      render={({ field }) => (
+                        <div className="flex flex-col space-y-1.5">
+                          <FormLabel className="text-xs">
+                            BCC (Blind Carbon Copy)
+                          </FormLabel>
+                          <FormControl>
+                            <InputTags
+                              {...field}
+                              placeholder="e.g. ceo@acme.com"
+                              className="max-w-[500px]"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </div>
+                      )}
+                    />
+
                     <FormField
                       control={form.control}
                       name="subject"
@@ -132,7 +193,7 @@ const SendInvoice = () => {
                           </FormLabel>
                           <FormControl>
                             <Textarea
-                              placeholder="this mails is regarding.."
+                              placeholder="the invoice is regaring.."
                               className="shadow-none resize-none"
                               {...field}
                             />
@@ -170,7 +231,16 @@ const SendInvoice = () => {
                         Send notifications to device.
                       </p>
                     </div>
-                    <Switch />
+                    <FormField
+                      control={form.control}
+                      name="sendNotifs"
+                      render={({ field }) => (
+                        <Switch
+                          checked={field.value}
+                          onChange={field.onChange}
+                        />
+                      )}
+                    />
                   </div>
                 </CardContent>
                 <CardFooter>
